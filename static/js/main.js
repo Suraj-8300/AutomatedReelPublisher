@@ -13,8 +13,44 @@ let isSafeZoneVisible = false;
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     checkAccountStatus();
+    updateCacheStats();
     loadGallery();
 });
+
+/**
+ * Fetch storage & cache stats
+ */
+async function updateCacheStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/cache-stats`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && data.stats) {
+            const el = document.getElementById('cacheUsageText');
+            if (el) el.innerText = `Cache: ${data.stats.total_mb} MB (${data.stats.file_count} files)`;
+        }
+    } catch (e) {
+        console.warn('Could not fetch cache stats:', e);
+    }
+}
+
+/**
+ * 1-Click Clear Cache Storage
+ */
+async function clearCacheStorage() {
+    const el = document.getElementById('cacheUsageText');
+    if (el) el.innerText = 'Cleaning...';
+    try {
+        const res = await fetch(`${API_BASE}/api/clear-cache`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            updateCacheStats();
+            showSuccess('🧹 Cache Cleaned', `Successfully purged temporary files. Freed ${data.freed_mb} MB (${data.deleted_count} files deleted).`);
+        }
+    } catch (e) {
+        showError('Clean Cache Failed', e.message);
+    }
+}
 
 /**
  * 1. Fetch live Meta Instagram Account status and quota
@@ -95,6 +131,7 @@ async function triggerOneClickPublish() {
             loadVideoIntoPreview(data.video_url, data.filename || 'reel.mp4', true);
             loadGallery();
             checkAccountStatus();
+            updateCacheStats();
         } else {
             showError('Publication Failed', data.error || 'Unknown error occurred in pipeline');
         }
@@ -131,6 +168,7 @@ async function triggerGenerateDraft() {
             showSuccess('✅ Video Draft Rendered!', `Reel compiled in ${data.elapsed.toFixed(1)}s. Preview loaded below. You can inspect specs or publish whenever ready.`);
             loadVideoIntoPreview(data.video_url, data.filename || 'reel.mp4', false);
             loadGallery();
+            updateCacheStats();
         } else {
             showError('Draft Generation Failed', data.error || 'Failed to render video');
         }
@@ -442,3 +480,4 @@ function showError(title, message) {
     titleEl.style.color = 'var(--danger)';
     msgEl.innerHTML = `<span style="color: var(--danger);">${message}</span>`;
 }
+

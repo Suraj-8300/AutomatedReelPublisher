@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from .config import WIDTH, HEIGHT, FPS, CACHE_DIR, OUTPUT_DIR, PALETTES, FONTS
 from .broll_engine import BRollEngine
+from .cache_manager import CacheManager
 
 class VideoComposer:
     """
@@ -128,7 +129,7 @@ class VideoComposer:
         try:
             subprocess.run(cmd_final, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=True)
         finally:
-            # Clean up intermediate render files to avoid cache bloat
+            # Clean up all intermediate render files to avoid cache bloat
             for p in scene_clip_paths:
                 try:
                     Path(p).unlink(missing_ok=True)
@@ -139,5 +140,15 @@ class VideoComposer:
                 raw_video.unlink(missing_ok=True)
             except OSError:
                 pass
+
+            # Automatically purge transient speech, music, and subtitle files
+            CacheManager.clean_transient_assets(
+                voice_file=str(voice_audio),
+                music_file=str(music_file),
+                ass_file=str(ass_subtitle_file)
+            )
+
+            # Auto-enforce global cache storage limits (LRU stock retention)
+            CacheManager.auto_prune()
 
         return str(output_file)

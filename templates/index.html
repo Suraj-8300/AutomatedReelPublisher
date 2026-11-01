@@ -18,12 +18,21 @@
                         <p class="subtitle">Autonomous AI Video Engine & Direct Meta Graph API Publisher</p>
                     </div>
                 </div>
-                <!-- Live Meta Account Status Card -->
-                <div class="account-pill" id="accountStatusPill">
-                    <div class="status-dot online"></div>
-                    <div class="account-details">
-                        <span class="account-handle" id="igHandle">@sun_27417</span>
-                        <span class="account-quota" id="igQuota">Meta Quota: 100/100 remaining</span>
+                <div class="header-pills">
+                    <!-- Storage & Cache Monitor -->
+                    <div class="storage-pill" id="storagePill" title="Temporary render clips & audio cache">
+                        <span class="storage-icon">💾</span>
+                        <span id="cacheUsageText">Cache: 0 MB</span>
+                        <button class="btn-clean-cache" onclick="clearCacheStorage()" title="Clear temporary cache files">🧹 Clean</button>
+                    </div>
+
+                    <!-- Live Meta Account Status Card -->
+                    <div class="account-pill" id="accountStatusPill">
+                        <div class="status-dot online"></div>
+                        <div class="account-details">
+                            <span class="account-handle" id="igHandle">@sun_27417</span>
+                            <span class="account-quota" id="igQuota">Meta Quota: 100/100 remaining</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -241,3 +250,4 @@
     <script src="/static/js/main.js"></script>
 </body>
 </html>
+

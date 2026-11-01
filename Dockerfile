@@ -38,3 +38,4 @@ EXPOSE 7860
 
 # Run ReelPublisher Server
 CMD ["python3", "server.py"]
+

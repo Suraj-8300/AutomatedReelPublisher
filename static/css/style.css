@@ -99,6 +99,43 @@ body {
     margin-top: 3px;
 }
 
+.header-pills {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.storage-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #080c14;
+    border: 1px solid var(--card-border);
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.btn-clean-cache {
+    background: #19273c;
+    border: 1px solid var(--card-border);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clean-cache:hover {
+    background: #253957;
+    border-color: var(--accent);
+}
+
 .account-pill {
     display: flex;
     align-items: center;
@@ -834,3 +871,4 @@ video {
     font-size: 1.2rem;
     cursor: pointer;
 }
+

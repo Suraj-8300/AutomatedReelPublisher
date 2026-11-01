@@ -16,6 +16,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.config import OUTPUT_DIR, CACHE_DIR, VOICES
 from core.idea_generator import generate_random_topic, get_topics_by_niche
+from core.cache_manager import CacheManager
 from generate import run_pipeline
 from instagram_pipeline.config import INBOX_DIR, ARCHIVE_DIR, INSTAGRAM_ACCOUNT_ID, META_ACCESS_TOKEN
 from instagram_pipeline.preprocessor import VideoPreprocessor
@@ -153,6 +154,15 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(res).encode("utf-8"))
 
+        # 9. API: Storage & Cache Stats
+        elif url.path == "/api/cache-stats":
+            stats = CacheManager.get_cache_stats()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "stats": stats}).encode("utf-8"))
+
         else:
             self.send_error(404)
 
@@ -186,6 +196,22 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         # 3. API: Publish an Existing Video File to Instagram
         elif url.path == "/api/publish-reel":
             res = self._handle_publish_reel(data)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 4. API: Clear Cache Storage
+        elif url.path == "/api/clear-cache":
+            purged = CacheManager.purge_all()
+            new_stats = CacheManager.get_cache_stats()
+            res = {
+                "success": True,
+                "freed_mb": purged.get("freed_mb", 0.0),
+                "deleted_count": purged.get("deleted_count", 0),
+                "new_stats": new_stats
+            }
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self._set_cors_headers()
@@ -425,11 +451,16 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             return {"success": False, "error": str(e)}
 
 def start_server(port=PORT):
+    # Auto-prune cache on launch
+    prune_res = CacheManager.auto_prune()
+    stats = CacheManager.get_cache_stats()
+
     server = ThreadingHTTPServer(("0.0.0.0", port), ReelServerHandler)
     print("=" * 60)
     print(f"🚀 REEL PUBLISHER STUDIO RUNNING AT: http://localhost:{port}")
     print(f"📱 Instagram Account:  @{os.environ.get('INSTAGRAM_USERNAME', 'sun_27417')}")
     print(f"📦 Active Cloud Bridge: Zero-Card OpenSSH TLS Tunnel (*.lhr.life)")
+    print(f"💾 Storage Cache:      {stats['total_mb']} MB ({stats['file_count']} files, auto-pruned {prune_res['freed_mb']} MB)")
     print("=" * 60)
     try:
         server.serve_forever()
