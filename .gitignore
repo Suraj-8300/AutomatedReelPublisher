@@ -1,0 +1,38 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Virtual Environment & Python Cache
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.whl
+
+# Operational Queues & Transcoding Workdirs
+cache/*
+!cache/.gitkeep
+output/*
+!output/.gitkeep
+reels_inbox/*
+!reels_inbox/.gitkeep
+reels_processing/*
+!reels_processing/.gitkeep
+reels_archive/*
+!reels_archive/.gitkeep
+reels_failed/*
+!reels_failed/.gitkeep
+
+# Large Media & Scratch Audio
+*.mp4
+*.mp3
+*.wav
+*.m4a
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

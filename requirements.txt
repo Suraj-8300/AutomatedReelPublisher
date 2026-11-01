@@ -1,0 +1,7 @@
+# Core Dependencies for Automated Reel Publisher
+edge-tts>=7.0.0
+requests>=2.31.0
+boto3>=1.34.0
+Pillow>=10.0.0
+mutagen>=1.47.0
+gunicorn>=21.2.0

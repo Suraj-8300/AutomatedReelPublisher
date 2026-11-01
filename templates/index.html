@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReelPublisher - Autonomous Instagram Reels Studio</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Top Navigation & Brand Header -->
+        <header class="header">
+            <div class="brand-row">
+                <div class="logo-box">
+                    <span class="logo-icon">⚡</span>
+                    <div>
+                        <h1>ReelPublisher</h1>
+                        <p class="subtitle">Autonomous AI Video Engine & Direct Meta Graph API Publisher</p>
+                    </div>
+                </div>
+                <!-- Live Meta Account Status Card -->
+                <div class="account-pill" id="accountStatusPill">
+                    <div class="status-dot online"></div>
+                    <div class="account-details">
+                        <span class="account-handle" id="igHandle">@sun_27417</span>
+                        <span class="account-quota" id="igQuota">Meta Quota: 100/100 remaining</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace Container -->
+        <div class="workspace-grid">
+            <!-- Left Column: Controls & Prompt Generator -->
+            <section class="card control-panel">
+                <div class="section-title">
+                    <span>1. Content & Topic Engine</span>
+                    <span class="badge badge-accent">100% Free AI</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="nicheSelect">Niche / Category</label>
+                    <div class="select-wrapper">
+                        <select id="nicheSelect" onchange="rollIdea()">
+                            <option value="RANDOM">🎲 Any / Surprise Me (Universal Viral)</option>
+                            <option value="PSYCHOLOGY">🧠 Dark Psychology & Brain Glitches</option>
+                            <option value="WEALTH & SUCCESS">💰 Wealth, Money & Power Dynamics</option>
+                            <option value="ANCIENT HISTORY & SECRETS">📜 Ancient History & Lost Secrets</option>
+                            <option value="SPACE & COSMOS">🌌 Deep Space & Cosmic Truths</option>
+                            <option value="TECH & FUTURE AI">⚡ Future Tech & AI Paradoxes</option>
+                            <option value="BIOHACKING & BODY">🧬 Biohacking & Human Longevity</option>
+                            <option value="WILD NATURE & ANIMALS">🌿 Uncanny Nature & Animal Superpowers</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="promptInput">Prompt / Storyboard Topic</label>
+                    <div class="input-with-action">
+                        <input type="text" id="promptInput" placeholder="e.g. Why billionaires never keep cash in bank accounts...">
+                        <button class="btn-secondary" onclick="rollIdea()" title="Generate Random Viral Topic">🎲 Roll Idea</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label>Target Duration</label>
+                        <div class="duration-grid">
+                            <label class="duration-chip">
+                                <input type="radio" name="duration" value="10">
+                                <span>10s</span>
+                            </label>
+                            <label class="duration-chip">
+                                <input type="radio" name="duration" value="15" checked>
+                                <span>15s</span>
+                            </label>
+                            <label class="duration-chip">
+                                <input type="radio" name="duration" value="30">
+                                <span>30s</span>
+                            </label>
+                            <label class="duration-chip">
+                                <input type="radio" name="duration" value="60">
+                                <span>60s</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-half">
+                        <label for="voiceSelect">Neural Voice Actor</label>
+                        <select id="voiceSelect">
+                            <option value="en-US-ChristopherNeural" selected>Christopher (Energetic & Viral)</option>
+                            <option value="en-US-GuyNeural">Guy (Authoritative & Deep Mystery)</option>
+                            <option value="en-US-JennyNeural">Jenny (Expressive & Friendly Female)</option>
+                            <option value="en-US-AvaNeural">Ava (Conversational Female)</option>
+                            <option value="en-US-AndrewNeural">Andrew (Deep & Resonant Male)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label for="musicSelect">Soundtrack Style</label>
+                        <select id="musicSelect">
+                            <option value="cyber_pulse" selected>Cyber Pulse (Punchy Synthwave)</option>
+                            <option value="deep_mystery">Deep Mystery (Dark Drone & Swells)</option>
+                            <option value="cinematic_drive">Cinematic Drive (Suspense & Tension)</option>
+                            <option value="curiosity_lofi">Curiosity Lo-Fi (Warm Minor Chords)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-half">
+                        <label for="publishMode">Instagram Publish Mode</label>
+                        <select id="publishMode">
+                            <option value="live" selected>🔴 Live Publish (Post to @sun_27417)</option>
+                            <option value="dry_run">🧪 Dry-Run Test (Simulate Meta API)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Button Matrix -->
+                <div class="action-matrix">
+                    <!-- Primary 1-Click Hero Button -->
+                    <button class="btn-hero" id="btnOneClick" onclick="triggerOneClickPublish()">
+                        <span class="btn-icon">⚡</span>
+                        <div class="btn-text">
+                            <span class="btn-main">1-Click Generate & Publish to Instagram</span>
+                            <span class="btn-sub">Auto-synthesize video, normalize to 9:16 specs & post live to Reels</span>
+                        </div>
+                    </button>
+
+                    <div class="secondary-actions">
+                        <!-- Generate Video Only -->
+                        <button class="btn-action" id="btnGenerateOnly" onclick="triggerGenerateDraft()">
+                            <span>🎬 Generate Video Only (Draft / Preview)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Status & Progress Box -->
+                <div id="statusBox" class="status-container" style="display: none;">
+                    <div class="status-header">
+                        <div class="spinner" id="statusSpinner"></div>
+                        <span id="statusTitle">Processing Pipeline...</span>
+                    </div>
+                    <p id="statusMessage" class="status-details">Starting engine...</p>
+                    <div class="progress-bar-bg" id="progressBarBg">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Interactive Reel Preview & Inspector -->
+            <section class="card preview-panel">
+                <div class="section-title">
+                    <span>2. Reel Inspection & Player</span>
+                    <span id="videoStatusBadge" class="badge badge-dim">No Video</span>
+                </div>
+
+                <div class="phone-frame">
+                    <div class="empty-state" id="emptyPreview">
+                        <div class="empty-icon">📱</div>
+                        <h3>9:16 Vertical Reel Player</h3>
+                        <p>Generate a video on the left to preview neural subtitles, B-roll visuals, and procedural audio.</p>
+                    </div>
+                    <video id="mainVideoPlayer" controls playsinline style="display: none;"></video>
+                    <!-- Safe Zone Overlay Canvas/Layer -->
+                    <div id="safeZoneOverlay" class="safe-zone-overlay" style="display: none;">
+                        <div class="danger-zone danger-top">
+                            <span>Top 220px (Meta Header / Back / Camera)</span>
+                        </div>
+                        <div class="safe-zone-guide">
+                            <span>Safe Content Area (1080 x 1320)</span>
+                        </div>
+                        <div class="danger-zone danger-bottom">
+                            <span>Bottom 380px (Meta Caption / Audio / Actions)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Controls & Inspector Buttons -->
+                <div class="preview-actions" id="previewActions" style="display: none;">
+                    <button class="btn-publish-direct" id="btnPublishActive" onclick="publishActiveVideo()">
+                        <span>📲 Publish This Reel to Instagram</span>
+                    </button>
+
+                    <div class="tool-row">
+                        <button class="btn-tool" onclick="toggleSafeZoneOverlay()">
+                            <span id="safeZoneBtnText">📐 Toggle Safe Zones</span>
+                        </button>
+                        <button class="btn-tool" onclick="inspectActiveVideo()">
+                            <span>🔍 Audit Specs</span>
+                        </button>
+                        <a id="btnDownloadActive" class="btn-tool" download="reel.mp4">
+                            <span>⬇️ Download</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Spec Inspection Drawer -->
+                <div id="specAuditDrawer" class="spec-drawer" style="display: none;">
+                    <div class="spec-drawer-header">
+                        <h4>📊 Technical Compliance Audit</h4>
+                        <button class="btn-close-drawer" onclick="closeSpecAudit()">✕</button>
+                    </div>
+                    <div id="specAuditContent" class="spec-audit-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Section 3: Generated Video Gallery -->
+        <section class="card gallery-section">
+            <div class="gallery-title-row">
+                <div class="section-title">
+                    <span>🎬 Reel Archive & Draft Library</span>
+                    <span class="count-pill" id="galleryCount">0 videos</span>
+                </div>
+                <button class="btn-secondary" onclick="loadGallery()">🔄 Refresh Archive</button>
+            </div>
+
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Video cards rendered by JS -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Inspector Modal for Gallery Items -->
+    <div id="inspectModal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalVideoTitle">Reel Technical Audit</h3>
+                <button class="btn-close-modal" onclick="closeInspectModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalAuditBody">
+                <p>Auditing video container...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
