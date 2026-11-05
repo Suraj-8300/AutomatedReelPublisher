@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
-    <link rel="stylesheet" href="/static/css/style.css?v=3.0">
+    <link rel="stylesheet" href="/static/css/style.css?v=3.1">
 </head>
 <body class="md3-body">
     <div class="md3-container">
@@ -404,6 +404,10 @@
                             <span style="font-size: 16px;">⬇️</span>
                             <span>Download MP4</span>
                         </a>
+                        <button class="btn-modal-discard" id="modalBtnDiscard" onclick="modalRemoveCurrentReel()" title="Discard and remove this reel from queue">
+                            <span style="font-size: 15px;">🗑️</span>
+                            <span>Remove from Queue</span>
+                        </button>
                         <button class="md3-btn-text-sm" onclick="closeVideoModal()" style="color: var(--md-sys-color-on-surface-variant); cursor: pointer; border: none; background: transparent; padding: 8px 12px;">
                             Dismiss
                         </button>
@@ -416,6 +420,6 @@
     <!-- MD3 Floating Snackbar / Toast Container -->
     <div class="md3-snackbar-container" id="snackbarContainer"></div>
 
-    <script src="/static/js/main.js?v=3.0"></script>
+    <script src="/static/js/main.js?v=3.1"></script>
 </body>
 </html>

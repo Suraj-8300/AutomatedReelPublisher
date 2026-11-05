@@ -171,24 +171,35 @@ async function uploadQueueItemNow(itemId) {
 }
 
 /**
- * Cancel Item in Queue
+ * Remove Item from Queue and Disk
  */
-async function cancelQueueItem(itemId) {
-    if (!confirm('Remove this video from the scheduled publishing queue?')) return;
+async function removeQueueItem(itemId, itemTitle) {
+    const titleText = itemTitle ? `"${itemTitle}"` : 'this reel';
+    if (!confirm(`Are you sure you want to remove ${titleText} from the publishing queue?\n\nThis will delete the generated video file from disk and clear its scheduled slot.`)) return;
+
     try {
-        const res = await fetch(`${API_BASE}/api/publishing-queue/cancel`, {
+        showSnackbar(`Removing ${titleText}...`, 'info');
+        const res = await fetch(`${API_BASE}/api/publishing-queue/remove`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: itemId })
+            body: JSON.stringify({ id: itemId, delete_file: true })
         });
         const data = await res.json();
         if (data.success) {
-            showSnackbar('Item removed from queue', 'info');
+            showSnackbar(`🗑️ Reel removed from queue: ${data.title || ''}`, 'success');
             await fetchPublishingQueue();
+        } else {
+            showSnackbar(`Failed to remove reel: ${data.error || 'Unknown error'}`, 'error');
         }
     } catch (err) {
         showSnackbar(`Error: ${err.message}`, 'error');
     }
+}
+
+// Backward-compatible alias
+async function cancelQueueItem(itemId) {
+    const item = allKnownItems.get(itemId);
+    return removeQueueItem(itemId, item ? item.title : '');
 }
 
 // Global preview item registry
@@ -295,8 +306,9 @@ function renderQueueList(items) {
                         <span style="font-size: 14px;">⚡</span>
                         <span>Publish Now</span>
                     </button>
-                    <button class="btn-icon-only" onclick="cancelQueueItem('${item.id}')" title="Cancel this queued reel">
-                        <span style="font-size: 14px; font-weight: bold;">✕</span>
+                    <button class="btn-item-action btn-remove-queue" onclick="removeQueueItem('${item.id}', '${escapeHtml(item.title)}')" title="Remove this reel from queue">
+                        <span style="font-size: 13px;">🗑️</span>
+                        <span>Remove</span>
                     </button>
                 </div>
             </div>
@@ -534,6 +546,16 @@ async function modalPublishCurrentReel() {
     const itm = currentPreviewItem;
     closeVideoModal();
     await uploadQueueItemNow(itm.id);
+}
+
+/**
+ * Modal Discard / Remove Current Reel Action
+ */
+async function modalRemoveCurrentReel() {
+    if (!currentPreviewItem || !currentPreviewItem.id) return;
+    const itm = currentPreviewItem;
+    closeVideoModal();
+    await removeQueueItem(itm.id, itm.title);
 }
 
 /**

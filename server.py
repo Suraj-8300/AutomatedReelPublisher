@@ -629,16 +629,17 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"success": success, "active": UniverseManager.get_active_universe_info()}).encode("utf-8"))
 
-        # 3e. API: Cancel Scheduled Video in Publishing Queue
-        elif url.path == "/api/publishing-queue/cancel":
+        # 3e. API: Cancel / Remove Video from Publishing Queue
+        elif url.path in ["/api/publishing-queue/cancel", "/api/publishing-queue/remove"]:
             from publishers.dispatch_queue import PublishingQueueManager
             item_id = data.get("id", "")
-            success = PublishingQueueManager.cancel_item(item_id)
+            delete_file = data.get("delete_file", True)
+            res = PublishingQueueManager.remove_item(item_id, delete_file=delete_file)
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self._set_cors_headers()
             self.end_headers()
-            self.wfile.write(json.dumps({"success": success}).encode("utf-8"))
+            self.wfile.write(json.dumps(res).encode("utf-8"))
 
         # 3f. API: Enqueue Video to Publishing Queue
         elif url.path == "/api/publishing-queue/enqueue":

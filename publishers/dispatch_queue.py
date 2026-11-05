@@ -363,6 +363,57 @@ class PublishingQueueManager:
         return False
 
     @classmethod
+    def remove_item(cls, item_id: str, delete_file: bool = True) -> Dict[str, Any]:
+        """
+        Permanently removes a reel from the publishing queue and deletes its
+        master video file from disk so it frees up storage.
+        """
+        items = cls._load_data()
+        target = None
+        new_items = []
+        for item in items:
+            if item.get("id") == item_id:
+                target = item
+            else:
+                new_items.append(item)
+
+        if not target:
+            return {"success": False, "error": f"Item {item_id} not found in publishing queue"}
+
+        # Delete local video files if requested
+        deleted_files = []
+        if delete_file:
+            vpath = target.get("video_path")
+            if vpath:
+                p = Path(vpath)
+                if p.is_file():
+                    try:
+                        p.unlink()
+                        deleted_files.append(str(p))
+                        print(f"🗑️ [PublishingQueue] Deleted master video file: {p}")
+                    except Exception as e:
+                        print(f"⚠️ Could not delete video file {p}: {e}")
+                # Also clean up matching jpg thumbnail if exists
+                jpg_thumb = p.with_suffix(".jpg")
+                if jpg_thumb.is_file():
+                    try:
+                        jpg_thumb.unlink()
+                        deleted_files.append(str(jpg_thumb))
+                    except Exception:
+                        pass
+
+        cls._save_data(new_items)
+        active_remaining = len([i for i in new_items if i.get("status") in ["scheduled", "pending"]])
+        print(f"🗑️ [PublishingQueue] Reel '{target.get('title')}' permanently removed from queue. Remaining: {active_remaining}")
+        return {
+            "success": True,
+            "removed_id": item_id,
+            "title": target.get("title", ""),
+            "deleted_files": deleted_files,
+            "remaining_count": active_remaining
+        }
+
+    @classmethod
     def clear_completed(cls) -> int:
         """Cleans up published or cancelled queue entries."""
         items = cls._load_data()

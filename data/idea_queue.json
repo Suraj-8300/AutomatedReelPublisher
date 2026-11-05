@@ -1,38 +1,5 @@
 [
   {
-    "id": "eb93c0b88c48",
-    "title": "Virtual Memory & The TLB: The 64-Bit Pointer Illusion",
-    "genre": "computer_engineering",
-    "hook": "Your computer thinks every program owns 128 Terabytes of RAM, even if you only bought 16 Gigabytes.",
-    "script": "Your computer thinks every program owns 128 Terabytes of RAM, even if you only bought 16 Gigabytes. The Memory Management Unit walks a 4-level page table to translate every virtual pointer to physical DRAM. The Translation Lookaside Buffer caches these translations in single-cycle hardware, enabling blazing pointer access.",
-    "scenes": [
-      {
-        "text": "Your computer thinks every program owns 128 Terabytes of RAM, even if you only bought 16 Gigabytes.",
-        "visual_prompt": "Computer engineering visual showing 64-bit virtual address space illusion mapping into physical DDR5 RAM modules, dark theme with glowing cyan page tables, 9:16 vertical layout",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "The Memory Management Unit walks a 4-level page table to translate every virtual pointer to physical DRAM.",
-        "visual_prompt": "Hardware architecture diagram of 4-Level Page Table Walk: PML4 to Page Directory Pointer to Page Directory to Physical Page Frame, 9:16 vertical format",
-        "motion": "pan_right"
-      },
-      {
-        "text": "The Translation Lookaside Buffer caches these translations in single-cycle hardware, enabling blazing pointer access.",
-        "visual_prompt": "Latency hierarchy card: TLB Hit (0.5ns, 1 cycle) vs 4-Level Page Walk (60ns, 200 cycles) with memory isolation security guarantees, 9:16 vertical format",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "Every memory address in user space is virtual. The CPU Memory Management Unit (MMU) walks a 4-level page table to map virtual pages to physical DRAM frames. To avoid 4 memory lookups on every single pointer, the Translation Lookaside Buffer (TLB) caches translations in single-cycle silicon.",
-    "payoff": "Virtual memory isolates processes so a crash in Chrome cannot corrupt your operating system kernel.",
-    "visual_style": "computer_engineering",
-    "suggested_voice": "en-US-BrianMultilingualNeural",
-    "suggested_music": "cyber_pulse",
-    "caption_style": "high_impact",
-    "duration": 35,
-    "created_at": 1793917634.9555774,
-    "status": "ready"
-  },
-  {
     "id": "3a5b0ddb9b21",
     "title": "Consistent Hashing: How Discord Scales Without Crashing",
     "genre": "system_design",
