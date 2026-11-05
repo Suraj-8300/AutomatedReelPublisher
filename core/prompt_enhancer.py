@@ -1,214 +1,205 @@
 import re
 import random
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from .config import DURATION_TARGETS, PALETTES
-from .idea_generator import VIRAL_NICHE_CATALOG, generate_random_topic
+from .creative_randomizer import CreativeRandomizer, GENRE_TAXONOMY
+from .content_history import ContentHistory
+from .hooks_engine import HooksEngine
+from .idea_generator import IdeaGenerator
+from .broll_engine import SYNONYM_MAP
+from .animal_storyteller import AnimalStoryteller
 
 class PromptEnhancer:
     """
-    Universal Reel Script & Storyboard Engine.
-    Generates highly engaging, niche-adaptive scripts for ANY topic
-    (psychology, wealth, history, tech, science, or custom user ideas)
-    precisely timed for 10s, 15s, 30s, and 60s vertical Reels.
+    Intelligent Storyboard & Dynamic Script Generation Engine.
+    Supports:
+    1. Infinite autonomous generative idea creation (never fixed, never static).
+    2. Dynamic custom prompt enhancement: user inputs any topic/idea and the engine
+       builds a complete, tailored vertical Reel around it.
     """
 
     @staticmethod
-    def enhance(user_prompt: str = None, duration: int = 15, theme: str = None) -> Dict[str, Any]:
+    def enhance(
+        user_prompt: Optional[str] = None,
+        duration: int = 15,
+        theme: Optional[str] = None,
+        genre: Optional[str] = None,
+        subgenre: Optional[str] = None,
+        mode: str = "balanced",
+        caption_style: Optional[str] = None,
+        seed: Optional[int] = None,
+        animal_species: Optional[str] = None,
+        visual_style: Optional[str] = None,
+        activity_type: Optional[str] = None,
+        is_duo: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Generates a rich, genre-aware storyboard.
+        Supports standard multi-genre Reels as well as AI Animal & Character Storytelling.
+        """
         if duration not in [10, 15, 30, 60]:
             duration = 15
 
-        # 1. Topic selection or dynamic generation
-        if not user_prompt or user_prompt.strip() == "":
-            topic_data = generate_random_topic()
+        # Check for AI Animal & Character Storytelling Mode
+        is_animal_request = (
+            mode == "animal_story" or
+            genre == "animal_story" or
+            bool(animal_species) or
+            bool(visual_style) or
+            is_duo or
+            (user_prompt and any(w in user_prompt.lower() for w in [
+                "kitten", "puppy", "capybara", "panda", "bunny", "duckling", "otter", "raccoon"
+            ]) and mode in ["story", "balanced", "animal_story"])
+        )
+
+        if is_animal_request:
+            storyboard = AnimalStoryteller.generate_story(
+                animal_species=animal_species,
+                is_duo=is_duo,
+                visual_style=visual_style,
+                story_genre=genre if genre in ["cute", "funny", "adventure", "emotional", "unexpected_funny", "educational"] else None,
+                activity_type=activity_type,
+                duration=duration,
+                custom_concept=user_prompt,
+                seed=seed
+            )
+            if caption_style:
+                storyboard["caption_style"] = caption_style
+            if theme and theme in PALETTES:
+                storyboard["theme"] = theme
+            return storyboard
+
+        # 1. Sample Creative Configuration
+        config = CreativeRandomizer.generate_creative_config(
+            mode=mode,
+            genre_preference=genre,
+            duration_preference=duration,
+            caption_style_preference=caption_style,
+            seed=seed
+        )
+
+        selected_genre = config["genre"]
+        selected_subgenre = config["subgenre"]
+        selected_seed = config["seed"]
+
+        # 2. Topic Resolution: User Custom Idea vs Infinite Autonomous Generation
+        if user_prompt and user_prompt.strip():
+            # User provided their own idea -> build completely around it
+            topic_data = IdeaGenerator.enhance_custom_prompt(
+                prompt=user_prompt.strip(),
+                genre_preference=genre or selected_genre,
+                duration=duration
+            )
+            selected_genre = topic_data["genre"]
         else:
-            prompt = user_prompt.strip()
-            # Check if it matches an existing catalog item
-            matched = None
-            for niche_items in VIRAL_NICHE_CATALOG.values():
-                for item in niche_items:
-                    if item["title"].lower() in prompt.lower() or prompt.lower() in item["title"].lower():
-                        matched = item.copy()
-                        break
-                if matched:
-                    break
-            topic_data = matched if matched else PromptEnhancer._construct_dynamic_topic(prompt)
+            # Autonomous generation: generate fresh idea on the fly
+            topic_data = IdeaGenerator.generate_autonomous_idea(
+                genre=selected_genre,
+                subgenre=selected_subgenre,
+                duration=duration,
+                seed=selected_seed
+            )
 
-        # 2. Build narrative storyboard suited to duration and genre
-        storyboard = PromptEnhancer._build_storyboard(topic_data, duration)
+            # Anti-repetition check: if similar concept was recently generated, re-roll with a new seed
+            attempts = 0
+            while ContentHistory.is_concept_repetitive(topic_data["title"], topic_data["hook"]) and attempts < 5:
+                selected_seed += 101
+                topic_data = IdeaGenerator.generate_autonomous_idea(
+                    genre=selected_genre,
+                    subgenre=selected_subgenre,
+                    duration=duration,
+                    seed=selected_seed
+                )
+                attempts += 1
 
-        # 3. Assign visual theme & duration
-        if not theme or theme not in PALETTES:
-            theme = topic_data.get("theme", "cyber_blue")
-        storyboard["theme"] = theme
-        storyboard["target_duration"] = duration
-        storyboard["badge"] = topic_data.get("badge", "🔥 DID YOU KNOW?")
+        # 3. Clean script from any AI clichés and split into visual scenes
+        clean_script = PromptEnhancer._clean_script_cliches(topic_data["script"])
+        scenes = PromptEnhancer._plan_scenes(clean_script, topic_data["keywords"], duration, selected_genre)
 
-        return storyboard
-
-    @staticmethod
-    def _construct_dynamic_topic(prompt: str) -> Dict[str, Any]:
-        """Dynamically parses and structures ANY custom prompt."""
-        clean = prompt.rstrip("?").strip()
-        lower = prompt.lower()
-
-        # Stop words filter
-        stop_words = {
-            "the", "and", "for", "with", "from", "that", "this", "what", "when", 
-            "where", "would", "could", "should", "about", "there", "their", 
-            "plausible", "really", "actually", "make", "into", "some", "more", 
-            "than", "over", "under", "been", "have", "were", "they", "them"
-        }
-        words = [w for w in re.findall(r'\b[a-zA-Z]{3,}\b', lower) if w not in stop_words]
-
-        # Categorize genre and assign visual style
-        if any(k in lower for k in ["money", "wealth", "rich", "billionaire", "invest", "crypto", "business", "tax"]):
-            cat = "WEALTH & POWER"
-            badge = "💰 WEALTH CODED"
-            theme = "deep_emerald"
-            keywords = words[:2] + ["money", "city", "skyscraper", "luxury"]
-            takeaway = "The ultra-successful play by an entirely different set of financial rules."
-        elif any(k in lower for k in ["brain", "psychology", "mind", "manipulation", "habit", "sleep", "attraction", "lie", "toxic"]):
-            cat = "PSYCHOLOGY"
-            badge = "🧠 MIND HACK"
-            theme = "cyber_blue"
-            keywords = words[:2] + ["thinking", "mind", "people", "talking"]
-            takeaway = "Once you understand human psychology, you can never look at people the same way again."
-        elif any(k in lower for k in ["ancient", "history", "rome", "egypt", "pyramid", "war", "emperor", "lost", "ruins"]):
-            cat = "UNTOLD HISTORY"
-            badge = "📜 UNTOLD HISTORY"
-            theme = "crimson_flame"
-            keywords = words[:2] + ["ancient", "architecture", "stone", "ruins"]
-            takeaway = "History is rarely what was written in standard textbooks."
-        elif any(k in lower for k in ["space", "galaxy", "black hole", "star", "planet", "alien", "universe", "nasa", "moon"]):
-            cat = "COSMIC TRUTH"
-            badge = "🌌 COSMIC TRUTH"
-            theme = "cosmic_purple"
-            keywords = words[:2] + ["space", "galaxy", "stars", "earth", "cosmos"]
-            takeaway = "The sheer scale of the cosmos humbles everything we know."
-        elif any(k in lower for k in ["ai", "robot", "quantum", "tech", "future", "algorithm", "code", "cyber"]):
-            cat = "FUTURE TECH"
-            badge = "⚡ FUTURE TECH"
-            theme = "cyber_blue"
-            keywords = words[:2] + ["digital", "technology", "circuit", "neon"]
-            takeaway = "We are sprinting into a technological future faster than society can adapt."
-        elif any(k in lower for k in ["workout", "fitness", "cold", "body", "health", "longevity", "fasting", "dopamine"]):
-            cat = "BIOHACKING"
-            badge = "🧬 BIOHACK"
-            theme = "deep_emerald"
-            keywords = words[:2] + ["fitness", "water", "cold", "medical", "health"]
-            takeaway = "Small biological upgrades trigger massive neurological compounding."
-        elif any(k in lower for k in ["plausible", "myth", "survive", "fall", "shark", "gun", "jump"]):
-            cat = "MYTHBUSTER"
-            badge = "🔬 IS IT PLAUSIBLE?"
-            theme = "crimson_flame"
-            keywords = words[:2] + ["science", "speed", "danger"]
-            takeaway = "Intuition frequently fails when tested against physical laws."
-        else:
-            cat = "WILD CURIOSITY"
-            badge = "🔥 DID YOU KNOW?"
-            theme = "cyber_blue"
-            keywords = words[:3] + ["nature", "city", "technology"]
-            takeaway = "Reality is often stranger than the wildest fiction."
-
-        # Generate engaging hook
-        if lower.startswith("why ") or lower.startswith("how ") or lower.startswith("what "):
-            hook = f"Did you know {clean.lower()}?"
-        else:
-            hook = f"Here is the mind-bending truth about {clean.lower()}."
-
-        insight = f"When researchers and experts investigated the data, they discovered something completely counterintuitive."
+        # 4. Integrate Creative Metadata
+        resolved_theme = theme if (theme and theme in PALETTES) else topic_data.get("theme", config["theme"])
 
         return {
-            "category": cat,
-            "badge": badge,
-            "title": clean,
-            "hook": hook,
-            "insight": insight,
-            "takeaway": takeaway,
-            "theme": theme,
-            "keywords": keywords
-        }
-
-    @staticmethod
-    def _build_storyboard(topic: Dict[str, Any], duration: int) -> Dict[str, Any]:
-        title = topic.get("title", "")
-        hook = topic.get("hook", "")
-        insight = topic.get("insight", "")
-        takeaway = topic.get("takeaway", "")
-        kw = topic.get("keywords", ["city", "technology", "nature"])
-
-        # Helper to cascade keywords so primary is tested first, then other topic terms
-        def scene_kw(primary_idx: int) -> List[str]:
-            primary = kw[primary_idx] if primary_idx < len(kw) else (kw[0] if kw else "technology")
-            rest = [k for k in kw if k != primary]
-            return [primary] + rest
-
-        # Pacing and script tuning per duration
-        if duration == 10:
-            # 10s: ~18-22 words. Instant punchy revelation.
-            script = f"{hook} {insight.split('.')[0]}. {takeaway.split('.')[0]}!"
-            scenes = [
-                {"title": "THE HOOK", "text": hook, "keywords": scene_kw(0)},
-                {"title": "THE REVEAL", "text": insight, "keywords": scene_kw(1)},
-                {"title": "THE TAKEAWAY", "text": takeaway, "keywords": scene_kw(2)}
-            ]
-
-        elif duration == 15:
-            # 15s: ~28-34 words. Viral Short structure.
-            script = (
-                f"{hook} Here is what actually happens. "
-                f"{insight.split('.')[0]}. "
-                f"The bottom line? {takeaway}"
-            )
-            scenes = [
-                {"title": "THE HOOK", "text": hook, "keywords": scene_kw(0)},
-                {"title": "THE INSIGHT", "text": insight, "keywords": scene_kw(1)},
-                {"title": "THE TAKEAWAY", "text": takeaway, "keywords": scene_kw(2)}
-            ]
-
-        elif duration == 30:
-            # 30s: ~65-72 words. Complete storytelling reel.
-            script = (
-                f"{hook} Most people go through life completely unaware of this. "
-                f"When you look beneath the surface, the mechanism becomes crystal clear. "
-                f"{insight} "
-                f"Think about the implications of this. "
-                f"{takeaway} "
-                f"Follow for more daily mind-openers, and share this with someone who needs to hear it."
-            )
-            scenes = [
-                {"title": "THE MYSTERY", "text": hook, "keywords": scene_kw(0)},
-                {"title": "THE HIDDEN LAYER", "text": "What everyone overlooks.", "keywords": scene_kw(1)},
-                {"title": "THE BREAKTHROUGH", "text": insight, "keywords": scene_kw(2)},
-                {"title": "THE LESSON", "text": takeaway, "keywords": scene_kw(3)},
-                {"title": "THE CALL TO ACTION", "text": "Follow for more daily revelations.", "keywords": scene_kw(0)}
-            ]
-
-        else: # 60 seconds
-            # 60s: ~135-155 words. Deep documentary style.
-            script = (
-                f"Pay close attention, because what you are about to discover will change your entire perspective. "
-                f"{hook} "
-                f"On the surface, it seems totally counterintuitive. Society teaches us to expect one outcome, yet reality operates on completely different principles. "
-                f"{insight} "
-                f"Consider the profound ripple effects this creates across your everyday life. When you master this concept, the world starts making a lot more sense. "
-                f"{takeaway} "
-                f"Drop a comment with your thoughts below, hit follow for more powerful daily insights, and share this with someone who thinks differently."
-            )
-            scenes = [
-                {"title": "THE AWAKENING", "text": hook, "keywords": scene_kw(0)},
-                {"title": "THE COMMON TRAP", "text": "Why society gets this backwards.", "keywords": scene_kw(1)},
-                {"title": "THE HIDDEN MECHANISM", "text": insight, "keywords": scene_kw(2)},
-                {"title": "THE MASTER KEY", "text": takeaway, "keywords": scene_kw(3)},
-                {"title": "THE TAKEAWAY", "text": "Follow for daily high-leverage insights.", "keywords": scene_kw(0)}
-            ]
-
-        return {
-            "title": title,
-            "badge": topic.get("badge", "🔥 DID YOU KNOW?"),
-            "category": topic.get("category", "VIRAL INSIGHT"),
-            "hook": hook,
-            "script": script,
+            "title": topic_data["title"],
+            "hook": topic_data.get("hook", ""),
+            "script": clean_script,
             "scenes": scenes,
-            "keywords": kw
+            "keywords": topic_data.get("keywords", ["technology", "city"]),
+            "theme": resolved_theme,
+            "target_duration": duration,
+            "badge": topic_data.get("badge", config["badge"]),
+            "genre": selected_genre,
+            "subgenre": topic_data.get("subgenre", selected_subgenre),
+            "caption_style": config["caption_style"],
+            "voice": config["voice"],
+            "speech_rate": config["speech_rate"],
+            "music_style": config["music_style"],
+            "editing_style": config["editing_style"],
+            "visual_approach": config["visual_approach"],
+            "seed": selected_seed,
+            "source": topic_data.get("source", "Autonomous Synthesis")
         }
+
+    @staticmethod
+    def _clean_script_cliches(script: str) -> str:
+        """Removes robotic AI clichés and filler phrases."""
+        cliches = [
+            r"pay close attention,?\s*",
+            r"hello guys,?\s*",
+            r"welcome back,?\s*",
+            r"in this video,?\s*",
+            r"drop a comment below,?\s*",
+            r"hit the subscribe button,?\s*",
+            r"smash the like button,?\s*",
+            r"make sure to follow,?\s*",
+            r"did you know that\s+"
+        ]
+        cleaned = script
+        for c in cliches:
+            cleaned = re.sub(c, "", cleaned, flags=re.IGNORECASE)
+
+        cleaned = ". ".join(s.strip().capitalize() for s in cleaned.split(".") if s.strip())
+        if cleaned and not cleaned.endswith((".", "!", "?")):
+            cleaned += "."
+        return cleaned
+
+    @staticmethod
+    def _plan_scenes(script: str, keywords: List[str], duration: int, genre: str) -> List[Dict[str, Any]]:
+        """Splits the script into visual scenes with keyword progression."""
+        sentences = [s.strip() for s in re.split(r'(?<=[.!?]) +', script) if s.strip()]
+        if not sentences:
+            sentences = [script]
+
+        if duration <= 15:
+            num_scenes = min(3, max(2, len(sentences)))
+        elif duration <= 30:
+            num_scenes = min(4, max(3, len(sentences)))
+        else:
+            num_scenes = min(6, max(4, len(sentences)))
+
+        scenes = []
+        words = script.split()
+        chunk_size = max(1, len(words) // num_scenes)
+
+        for i in range(num_scenes):
+            scene_text = sentences[i] if i < len(sentences) else " ".join(words[i * chunk_size:(i + 1) * chunk_size])
+
+            # Find keywords mentioned directly in this specific scene's text
+            scene_words = re.findall(r'\b[a-zA-Z]{3,}\b', scene_text.lower())
+            direct_matches = [w for w in scene_words if w in SYNONYM_MAP]
+
+            if direct_matches:
+                kw_primary = direct_matches[0]
+                kw_secondary = direct_matches[1] if len(direct_matches) > 1 else (keywords[i % len(keywords)] if keywords else kw_primary)
+            else:
+                kw_primary = keywords[i % len(keywords)] if keywords else "technology"
+                kw_secondary = keywords[(i + 1) % len(keywords)] if len(keywords) > 1 else kw_primary
+
+            scenes.append({
+                "index": i,
+                "title": f"SCENE_{i+1}",
+                "text": scene_text,
+                "keywords": [kw_primary, kw_secondary]
+            })
+
+        return scenes

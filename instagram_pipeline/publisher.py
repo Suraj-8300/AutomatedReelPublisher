@@ -1,7 +1,10 @@
 import time
 import uuid
 import requests
-from typing import Dict, Any, Optional
+import urllib.request
+import json
+from pathlib import Path
+from typing import Dict, Any, Optional, Tuple
 
 from .config import (
     META_API_BASE_URL,
@@ -29,6 +32,79 @@ class MetaGraphPublisher:
     def is_configured(self) -> bool:
         """Verifies if Meta Graph API account ID and access token are provided."""
         return bool(self.account_id and self.access_token)
+
+    def create_resumable_container(
+        self,
+        caption: str,
+        share_to_feed: bool = True,
+        thumb_offset_ms: int = 1000,
+        cover_url: Optional[str] = None,
+        dry_run: bool = False
+    ) -> Tuple[str, str]:
+        """
+        Step 1 (Direct Binary Flow): Initializes a resumable Reels upload session on Meta.
+        Returns: (container_id, upload_uri)
+        """
+        if dry_run or not self.is_configured():
+            sim_id = f"1799{uuid.uuid4().int % 1000000000:09d}"
+            print(f"[MetaGraphAPI (Dry-Run)] POST /{self.account_id or 'mock_account'}/media (upload_type=resumable)")
+            return sim_id, f"https://rupload.facebook.com/ig-api-upload/mock/{sim_id}"
+
+        url = f"{self.base_url}/{self.account_id}/media"
+        payload = {
+            "media_type": "REELS",
+            "upload_type": "resumable",
+            "caption": caption,
+            "share_to_feed": share_to_feed,
+            "thumb_offset": thumb_offset_ms,
+            "access_token": self.access_token
+        }
+        if cover_url:
+            payload["cover_url"] = cover_url
+
+        response = requests.post(url, data=payload, timeout=self.timeout)
+        data = response.json()
+
+        if response.status_code != 200 or "id" not in data or "uri" not in data:
+            error_msg = data.get("error", {}).get("message", response.text)
+            raise RuntimeError(f"Meta Graph API resumable container init failed (HTTP {response.status_code}): {error_msg}")
+
+        container_id = data["id"]
+        upload_uri = data["uri"]
+        print(f"[MetaGraphAPI] Resumable Reel container created: {container_id}")
+        return container_id, upload_uri
+
+    def upload_binary_stream(self, upload_uri: str, file_path: Path, dry_run: bool = False) -> bool:
+        """
+        Step 2 (Direct Binary Flow): Streams local video bytes directly into Meta's rupload servers.
+        """
+        p = Path(file_path).resolve()
+        if not p.exists():
+            raise FileNotFoundError(f"Video file not found: {p}")
+
+        file_size = p.stat().st_size
+        size_mb = file_size / (1024 * 1024)
+        print(f"[MetaGraphAPI] ⚡ Direct Binary Stream: Uploading {p.name} ({size_mb:.2f} MB) directly to Meta...")
+
+        if dry_run or not self.is_configured():
+            time.sleep(1.0)
+            print("[MetaGraphAPI (Dry-Run)] Binary stream upload simulated successfully.")
+            return True
+
+        headers = {
+            "Authorization": f"OAuth {self.access_token}",
+            "offset": "0",
+            "file_size": str(file_size)
+        }
+
+        with open(p, "rb") as f:
+            resp = requests.post(upload_uri, headers=headers, data=f, timeout=120)
+
+        if resp.status_code != 200:
+            raise RuntimeError(f"Meta binary upload failed (HTTP {resp.status_code}): {resp.text}")
+
+        print("[MetaGraphAPI] ✅ Direct binary upload to Meta completed successfully!")
+        return True
 
     def create_reel_container(
         self,
@@ -104,7 +180,14 @@ class MetaGraphPublisher:
             if status_code == "FINISHED":
                 return data
             elif status_code == "ERROR":
-                raise RuntimeError(f"Meta container ingestion failed: {status_desc or data}")
+                err_text = str(status_desc or data)
+                if "2207077" in err_text:
+                    raise RuntimeError(
+                        f"Meta video ingestion failed (Error 2207077: Media download failed). "
+                        f"Meta's crawler was unable to download the video file from the public URL. "
+                        f"Check that your public tunnel is accessible, or configure free Cloudflare R2 / AWS S3 in .env for guaranteed direct CDN delivery."
+                    )
+                raise RuntimeError(f"Meta container ingestion failed: {err_text}")
             elif status_code == "EXPIRED":
                 raise RuntimeError(f"Meta container expired before publishing: {status_desc or data}")
 
@@ -164,8 +247,9 @@ class MetaGraphPublisher:
 
     def publish_pipeline(
         self,
-        video_url: str,
-        caption: str,
+        video_path: Optional[Path] = None,
+        video_url: Optional[str] = None,
+        caption: str = "",
         share_to_feed: bool = True,
         thumb_offset_ms: int = 1000,
         cover_url: Optional[str] = None,
@@ -173,19 +257,33 @@ class MetaGraphPublisher:
     ) -> Dict[str, Any]:
         """
         Executes the full Meta Graph API Reels publication pipeline:
-        Container Creation -> Status Validation -> Media Publish -> Permalink Retrieval
+        Direct Binary Streaming (or Public URL) -> Status Validation -> Media Publish -> Permalink Retrieval
         """
         print("\n[MetaGraphAPI] Initiating Instagram Reels publication sequence...")
         
-        # 1. Create Container
-        container_id = self.create_reel_container(
-            video_url=video_url,
-            caption=caption,
-            share_to_feed=share_to_feed,
-            thumb_offset_ms=thumb_offset_ms,
-            cover_url=cover_url,
-            dry_run=dry_run
-        )
+        # 1. Ingestion: Prefer Direct Binary Resumable Upload if local file is provided
+        if video_path and Path(video_path).exists():
+            print("[MetaGraphAPI] Using 100% Free Direct Binary Resumable Ingestion (No Tunnels Required)...")
+            container_id, upload_uri = self.create_resumable_container(
+                caption=caption,
+                share_to_feed=share_to_feed,
+                thumb_offset_ms=thumb_offset_ms,
+                cover_url=cover_url,
+                dry_run=dry_run
+            )
+            self.upload_binary_stream(upload_uri, Path(video_path), dry_run=dry_run)
+        elif video_url:
+            print("[MetaGraphAPI] Using URL Ingestion Flow...")
+            container_id = self.create_reel_container(
+                video_url=video_url,
+                caption=caption,
+                share_to_feed=share_to_feed,
+                thumb_offset_ms=thumb_offset_ms,
+                cover_url=cover_url,
+                dry_run=dry_run
+            )
+        else:
+            raise ValueError("Either video_path or video_url must be provided for publication.")
 
         # 2. Poll Container Status
         status_info = self.poll_container_status(container_id, dry_run=dry_run)

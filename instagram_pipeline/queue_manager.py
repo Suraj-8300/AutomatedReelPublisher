@@ -140,15 +140,13 @@ class ReelQueueManager:
                 )
                 print(f"           ✅ Successfully normalized: {normalized_path.name} (1080x1920 @ 30fps H.264/AAC)")
 
-            # 5. Cloud Storage Bridge Upload
-            print("\n[Step 3/5] ☁️ Uploading to Cloud Storage Bridge...")
-            upload_res = self.cloud_bridge.upload_file(normalized_path)
-            public_video_url = upload_res["url"]
-            uploaded_object_key = upload_res.get("object_key")
-            print(f"           Public Ingestion URL: {public_video_url}")
-
-            # Optional custom cover upload
+            # 5. Ingestion Strategy: Native Meta Direct Resumable Binary Stream (No Tunnels, No Rate Limits)
+            # or S3/R2 Cloud URL if specifically configured with credentials
+            use_direct_binary = not self.cloud_bridge.is_cloud_configured()
+            uploaded_object_key = None
+            cover_object_key = None
             cover_url = None
+
             if meta_info.get("cover_image"):
                 cover_path = Path(meta_info["cover_image"])
                 if cover_path.exists():
@@ -157,9 +155,21 @@ class ReelQueueManager:
                     cover_object_key = cover_upload.get("object_key")
                     print(f"           Custom Cover URL: {cover_url}")
 
+            if use_direct_binary:
+                print("\n[Step 3/5] ⚡ Using Meta Native Resumable Ingestion (Direct Binary Stream)...")
+                print(f"           Local Source: {normalized_path.name}")
+                public_video_url = None
+            else:
+                print("\n[Step 3/5] ☁️ Uploading to Cloud Storage Bridge...")
+                upload_res = self.cloud_bridge.upload_file(normalized_path)
+                public_video_url = upload_res["url"]
+                uploaded_object_key = upload_res.get("object_key")
+                print(f"           Public Ingestion URL: {public_video_url}")
+
             # 6. Meta Graph API Publishing Sequence
             print("\n[Step 4/5] 🚀 Publishing to Instagram Reels via Meta Graph API...")
             pub_result = self.publisher.publish_pipeline(
+                video_path=normalized_path if use_direct_binary else None,
                 video_url=public_video_url,
                 caption=meta_info["caption"],
                 share_to_feed=meta_info["share_to_feed"],

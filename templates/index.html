@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReelPublisher - Autonomous Instagram Reels Studio</title>
+    <title>AutoReelStudio — Autonomous AI Video Generator & Meta Reels Publisher</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -14,8 +14,8 @@
                 <div class="logo-box">
                     <span class="logo-icon">⚡</span>
                     <div>
-                        <h1>ReelPublisher</h1>
-                        <p class="subtitle">Autonomous AI Video Engine & Direct Meta Graph API Publisher</p>
+                        <h1>AutoReelStudio</h1>
+                        <p class="subtitle">Autonomous AI Video Studio (ReelMakerAI) & Direct Meta Graph API Publisher (ReelPublisher)</p>
                     </div>
                 </div>
                 <div class="header-pills">
@@ -43,31 +43,165 @@
             <!-- Left Column: Controls & Prompt Generator -->
             <section class="card control-panel">
                 <div class="section-title">
-                    <span>1. Content & Topic Engine</span>
-                    <span class="badge badge-accent">100% Free AI</span>
+                    <span>1. Creative Strategy & Storyboard</span>
+                    <span class="badge badge-accent">Intelligent Engine</span>
                 </div>
 
-                <div class="form-group">
-                    <label for="nicheSelect">Niche / Category</label>
-                    <div class="select-wrapper">
-                        <select id="nicheSelect" onchange="rollIdea()">
-                            <option value="RANDOM">🎲 Any / Surprise Me (Universal Viral)</option>
-                            <option value="PSYCHOLOGY">🧠 Dark Psychology & Brain Glitches</option>
-                            <option value="WEALTH & SUCCESS">💰 Wealth, Money & Power Dynamics</option>
-                            <option value="ANCIENT HISTORY & SECRETS">📜 Ancient History & Lost Secrets</option>
-                            <option value="SPACE & COSMOS">🌌 Deep Space & Cosmic Truths</option>
-                            <option value="TECH & FUTURE AI">⚡ Future Tech & AI Paradoxes</option>
-                            <option value="BIOHACKING & BODY">🧬 Biohacking & Human Longevity</option>
-                            <option value="WILD NATURE & ANIMALS">🌿 Uncanny Nature & Animal Superpowers</option>
-                        </select>
+                <!-- Top Studio Mode Switcher -->
+                <div class="studio-type-switcher">
+                    <button type="button" class="studio-btn active" id="btnStudioStandard" onclick="switchStudioMode('standard')">
+                        <span>⚡ Standard Reels Studio</span>
+                    </button>
+                    <button type="button" class="studio-btn" id="btnStudioAnimal" onclick="switchStudioMode('animal')">
+                        <span>🐾 Animal & Character Story Studio</span>
+                    </button>
+                </div>
+
+                <!-- ================= STANDARD STUDIO CONTROLS ================= -->
+                <div id="standardStudioSection">
+                    <!-- Generation Mode -->
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="modeSelect">Generation Mode</label>
+                            <select id="modeSelect">
+                                <option value="balanced" selected>⚖️ Balanced (Multi-Genre Rotation)</option>
+                                <option value="comedy">😂 Comedy Mode (Humor & Memes)</option>
+                                <option value="educational">🔬 Educational Mode (Science & Facts)</option>
+                                <option value="story">📖 Story Mode (Narratives & Fiction)</option>
+                                <option value="cinematic">🎬 Cinematic Mode (Action & Edits)</option>
+                                <option value="surprise">🎲 Surprise Mode (Unexpected Formats)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-half">
+                            <label for="genreSelect">Content Genre</label>
+                            <select id="genreSelect" onchange="rollIdea()">
+                                <option value="RANDOM">🎲 Any / Autonomous Creative Choice</option>
+                                <option value="comedy">😂 Funny & Comedy Reels</option>
+                                <option value="meme">💀 Meme Reels & POV Tropes</option>
+                                <option value="science">🔬 Scientific & Educational</option>
+                                <option value="mysteries">🔍 Interesting Facts & Mysteries</option>
+                                <option value="informative">💡 Serious & Informative</option>
+                                <option value="emotional">✨ Emotional & Motivational</option>
+                                <option value="storytelling">📖 Storytelling & Narratives</option>
+                                <option value="animation">🎨 Animated Cartoons & Motion Comics</option>
+                                <option value="cinematic">🎬 Movie Edits & Action Scenes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Idea & Topic Strategy</label>
+                        <div class="idea-mode-tabs">
+                            <button type="button" class="btn-tab active" id="tabAutoIdea" onclick="setIdeaMode('auto')">✨ Autonomous (Engine Invents Idea)</button>
+                            <button type="button" class="btn-tab" id="tabCustomIdea" onclick="setIdeaMode('custom')">✍️ Custom Topic / My Prompt</button>
+                        </div>
+                        <div class="input-with-action">
+                            <input type="text" id="promptInput" placeholder="Leave empty for infinite autonomous creation, or click '🎲 Roll Fresh Idea'...">
+                            <button class="btn-secondary" id="btnRollTopic" onclick="rollIdea()" title="Generate Random Creative Topic">🎲 Roll Fresh Idea</button>
+                        </div>
+                        <p id="ideaModeHint" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px;">
+                            💡 <strong>Autonomous Mode:</strong> The engine automatically invents an original, non-repeating concept for you.
+                        </p>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="promptInput">Prompt / Storyboard Topic</label>
-                    <div class="input-with-action">
-                        <input type="text" id="promptInput" placeholder="e.g. Why billionaires never keep cash in bank accounts...">
-                        <button class="btn-secondary" onclick="rollIdea()" title="Generate Random Viral Topic">🎲 Roll Idea</button>
+                <!-- ================= ANIMAL & CHARACTER STORY STUDIO ================= -->
+                <div id="animalStudioSection" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="animalSpeciesSelect">🐾 Hero Animal Character</label>
+                            <select id="animalSpeciesSelect" onchange="onAnimalOptionChange()">
+                                <option value="RANDOM">🎲 Any / Autonomous Animal Pick</option>
+                                <option value="kitten" selected>🐱 Kitten / Baby Cat</option>
+                                <option value="puppy">🐶 Puppy / Golden Retriever</option>
+                                <option value="rabbit">🐰 Mini Bunny / Lop Rabbit</option>
+                                <option value="capybara">🦫 Zen Capybara</option>
+                                <option value="panda">🐼 Baby Giant Panda</option>
+                                <option value="red_panda">🦊 Fluffy Red Panda</option>
+                                <option value="duckling">🐥 Yellow Duckling</option>
+                                <option value="otter">🦦 Playful River Otter</option>
+                                <option value="raccoon">🦝 Clever Bandit Raccoon</option>
+                                <option value="fox">🦊 Crimson Baby Fox</option>
+                                <option value="hamster">🐹 Fluffy Dwarf Hamster</option>
+                                <option value="penguin">🐧 Baby Emperor Penguin</option>
+                                <option value="squirrel">🐿️ Curious Acorn Squirrel</option>
+                                <option value="bear_cub">🐻 Tiny Brown Bear Cub</option>
+                                <option value="hedgehog">🦔 Pygmy Hedgehog</option>
+                                <option value="baby_lion">🦁 Royal Baby Lion Cub</option>
+                                <option value="baby_tiger">🐯 Striped Baby Tiger</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-half" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                            <label class="duo-checkbox-row" title="Feature an unusual best-friends animal pair">
+                                <input type="checkbox" id="animalDuoCheckbox" onchange="onAnimalOptionChange()">
+                                <span>🤝 Unusual Animal Duo Mode</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="animalStyleSelect">🎨 Visual Filmmaking Style</label>
+                            <select id="animalStyleSelect" onchange="onAnimalOptionChange()">
+                                <option value="pixar_3d" selected>🎬 Pixar 3D Animation (Glossy Eyes & Warm Rim)</option>
+                                <option value="photorealistic">📸 Photorealistic (Nat Geo 8K Fur & Macro)</option>
+                                <option value="cartoon_2d">🎨 2D Hand-Drawn (Studio Ghibli Whimsical)</option>
+                                <option value="anime">🌸 Anime Aesthetic (Makoto Shinkai Skies)</option>
+                                <option value="stop_motion">🧶 Handcrafted Stop-Motion (Felt & Clay)</option>
+                                <option value="fantasy_world">✨ Fantasy & Magical World (Glowing Flora)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-half">
+                            <label for="animalGenreSelect">🎭 Story Narrative Type</label>
+                            <select id="animalGenreSelect" onchange="onAnimalOptionChange()">
+                                <option value="cute" selected>💖 Cute & Heartwarming Friendship</option>
+                                <option value="funny">😂 Funny & Kitchen Chaos</option>
+                                <option value="adventure">🗺️ Tiny Epic Adventure</option>
+                                <option value="emotional">🥺 Emotional & Wholesome</option>
+                                <option value="unexpected_funny">🤪 Unexpected & Quirky</option>
+                                <option value="educational">🌿 Educational Nature Story</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="animalActivitySelect">🛠️ Human-Like Animal Activity</label>
+                        <select id="animalActivitySelect" onchange="onAnimalOptionChange()">
+                            <option value="RANDOM">🎲 Autonomous Activity Match</option>
+                            <option value="baking_pancakes" selected>🥞 Baking Breakfast Pancakes</option>
+                            <option value="running_bakery">🥐 Opening a Tiny Village Bakery</option>
+                            <option value="camping_adventure">⛺ Camping Under the Stars</option>
+                            <option value="driving_mini_car">🚗 Cruising in a Miniature Toy Car</option>
+                            <option value="birthday_surprise">🎂 Preparing a Surprise Birthday Party</option>
+                            <option value="secret_garden_quest">🗝️ Discovering a Mysterious Secret Door</option>
+                            <option value="tiny_office_day">💼 Working at a Matchbox-Sized Office</option>
+                            <option value="rescue_and_friendship">☔ Rescuing a Lost Friend in the Rain</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🐾 Story Premise / Custom Idea</label>
+                        <div class="input-with-action">
+                            <input type="text" id="animalPromptInput" placeholder="Leave empty for autonomous creative story, or specify your custom concept...">
+                            <button class="btn-secondary" id="btnRollAnimalStory" onclick="rollAnimalStory()" title="Roll Character & Storyline Concept">🎲 Roll Animal Story</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Character Profile & Narrative Preview Card -->
+                    <div id="characterPreviewCard" class="character-preview-card" style="display: none;">
+                        <div class="character-card-header">
+                            <span class="character-card-title" id="charCardTitle">🐾 Hero Character Sheet</span>
+                            <span class="badge badge-accent" id="charStyleBadge">Pixar 3D</span>
+                        </div>
+                        <div class="character-details-grid" id="charDetailsGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="story-scenes-preview" id="charScenesPreview">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                 </div>
 
@@ -95,26 +229,51 @@
                     </div>
 
                     <div class="form-group col-half">
-                        <label for="voiceSelect">Neural Voice Actor</label>
-                        <select id="voiceSelect">
-                            <option value="en-US-ChristopherNeural" selected>Christopher (Energetic & Viral)</option>
-                            <option value="en-US-GuyNeural">Guy (Authoritative & Deep Mystery)</option>
-                            <option value="en-US-JennyNeural">Jenny (Expressive & Friendly Female)</option>
-                            <option value="en-US-AvaNeural">Ava (Conversational Female)</option>
-                            <option value="en-US-AndrewNeural">Andrew (Deep & Resonant Male)</option>
+                        <label for="captionStyleSelect">Caption & Typography Style</label>
+                        <select id="captionStyleSelect">
+                            <option value="karaoke" selected>⚡ Karaoke (Word-by-Word Active Pop)</option>
+                            <option value="high_impact">🔥 High Impact (1-2 Word Rapid Flash)</option>
+                            <option value="clean_minimal">✨ Clean Minimal (Understated Subtitles)</option>
+                            <option value="cinematic">🎬 Cinematic (Documentary Wide-Track)</option>
+                            <option value="dynamic_phrase">💬 Dynamic Phrase (Natural Clauses)</option>
+                            <option value="meme">💀 Meme Style (Classic Bold Upper)</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group col-half">
-                        <label for="musicSelect">Soundtrack Style</label>
+                        <label for="voiceSelect">Neural Voice Actor</label>
+                        <select id="voiceSelect">
+                            <option value="AUTO" selected>🤖 Auto-Genre Selection</option>
+                            <option value="en-US-ChristopherNeural">Christopher (Energetic & Viral)</option>
+                            <option value="en-US-GuyNeural">Guy (Authoritative & Deep Mystery)</option>
+                            <option value="en-US-JennyNeural">Jenny (Expressive & Engaging Female)</option>
+                            <option value="en-US-AvaNeural">Ava (Conversational Storyteller)</option>
+                            <option value="en-US-AndrewNeural">Andrew (Charismatic & Deep Male)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-half">
+                        <label for="musicSelect">Soundtrack & SFX Style</label>
                         <select id="musicSelect">
-                            <option value="cyber_pulse" selected>Cyber Pulse (Punchy Synthwave)</option>
+                            <option value="AUTO" selected>🤖 Auto-Genre Selection</option>
+                            <option value="comedy_bounce">Comedy Bounce (Playful & Upbeat)</option>
+                            <option value="cyber_pulse">Cyber Pulse (Punchy Synthwave)</option>
                             <option value="deep_mystery">Deep Mystery (Dark Drone & Swells)</option>
                             <option value="cinematic_drive">Cinematic Drive (Suspense & Tension)</option>
+                            <option value="emotional_piano">Emotional Piano (Melancholic & Warm)</option>
+                            <option value="action_hybrid">Action Hybrid (Sub-bass & Driving Hits)</option>
                             <option value="curiosity_lofi">Curiosity Lo-Fi (Warm Minor Chords)</option>
+                            <option value="horror_tension">Horror Tension (Dissonant Drone)</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label for="seedInput">Creative Seed (Optional Reproducibility)</label>
+                        <input type="number" id="seedInput" placeholder="e.g. 482910 (or empty for random)">
                     </div>
 
                     <div class="form-group col-half">
@@ -169,7 +328,7 @@
                     <div class="empty-state" id="emptyPreview">
                         <div class="empty-icon">📱</div>
                         <h3>9:16 Vertical Reel Player</h3>
-                        <p>Generate a video on the left to preview neural subtitles, B-roll visuals, and procedural audio.</p>
+                        <p>Generate a video to preview full-screen Instagram-native visuals, synchronized captions, and procedural audio.</p>
                     </div>
                     <video id="mainVideoPlayer" controls playsinline style="display: none;"></video>
                     <!-- Safe Zone Overlay Canvas/Layer -->
@@ -197,7 +356,7 @@
                             <span id="safeZoneBtnText">📐 Toggle Safe Zones</span>
                         </button>
                         <button class="btn-tool" onclick="inspectActiveVideo()">
-                            <span>🔍 Audit Specs</span>
+                            <span>🔍 Audit Specs & QC</span>
                         </button>
                         <a id="btnDownloadActive" class="btn-tool" download="reel.mp4">
                             <span>⬇️ Download</span>
@@ -205,10 +364,10 @@
                     </div>
                 </div>
 
-                <!-- Spec Inspection Drawer -->
+                <!-- Spec & QC Inspection Drawer -->
                 <div id="specAuditDrawer" class="spec-drawer" style="display: none;">
                     <div class="spec-drawer-header">
-                        <h4>📊 Technical Compliance Audit</h4>
+                        <h4>📊 Quality Control & Technical Audit</h4>
                         <button class="btn-close-drawer" onclick="closeSpecAudit()">✕</button>
                     </div>
                     <div id="specAuditContent" class="spec-audit-grid">
@@ -238,7 +397,7 @@
     <div id="inspectModal" class="modal-backdrop" style="display: none;">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 id="modalVideoTitle">Reel Technical Audit</h3>
+                <h3 id="modalVideoTitle">Reel Technical & QC Audit</h3>
                 <button class="btn-close-modal" onclick="closeInspectModal()">✕</button>
             </div>
             <div class="modal-body" id="modalAuditBody">
@@ -250,4 +409,3 @@
     <script src="/static/js/main.js"></script>
 </body>
 </html>
-

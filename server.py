@@ -15,8 +15,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.config import OUTPUT_DIR, CACHE_DIR, VOICES
-from core.idea_generator import generate_random_topic, get_topics_by_niche
+from core.creative_randomizer import GENRE_TAXONOMY, GENERATION_MODES
+from core.genre_catalog import get_catalog_topics
+from core.content_history import ContentHistory
+from core.quality_control import QualityControlEngine
 from core.cache_manager import CacheManager
+from core.animal_storyteller import AnimalStoryteller, VISUAL_STYLES, ACTIVITIES, STORY_ARCHETYPES
+from core.character_director import ANIMAL_SPECIES, UNUSUAL_DUOS
 from generate import run_pipeline
 from instagram_pipeline.config import INBOX_DIR, ARCHIVE_DIR, INSTAGRAM_ACCOUNT_ID, META_ACCESS_TOKEN
 from instagram_pipeline.preprocessor import VideoPreprocessor
@@ -26,11 +31,34 @@ from instagram_pipeline.publisher import MetaGraphPublisher as InstagramReelPubl
 
 PORT = int(os.environ.get("PORT", 8080))
 
+class QuietThreadingHTTPServer(ThreadingHTTPServer):
+    """ThreadingHTTPServer that cleanly handles browser client disconnects without printing tracebacks."""
+    def handle_error(self, request, client_address):
+        exc_type, exc_val, _ = sys.exc_info()
+        if exc_type in (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            return # Silently ignore client disconnects
+        if isinstance(exc_val, OSError) and exc_val.errno in (32, 104):
+            return
+        super().handle_error(request, client_address)
+
 class ReelServerHandler(SimpleHTTPRequestHandler):
     """
-    High-performance, CORS-enabled HTTP Request Handler for ReelPublisher Studio.
+    High-performance, CORS-enabled HTTP Request Handler for AutoReelStudio.
+    Unified backend integrating ReelMakerAI generation and ReelPublisher Meta publishing.
     Serves static assets, video byte-range streams, and REST APIs.
     """
+
+    def handle(self):
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
+            pass
+
+    def finish(self):
+        try:
+            super().finish()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
+            pass
 
     def _set_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -120,14 +148,30 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(status_data).encode("utf-8"))
 
-        # 6. API: Random Topic Generator
+        # 6. API: Genres Taxonomy
+        elif url.path == "/api/genres":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(GENRE_TAXONOMY).encode("utf-8"))
+
+        # 7. API: Dynamic Autonomous Topic Generator
         elif url.path == "/api/random-topic":
-            niche = params.get("niche", ["RANDOM"])[0]
-            if niche != "RANDOM":
-                topics = get_topics_by_niche(niche)
-                topic = random.choice(topics).copy() if topics else generate_random_topic()
-            else:
-                topic = generate_random_topic()
+            genre = params.get("genre", [None])[0]
+            if genre == "RANDOM":
+                genre = None
+            from core.idea_generator import IdeaGenerator
+            duration = int(params.get("duration", ["15"])[0])
+            candidates = IdeaGenerator.generate_idea_candidates(
+                genre=genre,
+                duration=duration,
+                count=1
+            )
+            topic = candidates[0] if candidates else IdeaGenerator.generate_autonomous_idea(
+                genre=genre or "science",
+                duration=duration
+            )
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -135,7 +179,36 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(topic).encode("utf-8"))
 
-        # 7. API: Gallery Archive & Publishing Receipts
+        # 8. API: Ranked autonomous idea candidates
+        elif url.path == "/api/idea-bank":
+            from core.idea_generator import IdeaGenerator
+            genre = params.get("genre", [None])[0]
+            if genre == "RANDOM":
+                genre = None
+            duration = int(params.get("duration", ["15"])[0])
+            count = int(params.get("count", ["5"])[0])
+            seed_value = params.get("seed", [None])[0]
+            seed = int(seed_value) if seed_value else None
+            ideas = IdeaGenerator.generate_idea_candidates(
+                genre=genre, duration=duration, count=count, seed=seed
+            )
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "ideas": ideas}).encode("utf-8"))
+
+        # 9. API: Content Generation History & Anti-Repetition Stats
+        elif url.path == "/api/history":
+            history = ContentHistory.get_recent_history(limit=25)
+            dist = ContentHistory.get_genre_distribution(window_size=30)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"history": history, "distribution": dist}).encode("utf-8"))
+
+        # 9. API: Gallery Archive & Publishing Receipts
         elif url.path == "/api/gallery":
             gallery_data = self._get_gallery_data()
             self.send_response(200)
@@ -144,7 +217,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(gallery_data).encode("utf-8"))
 
-        # 8. API: Inspect Video Specs
+        # 10. API: Inspect Video Specs & QC
         elif url.path == "/api/inspect":
             video_name = params.get("video", [""])[0]
             res = self._inspect_video(video_name)
@@ -154,7 +227,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(res).encode("utf-8"))
 
-        # 9. API: Storage & Cache Stats
+        # 11. API: Storage & Cache Stats
         elif url.path == "/api/cache-stats":
             stats = CacheManager.get_cache_stats()
             self.send_response(200)
@@ -162,6 +235,69 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self._set_cors_headers()
             self.end_headers()
             self.wfile.write(json.dumps({"success": True, "stats": stats}).encode("utf-8"))
+
+        # 12. API: Animal Storytelling Studio Options
+        elif url.path == "/api/animal-options":
+            species_list = [
+                {"key": s["species"], "label": s["label"], "default_name": s["default_name"], "size": s.get("size", "small")}
+                for s in ANIMAL_SPECIES
+            ]
+            styles_list = [
+                {"key": k, "label": v["label"], "description": v["description"]}
+                for k, v in VISUAL_STYLES.items()
+            ]
+            activities_list = [
+                {"key": k, "label": v["label"]}
+                for k, v in ACTIVITIES.items()
+            ]
+            genres_list = [
+                {"key": k, "label": k.replace("_", " ").title(), "music_style": v["music_style"]}
+                for k, v in STORY_ARCHETYPES.items()
+            ]
+            duos_list = [
+                {
+                    "duo_name": d["duo_name"],
+                    "char1": d["char1"],
+                    "char2": d["char2"]
+                }
+                for d in UNUSUAL_DUOS
+            ]
+            res = {
+                "success": True,
+                "species": species_list,
+                "styles": styles_list,
+                "activities": activities_list,
+                "genres": genres_list,
+                "duos": duos_list
+            }
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 13. API: Generate Random Animal Story Concept Preview
+        elif url.path == "/api/random-animal-story":
+            species = params.get("species", [None])[0]
+            style = params.get("style", [None])[0]
+            genre = params.get("genre", [None])[0]
+            activity = params.get("activity", [None])[0]
+            is_duo = params.get("is_duo", ["false"])[0].lower() in ["true", "1", "yes"]
+            prompt = params.get("prompt", [None])[0]
+
+            story = AnimalStoryteller.generate_story(
+                animal_species=species if (species and species != "RANDOM") else None,
+                visual_style=style if (style and style != "RANDOM") else None,
+                story_genre=genre if (genre and genre != "RANDOM") else None,
+                activity_type=activity if (activity and activity != "RANDOM") else None,
+                is_duo=is_duo,
+                custom_concept=prompt
+            )
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "story": story}).encode("utf-8"))
 
         else:
             self.send_error(404)
@@ -218,16 +354,40 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(res).encode("utf-8"))
 
+        # 5. API: Delete Video from Archive
+        elif url.path == "/api/delete-video":
+            filename = data.get("filename")
+            if not filename:
+                res = {"success": False, "error": "No filename specified"}
+            else:
+                target = OUTPUT_DIR / Path(filename).name
+                if target.exists() and target.suffix.lower() == ".mp4":
+                    try:
+                        target.unlink()
+                        cap = INBOX_DIR / f"{target.stem}.txt"
+                        if cap.exists():
+                            cap.unlink(missing_ok=True)
+                        res = {"success": True, "filename": filename}
+                    except Exception as e:
+                        res = {"success": False, "error": str(e)}
+                else:
+                    res = {"success": False, "error": "Video file not found"}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
         else:
             self.send_error(404)
 
     def _serve_video_file(self, file_path: Path):
-        file_size = file_path.stat().st_size
-        range_header = self.headers.get("Range")
+        try:
+            file_size = file_path.stat().st_size
+            range_header = self.headers.get("Range")
 
-        if range_header:
-            # Parse Range: bytes=start-end
-            try:
+            if range_header:
                 bytes_range = range_header.strip().replace("bytes=", "")
                 start_str, end_str = bytes_range.split("-")
                 start = int(start_str) if start_str else 0
@@ -247,22 +407,19 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                     f.seek(start)
                     self.wfile.write(f.read(chunk_len))
                 return
-            except Exception:
-                pass
 
-        # Full stream
-        self.send_response(200)
-        self.send_header("Content-Type", "video/mp4")
-        self.send_header("Content-Length", str(file_size))
-        self.send_header("Accept-Ranges", "bytes")
-        self._set_cors_headers()
-        self.end_headers()
+            # Full stream
+            self.send_response(200)
+            self.send_header("Content-Type", "video/mp4")
+            self.send_header("Content-Length", str(file_size))
+            self.send_header("Accept-Ranges", "bytes")
+            self._set_cors_headers()
+            self.end_headers()
 
-        try:
             with open(file_path, "rb") as f:
                 while chunk := f.read(128 * 1024):
                     self.wfile.write(chunk)
-        except (BrokenPipeError, ConnectionResetError):
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
             pass
 
     def _get_account_status(self):
@@ -284,7 +441,6 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
 
     def _get_gallery_data(self):
         video_files = sorted(OUTPUT_DIR.glob("*.mp4"), key=os.path.getmtime, reverse=True)
-        # Scan archive for published receipts
         published_receipts = {}
         for rec in ARCHIVE_DIR.glob("**/*.published.json"):
             try:
@@ -321,10 +477,12 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         try:
             probe = VideoPreprocessor.probe_video(target)
             comp = VideoPreprocessor.validate_compliance(probe)
+            qc = QualityControlEngine.audit_video(target)
             return {
                 "success": True,
                 "probe": probe,
-                "compliance": comp
+                "compliance": comp,
+                "qc": qc
             }
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -332,20 +490,50 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
     def _handle_generate_draft(self, data: dict):
         prompt = data.get("prompt")
         duration = int(data.get("duration", 15))
-        voice = data.get("voice", "en-US-ChristopherNeural")
-        music = data.get("music", "cyber_pulse")
-        theme = data.get("theme", None)
+        genre = data.get("genre")
+        subgenre = data.get("subgenre")
+        mode = data.get("mode", "balanced")
+        caption_style = data.get("caption_style")
+        voice = data.get("voice")
+        if voice == "AUTO":
+            voice = None
+        music = data.get("music")
+        if music == "AUTO":
+            music = None
+        theme = data.get("theme")
+        seed = int(data.get("seed")) if data.get("seed") else None
+
+        animal_species = data.get("animal_species")
+        if animal_species == "RANDOM":
+            animal_species = None
+        visual_style = data.get("visual_style")
+        if visual_style == "RANDOM":
+            visual_style = None
+        activity_type = data.get("activity_type")
+        if activity_type == "RANDOM":
+            activity_type = None
+        is_duo = bool(data.get("is_duo", False))
 
         start = time.time()
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            video_file = loop.run_until_complete(run_pipeline(
+            video_file, storyboard, qc_result = loop.run_until_complete(run_pipeline(
                 prompt=prompt,
                 duration=duration,
+                genre=genre,
+                subgenre=subgenre,
+                mode=mode,
+                caption_style=caption_style,
                 voice=voice,
                 music_style=music,
-                theme=theme
+                theme=theme,
+                seed=seed,
+                run_qc=True,
+                animal_species=animal_species,
+                visual_style=visual_style,
+                activity_type=activity_type,
+                is_duo=is_duo
             ))
             loop.close()
             elapsed = time.time() - start
@@ -354,6 +542,8 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 "success": True,
                 "video_url": f"/output/{vf.name}",
                 "filename": vf.name,
+                "storyboard": storyboard,
+                "qc": qc_result,
                 "elapsed": elapsed
             }
         except Exception as e:
@@ -362,22 +552,52 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
     def _handle_generate_and_publish(self, data: dict):
         prompt = data.get("prompt")
         duration = int(data.get("duration", 15))
-        voice = data.get("voice", "en-US-ChristopherNeural")
-        music = data.get("music", "cyber_pulse")
-        theme = data.get("theme", None)
+        genre = data.get("genre")
+        subgenre = data.get("subgenre")
+        mode = data.get("mode", "balanced")
+        caption_style = data.get("caption_style")
+        voice = data.get("voice")
+        if voice == "AUTO":
+            voice = None
+        music = data.get("music")
+        if music == "AUTO":
+            music = None
+        theme = data.get("theme")
+        seed = int(data.get("seed")) if data.get("seed") else None
         dry_run = data.get("dry_run", False)
+
+        animal_species = data.get("animal_species")
+        if animal_species == "RANDOM":
+            animal_species = None
+        visual_style = data.get("visual_style")
+        if visual_style == "RANDOM":
+            visual_style = None
+        activity_type = data.get("activity_type")
+        if activity_type == "RANDOM":
+            activity_type = None
+        is_duo = bool(data.get("is_duo", False))
 
         start = time.time()
         try:
             # 1. Synthesize Draft Video
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            video_file = loop.run_until_complete(run_pipeline(
+            video_file, storyboard, qc_result = loop.run_until_complete(run_pipeline(
                 prompt=prompt,
                 duration=duration,
+                genre=genre,
+                subgenre=subgenre,
+                mode=mode,
+                caption_style=caption_style,
                 voice=voice,
                 music_style=music,
-                theme=theme
+                theme=theme,
+                seed=seed,
+                run_qc=True,
+                animal_species=animal_species,
+                visual_style=visual_style,
+                activity_type=activity_type,
+                is_duo=is_duo
             ))
             loop.close()
 
@@ -388,7 +608,12 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             shutil.copy(str(src_path), str(target))
 
             # Companion metadata
-            caption = MetadataLinker.generate_caption_from_title(src_path.stem)
+            caption = MetadataLinker.generate_caption(
+                title=storyboard.get("title", src_path.stem),
+                genre=storyboard.get("genre", "science"),
+                hook=storyboard.get("hook"),
+                source=storyboard.get("source")
+            )
             caption_file = INBOX_DIR / f"{src_path.stem}.txt"
             with open(caption_file, "w", encoding="utf-8") as f:
                 f.write(caption)
@@ -403,6 +628,8 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                     "success": True,
                     "video_url": f"/output/{src_path.name}",
                     "filename": src_path.name,
+                    "storyboard": storyboard,
+                    "qc": qc_result,
                     "permalink": receipt.get("instagram_permalink"),
                     "media_id": receipt.get("instagram_media_id"),
                     "elapsed": elapsed
@@ -412,6 +639,8 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                     "success": False,
                     "video_url": f"/output/{src_path.name}",
                     "filename": src_path.name,
+                    "storyboard": storyboard,
+                    "qc": qc_result,
                     "error": result.get("error", "Instagram publish failed"),
                     "elapsed": elapsed
                 }
@@ -455,13 +684,14 @@ def start_server(port=PORT):
     prune_res = CacheManager.auto_prune()
     stats = CacheManager.get_cache_stats()
 
-    server = ThreadingHTTPServer(("0.0.0.0", port), ReelServerHandler)
-    print("=" * 60)
-    print(f"🚀 REEL PUBLISHER STUDIO RUNNING AT: http://localhost:{port}")
+    server = QuietThreadingHTTPServer(("0.0.0.0", port), ReelServerHandler)
+    print("=" * 65)
+    print(f"🚀 AUTOREELSTUDIO RUNNING AT: http://localhost:{port}")
+    print(f"🎬 Subsystems:         ReelMakerAI (Generator) + ReelPublisher (Meta Reels API)")
     print(f"📱 Instagram Account:  @{os.environ.get('INSTAGRAM_USERNAME', 'sun_27417')}")
-    print(f"📦 Active Cloud Bridge: Zero-Card OpenSSH TLS Tunnel (*.lhr.life)")
+    print(f"📦 Active Ingestion Bridge: Meta Native Direct Resumable Upload (100% Free, Zero Tunnels)")
     print(f"💾 Storage Cache:      {stats['total_mb']} MB ({stats['file_count']} files, auto-pruned {prune_res['freed_mb']} MB)")
-    print("=" * 60)
+    print("=" * 65)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

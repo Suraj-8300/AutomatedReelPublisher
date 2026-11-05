@@ -234,6 +234,16 @@ def main():
     p_prev.add_argument("video", help="Path to input video file")
     p_prev.add_argument("output", nargs="?", default=None, help="Output JPEG preview path")
 
+    # Command: create
+    p_create = subparsers.add_parser("create", help="Synthesize intelligent Instagram Reel with AI pipeline")
+    p_create.add_argument("-p", "--prompt", default=None, help="Custom prompt or leave empty for creative engine")
+    p_create.add_argument("-d", "--duration", type=int, choices=[10, 15, 30, 60], default=15, help="Duration in seconds")
+    p_create.add_argument("-g", "--genre", default=None, help="Creative genre (comedy, meme, science, mysteries, informative, emotional, storytelling, animation, cinematic)")
+    p_create.add_argument("-m", "--mode", default="balanced", choices=["balanced", "comedy", "educational", "story", "cinematic", "surprise"], help="Generation mode")
+    p_create.add_argument("-c", "--caption-style", default=None, choices=["karaoke", "high_impact", "clean_minimal", "cinematic", "dynamic_phrase", "meme"], help="Subtitle typography")
+    p_create.add_argument("--publish", action="store_true", help="Publish immediately to Instagram Reels")
+    p_create.add_argument("--dry-run", action="store_true", help="Simulate Meta Graph API publishing in dry-run mode")
+
     # Command: test
     subparsers.add_parser("test", help="Run diagnostic pipeline self-test")
 
@@ -242,7 +252,19 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    if args.command == "blueprint":
+    if args.command == "create":
+        import asyncio
+        from generate import run_pipeline, send_to_instagram_inbox
+        out_vid, sb, qc = asyncio.run(run_pipeline(
+            prompt=args.prompt,
+            duration=args.duration,
+            genre=args.genre,
+            mode=args.mode,
+            caption_style=args.caption_style
+        ))
+        if args.publish:
+            send_to_instagram_inbox(out_vid, sb, auto_publish=True, dry_run=args.dry_run)
+    elif args.command == "blueprint":
         cmd_blueprint(args)
     elif args.command == "watch":
         cmd_watch(args)

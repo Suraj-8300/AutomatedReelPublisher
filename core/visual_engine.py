@@ -1,5 +1,7 @@
 import math
 import random
+import uuid
+import subprocess
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -7,8 +9,10 @@ from .config import WIDTH, HEIGHT, FPS, FONTS, PALETTES, CACHE_DIR
 
 class VisualEngine:
     """
-    Renders high-retention 9:16 vertical motion cards, diagrams,
-    and Ken Burns scene sequences optimized for CPU rendering on laptop hardware.
+    Instagram-Native Visual & Animation Engine.
+    Generates full-screen 1080x1920 9:16 vertical visual scenes, animated cartoon skits,
+    motion comic frames, and cinematic camera movements without artificial borders,
+    floating boxes, or top title panels.
     """
 
     @staticmethod
@@ -22,19 +26,25 @@ class VisualEngine:
     @staticmethod
     def create_scene_frame(
         scene_info: Dict[str, Any],
-        palette_key: str = "cyber_blue",
+        genre: str = "science",
+        theme: str = "cyber_blue",
         output_file: Optional[Path] = None
     ) -> str:
         """
-        Renders a single ultra-crisp 1080x1920 frame for a scene.
+        Renders a full-screen, cinematic 1080x1920 visual frame tailored to the genre.
+        Pure full-screen art with NO top badges, NO artificial borders, NO floating boxes.
         """
-        palette = PALETTES.get(palette_key, PALETTES["cyber_blue"])
+        if output_file is None:
+            output_file = CACHE_DIR / f"frame_{uuid.uuid4().hex[:8]}.png"
+
+        palette = PALETTES.get(theme, PALETTES["cyber_blue"])
         img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 255))
         draw = ImageDraw.Draw(img)
 
-        # 1. Subtle Radial / Linear Dark Gradient Background
+        # 1. Full-screen dynamic atmospheric background
         bg_top = palette["bg_top"]
         bg_bot = palette["bg_bottom"]
+
         for y in range(HEIGHT):
             ratio = y / HEIGHT
             r = int(bg_top[0] * (1 - ratio) + bg_bot[0] * ratio)
@@ -42,142 +52,136 @@ class VisualEngine:
             b = int(bg_top[2] * (1 - ratio) + bg_bot[2] * ratio)
             draw.line([(0, y), (WIDTH, y)], fill=(r, g, b, 255))
 
-        # 2. Tech Grid Lines & Ambient Star Dust
-        random.seed(hash(scene_info.get("title", "")) % 10000)
-        # Background Grid
-        grid_alpha = 25
-        grid_step = 120
-        for gx in range(0, WIDTH, grid_step):
-            draw.line([(gx, 0), (gx, HEIGHT)], fill=(255, 255, 255, grid_alpha), width=1)
-        for gy in range(0, HEIGHT, grid_step):
-            draw.line([(0, gy), (WIDTH, gy)], fill=(255, 255, 255, grid_alpha), width=1)
+        # 2. Genre-specific native visual motifs (Full-screen composition)
+        rng = random.Random(hash(scene_info.get("text", "reel")) % 10000)
 
-        # Ambient Particle Stars
-        for _ in range(60):
-            px = random.randint(30, WIDTH - 30)
-            py = random.randint(50, HEIGHT - 100)
-            p_radius = random.randint(1, 3)
-            p_alpha = random.randint(50, 180)
-            draw.ellipse([px - p_radius, py - p_radius, px + p_radius, py + p_radius], fill=(255, 255, 255, p_alpha))
+        if genre in ["science", "mysteries"]:
+            # Cosmic dust & deep atmospheric nebula particles
+            for _ in range(120):
+                px = rng.randint(0, WIDTH)
+                py = rng.randint(0, HEIGHT)
+                rad = rng.randint(1, 4)
+                alpha = rng.randint(40, 220)
+                draw.ellipse([px - rad, py - rad, px + rad, py + rad], fill=(255, 255, 255, alpha))
 
-        # 3. Top Branding Pill: "🔬 IS IT PLAUSIBLE?"
-        badge_y = 130
-        badge_w = 460
-        badge_h = 64
-        badge_x0 = (WIDTH - badge_w) // 2
-        badge_y0 = badge_y
-        badge_x1 = badge_x0 + badge_w
-        badge_y1 = badge_y0 + badge_h
+            # Subtle orbital rings
+            cx, cy = WIDTH // 2, HEIGHT // 2 - 80
+            accent_hex = palette["accent"]
+            for r in [220, 380, 520]:
+                draw.arc([cx - r, cy - r, cx + r, cy + r], start=0, end=360, fill=(255, 255, 255, 25), width=2)
+            draw.arc([cx - 300, cy - 300, cx + 300, cy + 300], start=45, end=225, fill=accent_hex, width=3)
 
-        # Rounded badge background
-        draw.rounded_rectangle([badge_x0, badge_y0, badge_x1, badge_y1], radius=32, fill=palette["badge_bg"], outline=palette["border"], width=2)
-        font_badge = VisualEngine._get_font(28, bold=True)
-        draw.text((WIDTH // 2, badge_y0 + badge_h // 2), "🔬  IS IT PLAUSIBLE?", font=font_badge, fill=palette["accent"], anchor="mm")
+        elif genre == "animation":
+            # 2D Cartoon / Motion Comic Skit Visuals
+            cx, cy = WIDTH // 2, HEIGHT // 2 - 100
+            # Draw cartoon character
+            VisualEngine._draw_cartoon_character(draw, (cx, cy), rng, palette)
 
-        # 4. Category & Scene Title Header
-        scene_title = scene_info.get("title", "ANALYSIS").upper()
-        font_title = VisualEngine._get_font(46, bold=True)
-        draw.text((WIDTH // 2, 250), scene_title, font=font_title, fill=(255, 255, 255, 240), anchor="mm")
+        elif genre == "comedy" or genre == "meme":
+            # Dynamic vibrant energy bursts
+            cx, cy = WIDTH // 2, HEIGHT // 2 - 100
+            # Radial comic speed lines
+            for angle in range(0, 360, 15):
+                rad = math.radians(angle)
+                x1 = int(cx + 350 * math.cos(rad))
+                y1 = int(cy + 350 * math.sin(rad))
+                x2 = int(cx + 900 * math.cos(rad))
+                y2 = int(cy + 900 * math.sin(rad))
+                draw.line([(x1, y1), (x2, y2)], fill=(255, 255, 255, 30), width=3)
 
-        # 5. Central Hero Visual Card (Y: 330 to 1180)
-        card_x0, card_y0 = 70, 330
-        card_x1, card_y1 = WIDTH - 70, 1180
-        draw.rounded_rectangle([card_x0, card_y0, card_x1, card_y1], radius=36, fill=palette["card_bg"], outline=palette["border"], width=3)
+        elif genre == "cinematic":
+            # High-contrast anamorphic lens flare & cinematic atmosphere
+            flare_y = HEIGHT // 2 - 120
+            # Horizontal anamorphic glow lines
+            draw.line([(0, flare_y), (WIDTH, flare_y)], fill=palette["accent"], width=2)
+            draw.line([(WIDTH // 2 - 300, flare_y - 1), (WIDTH // 2 + 300, flare_y - 1)], fill=(255, 255, 255, 180), width=3)
+            # Subtle vertical vignette
+            for y in range(0, 240):
+                alpha = int((1 - (y / 240)) * 160)
+                draw.line([(0, y), (WIDTH, y)], fill=(0, 0, 0, alpha))
+            for y in range(HEIGHT - 240, HEIGHT):
+                alpha = int(((y - (HEIGHT - 240)) / 240) * 160)
+                draw.line([(0, y), (WIDTH, y)], fill=(0, 0, 0, alpha))
 
-        # Thematic Diagram inside Card
-        graphic_type = scene_info.get("graphic_type", "default")
-        card_center = ((card_x0 + card_x1) // 2, (card_y0 + card_y1) // 2)
-        VisualEngine._draw_thematic_graphic(draw, card_center, graphic_type, palette, scene_info)
+        else: # Informative / Emotional
+            # Elegant minimalist ambient waves
+            for i in range(5):
+                y_offset = (HEIGHT // 3) + i * 160
+                points = []
+                for x in range(0, WIDTH + 40, 40):
+                    y_sin = y_offset + int(math.sin((x / 180.0) + i) * 60)
+                    points.append((x, y_sin))
+                draw.line(points, fill=(255, 255, 255, 35), width=2)
 
-        # 6. Secondary Accent Glow under card
-        glow_bar_y = 1220
-        draw.line([(WIDTH // 2 - 120, glow_bar_y), (WIDTH // 2 + 120, glow_bar_y)], fill=palette["accent"], width=3)
-
-        # 7. Subtitle Safe Zone Indicator (Y: 1300 - 1550) - purely aesthetic subtle corner bracket
-        draw.line([(90, 1320), (90, 1340)], fill=(255, 255, 255, 60), width=2)
-        draw.line([(90, 1320), (110, 1320)], fill=(255, 255, 255, 60), width=2)
-        draw.line([(WIDTH - 90, 1320), (WIDTH - 90, 1340)], fill=(255, 255, 255, 60), width=2)
-        draw.line([(WIDTH - 90, 1320), (WIDTH - 110, 1320)], fill=(255, 255, 255, 60), width=2)
-
-        # 8. Save Frame
-        if output_file is None:
-            output_file = CACHE_DIR / f"frame_{uuid.uuid4().hex[:6]}.png"
         img.save(str(output_file), "PNG")
         return str(output_file)
 
     @staticmethod
-    def _draw_thematic_graphic(draw: ImageDraw.ImageDraw, center: tuple, graphic_type: str, palette: dict, info: dict):
+    def _draw_cartoon_character(draw: ImageDraw.ImageDraw, center: tuple, rng: random.Random, palette: dict):
+        """Draws an expressive 2D cartoon character for animation skits."""
         cx, cy = center
         accent = palette["accent"]
         highlight = palette["highlight"]
 
-        # Universal outer analysis ring
-        draw.arc([cx - 240, cy - 240, cx + 240, cy + 240], start=0, end=360, fill=(255, 255, 255, 40), width=2)
-        draw.arc([cx - 210, cy - 210, cx + 210, cy + 210], start=-30, end=210, fill=accent, width=4)
-        draw.arc([cx - 180, cy - 180, cx + 180, cy + 180], start=120, end=300, fill=highlight, width=3)
+        # Character Head
+        head_rad = 180
+        draw.ellipse([cx - head_rad, cy - head_rad, cx + head_rad, cy + head_rad], fill=(255, 220, 180, 255), outline=(30, 30, 30, 255), width=8)
 
-        # Specialized graphics
-        if "verdict" in info.get("title", "").lower() or graphic_type == "verdict":
-            # Massive High-Impact Verdict Badge
-            verdict_text = info.get("text", "PLAUSIBLE").upper()
-            is_busted = "bust" in verdict_text.lower() or "0%" in verdict_text
-            stamp_color = "#FF3366" if is_busted else "#00FFA3"
-            draw.rounded_rectangle([cx - 320, cy - 100, cx + 320, cy + 100], radius=24, outline=stamp_color, width=6)
-            font_v = VisualEngine._get_font(52, bold=True)
-            draw.text((cx, cy - 15), verdict_text[:18], font=font_v, fill=stamp_color, anchor="mm")
-            font_sub = VisualEngine._get_font(26, bold=True)
-            draw.text((cx, cy + 50), "OFFICIAL SCIENTIFIC VERDICT", font=font_sub, fill=(255, 255, 255, 200), anchor="mm")
-            return
+        # Big expressive cartoon eyes
+        eye_y = cy - 40
+        eye_spacing = 65
+        # Left eye
+        draw.ellipse([cx - eye_spacing - 45, eye_y - 50, cx - eye_spacing + 45, eye_y + 50], fill=(255, 255, 255, 255), outline=(20, 20, 20), width=6)
+        draw.ellipse([cx - eye_spacing - 15, eye_y - 25, cx - eye_spacing + 25, eye_y + 25], fill=(30, 30, 30, 255))
+        draw.ellipse([cx - eye_spacing, eye_y - 18, cx - eye_spacing + 12, eye_y - 6], fill=(255, 255, 255, 255)) # Pupil sparkle
 
-        if graphic_type == "elevator":
-            # Elevator Shaft & Physics Vectors
-            draw.rectangle([cx - 120, cy - 160, cx + 120, cy + 160], outline=accent, width=4)
-            # Falling cable
-            draw.line([(cx, cy - 220), (cx, cy - 160)], fill="#FF3366", width=4)
-            # Downward velocity vectors
-            for vy in [-40, 0, 40]:
-                draw.line([(cx - 60, cy + vy), (cx - 60, cy + vy + 40)], fill=highlight, width=4)
-                draw.polygon([(cx - 66, cy + vy + 40), (cx - 54, cy + vy + 40), (cx - 60, cy + vy + 55)], fill=highlight)
-            font_metric = VisualEngine._get_font(32, bold=True)
-            draw.text((cx + 30, cy - 20), "80 MPH ↓", font=font_metric, fill="#FF3366")
-            draw.text((cx + 30, cy + 30), "+5 MPH ↑", font=font_metric, fill="#00FFA3")
+        # Right eye
+        draw.ellipse([cx + eye_spacing - 45, eye_y - 50, cx + eye_spacing + 45, eye_y + 50], fill=(255, 255, 255, 255), outline=(20, 20, 20), width=6)
+        draw.ellipse([cx + eye_spacing - 25, eye_y - 25, cx + eye_spacing + 15, eye_y + 25], fill=(30, 30, 30, 255))
+        draw.ellipse([cx + eye_spacing - 10, eye_y - 18, cx + eye_spacing + 2, eye_y - 6], fill=(255, 255, 255, 255)) # Pupil sparkle
 
-        elif graphic_type == "ocean_shark":
-            # Sonar Waves & Molecule Dispersal
-            for r in [60, 110, 160, 210]:
-                draw.arc([cx - r, cy - r, cx + r, cy + r], start=180, end=360, fill=accent, width=3)
-            draw.ellipse([cx - 20, cy - 20, cx + 20, cy + 20], fill="#FF3366")
-            font_metric = VisualEngine._get_font(30, bold=True)
-            draw.text((cx, cy + 80), "1 PART PER BILLION", font=font_metric, fill=highlight, anchor="mm")
-            draw.text((cx, cy + 130), "CURRENT DEPENDENT", font=VisualEngine._get_font(24), fill=(255, 255, 255, 180), anchor="mm")
+        # Eyebrows
+        draw.arc([cx - eye_spacing - 45, eye_y - 95, cx - eye_spacing + 45, eye_y - 55], start=200, end=340, fill=(30, 30, 30), width=8)
+        draw.arc([cx + eye_spacing - 45, eye_y - 95, cx + eye_spacing + 45, eye_y - 55], start=200, end=340, fill=(30, 30, 30), width=8)
 
-        elif graphic_type == "cloud_scale":
-            # Cloud & Scale Schematic
-            draw.ellipse([cx - 140, cy - 100, cx + 20, cy + 20], fill=(255, 255, 255, 160))
-            draw.ellipse([cx - 60, cy - 140, cx + 100, cy - 10], fill=(255, 255, 255, 200))
-            draw.ellipse([cx - 10, cy - 90, cx + 150, cy + 30], fill=(255, 255, 255, 170))
-            font_metric = VisualEngine._get_font(36, bold=True)
-            draw.text((cx, cy + 90), "500,000 KG", font=font_metric, fill=highlight, anchor="mm")
-            draw.text((cx, cy + 140), "≈ 100 ELEPHANTS", font=VisualEngine._get_font(28, bold=True), fill=accent, anchor="mm")
+        # Expressive Smile / Open Mouth
+        mouth_y = cy + 60
+        draw.chord([cx - 70, mouth_y - 20, cx + 70, mouth_y + 70], start=0, end=180, fill=(220, 50, 50, 255), outline=(30, 30, 30), width=6)
+        # Tongue
+        draw.ellipse([cx - 30, mouth_y + 25, cx + 30, mouth_y + 65], fill=(255, 130, 130, 255))
 
-        elif graphic_type == "time_relativity":
-            # Relativistic Velocity Clocks
-            draw.arc([cx - 100, cy - 100, cx + 100, cy + 100], start=0, end=360, fill=accent, width=5)
-            draw.line([(cx, cy), (cx, cy - 70)], fill=highlight, width=4)
-            draw.line([(cx, cy), (cx + 50, cy + 20)], fill=accent, width=4)
-            font_metric = VisualEngine._get_font(34, bold=True)
-            draw.text((cx, cy + 120), "17,500 MPH", font=font_metric, fill=highlight, anchor="mm")
-            draw.text((cx, cy + 165), "-0.005s TIME DILATION", font=VisualEngine._get_font(26, bold=True), fill=accent, anchor="mm")
+    @staticmethod
+    def render_motion_scene_clip(
+        frame_path: str,
+        duration: float,
+        output_clip: Path,
+        motion_type: str = "zoom_in"
+    ) -> str:
+        """
+        Renders a static 1080x1920 frame into a dynamic vertical 9:16 motion clip
+        using GPU/CPU Ken Burns camera pan & zoom.
+        """
+        fps = FPS
+        total_frames = int(duration * fps)
 
-        else:
-            # High-Tech Cyber Target / Orbit System
-            draw.line([(cx - 160, cy), (cx + 160, cy)], fill=(255, 255, 255, 70), width=2)
-            draw.line([(cx, cy - 160), (cx, cy + 160)], fill=(255, 255, 255, 70), width=2)
-            draw.ellipse([cx - 30, cy - 30, cx + 30, cy + 30], fill=accent)
-            for angle in [45, 135, 225, 315]:
-                rad = math.radians(angle)
-                px = int(cx + 140 * math.cos(rad))
-                py = int(cy + 140 * math.sin(rad))
-                draw.ellipse([px - 8, py - 8, px + 8, py + 8], fill=highlight)
-            font_metric = VisualEngine._get_font(28, bold=True)
-            draw.text((cx, cy + 130), "DATA ANALYSIS ACTIVE", font=font_metric, fill=highlight, anchor="mm")
+        # Zoompan filter: gentle 1.0 to 1.12 zoom or pan
+        if motion_type == "zoom_in":
+            vf = f"zoompan=z='min(zoom+0.0008,1.15)':d={total_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={WIDTH}x{HEIGHT}:fps={fps}"
+        elif motion_type == "zoom_out":
+            vf = f"zoompan=z='if(lte(zoom,1.0),1.15,max(1.0,zoom-0.0008))':d={total_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={WIDTH}x{HEIGHT}:fps={fps}"
+        else: # pan
+            vf = f"zoompan=z=1.08:x='if(lte(on,-1),(it/{duration})*(iw-iw/zoom),x)':y='ih/2-(ih/zoom/2)':d={total_frames}:s={WIDTH}x{HEIGHT}:fps={fps}"
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-loop", "1",
+            "-i", str(frame_path),
+            "-vf", vf,
+            "-t", f"{duration:.2f}",
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-pix_fmt", "yuv420p",
+            str(output_clip)
+        ]
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        return str(output_clip)

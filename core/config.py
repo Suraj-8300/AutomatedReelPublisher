@@ -70,6 +70,24 @@ PALETTES = {
         "badge_bg": (60, 20, 20, 200),
         "card_bg": (45, 15, 15, 220),
         "border": (255, 51, 102, 120),
+    },
+    "cozy_warm": {
+        "bg_top": (42, 24, 16),
+        "bg_bottom": (22, 12, 8),
+        "accent": "#FFA94D",
+        "highlight": "#FFE066",
+        "badge_bg": (60, 35, 25, 200),
+        "card_bg": (45, 25, 18, 220),
+        "border": (255, 169, 77, 120),
+    },
+    "nature": {
+        "bg_top": (16, 36, 22),
+        "bg_bottom": (8, 20, 12),
+        "accent": "#69DB7C",
+        "highlight": "#FFD43B",
+        "badge_bg": (25, 55, 35, 200),
+        "card_bg": (18, 40, 26, 220),
+        "border": (105, 219, 124, 120),
     }
 }
 

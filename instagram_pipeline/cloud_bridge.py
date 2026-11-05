@@ -8,7 +8,7 @@ import threading
 import subprocess
 from pathlib import Path
 from typing import Dict, Any, Optional
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 import boto3
 from botocore.config import Config
@@ -29,24 +29,77 @@ from .config import (
 class TunnelMediaHandler(BaseHTTPRequestHandler):
     """Serves media files to Meta's ingestion service with range & streaming support."""
     def log_message(self, format, *args):
-        pass # Silence logging to keep CLI clean
+        pass # Silence logging to keep terminal clean
+
+    def handle(self):
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass
+
+    def do_HEAD(self):
+        filename = self.path.lstrip("/").split("?")[0]
+        file_path = ZeroCardTunnelBridge._file_mapping.get(filename)
+        if file_path and Path(file_path).exists():
+            p = Path(file_path)
+            file_size = p.stat().st_size
+            content_type = "video/mp4" if p.suffix.lower() == ".mp4" else "image/jpeg"
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(file_size))
+            self.send_header("Accept-Ranges", "bytes")
+            self.end_headers()
+        else:
+            self.send_error(404, "File not found")
 
     def do_GET(self):
         filename = self.path.lstrip("/").split("?")[0]
         file_path = ZeroCardTunnelBridge._file_mapping.get(filename)
         if file_path and Path(file_path).exists():
             p = Path(file_path)
+            file_size = p.stat().st_size
             content_type = "video/mp4" if p.suffix.lower() == ".mp4" else "image/jpeg"
-            self.send_response(200)
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(p.stat().st_size))
-            self.send_header("Accept-Ranges", "bytes")
-            self.end_headers()
+            range_header = self.headers.get("Range")
+
             try:
+                if range_header:
+                    bytes_range = range_header.strip().replace("bytes=", "")
+                    start_str, end_str = bytes_range.split("-")
+                    start = int(start_str) if start_str else 0
+                    end = int(end_str) if end_str else file_size - 1
+                    end = min(end, file_size - 1)
+                    chunk_len = end - start + 1
+
+                    self.send_response(206)
+                    self.send_header("Content-Type", content_type)
+                    self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
+                    self.send_header("Content-Length", str(chunk_len))
+                    self.send_header("Accept-Ranges", "bytes")
+                    self.end_headers()
+
+                    with open(p, "rb") as f:
+                        f.seek(start)
+                        sent = 0
+                        while sent < chunk_len:
+                            to_read = min(64 * 1024, chunk_len - sent)
+                            buf = f.read(to_read)
+                            if not buf:
+                                break
+                            self.wfile.write(buf)
+                            sent += len(buf)
+                    return
+
+                # Full stream
+                self.send_response(200)
+                self.send_header("Content-Type", content_type)
+                self.send_header("Content-Length", str(file_size))
+                self.send_header("Accept-Ranges", "bytes")
+                self.end_headers()
+
                 with open(p, "rb") as f:
                     while chunk := f.read(64 * 1024):
                         self.wfile.write(chunk)
-            except (BrokenPipeError, ConnectionResetError):
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
                 pass
         else:
             self.send_error(404, "File not found")
@@ -57,7 +110,7 @@ class ZeroCardTunnelBridge:
     Uses OpenSSH TLS tunneling via localhost.run to securely expose local video files
     directly to Meta's servers without requiring third-party cloud storage accounts.
     """
-    _server: Optional[HTTPServer] = None
+    _server: Optional[ThreadingHTTPServer] = None
     _proc: Optional[subprocess.Popen] = None
     _public_domain: Optional[str] = None
     _port: int = 0
@@ -76,18 +129,25 @@ class ZeroCardTunnelBridge:
             cls._port = s.getsockname()[1]
             s.close()
 
-            # 2. Start local HTTP file server
-            cls._server = HTTPServer(('127.0.0.1', cls._port), TunnelMediaHandler)
+            # 2. Start local HTTP file server (multi-threaded with Range & HEAD support)
+            cls._server = ThreadingHTTPServer(('127.0.0.1', cls._port), TunnelMediaHandler)
             srv_thread = threading.Thread(target=cls._server.serve_forever, daemon=True)
             srv_thread.start()
 
-            # 3. Open TLS tunnel via OpenSSH
-            cmd = ['ssh', '-o', 'StrictHostKeyChecking=no', '-R', f'80:localhost:{cls._port}', 'nokey@localhost.run']
+            # 3. Open TLS tunnel via OpenSSH with keepalive
+            cmd = [
+                'ssh',
+                '-o', 'StrictHostKeyChecking=no',
+                '-o', 'ServerAliveInterval=15',
+                '-o', 'ServerAliveCountMax=3',
+                '-R', f'80:localhost:{cls._port}',
+                'nokey@localhost.run'
+            ]
             cls._proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
             # 4. Parse public https URL
             start = time.time()
-            while time.time() - start < 12:
+            while time.time() - start < 15:
                 line = cls._proc.stdout.readline()
                 if line:
                     m = re.search(r'https://[a-zA-Z0-9\.\-_]+\.lhr\.life', line)

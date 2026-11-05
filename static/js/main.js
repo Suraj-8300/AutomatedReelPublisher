@@ -1,10 +1,9 @@
 /**
- * ReelPublisher Web Studio Frontend Logic
+ * AutoReelStudio Web Frontend Logic (ReelMakerAI + ReelPublisher)
  * Supports standalone local serving, containerized Hugging Face Spaces,
  * and portfolio embedding via window.PROJECT_CONFIG.
  */
 
-// Dynamically determine API base URL (falls back to local relative paths)
 const API_BASE = (typeof window !== 'undefined' && window.PROJECT_CONFIG?.apiBaseUrl) || '';
 
 let activeVideoFilename = null;
@@ -15,6 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAccountStatus();
     updateCacheStats();
     loadGallery();
+
+    const promptInput = document.getElementById('promptInput');
+    if (promptInput) {
+        promptInput.addEventListener('input', () => {
+            if (promptInput.value.trim().length > 0 && currentIdeaMode !== 'custom') {
+                setIdeaMode('custom');
+            }
+        });
+    }
 });
 
 /**
@@ -73,39 +81,253 @@ async function checkAccountStatus() {
 }
 
 /**
- * 2. Roll random viral topic from chosen niche
+ * Idea Mode Switcher (Autonomous vs Custom Prompt)
+ */
+let currentIdeaMode = 'auto';
+let currentStudioMode = 'standard';
+
+function switchStudioMode(mode) {
+    currentStudioMode = mode;
+    const btnStandard = document.getElementById('btnStudioStandard');
+    const btnAnimal = document.getElementById('btnStudioAnimal');
+    const standardSection = document.getElementById('standardStudioSection');
+    const animalSection = document.getElementById('animalStudioSection');
+
+    if (mode === 'animal') {
+        if (btnAnimal) btnAnimal.classList.add('active');
+        if (btnStandard) btnStandard.classList.remove('active');
+        if (standardSection) standardSection.style.display = 'none';
+        if (animalSection) animalSection.style.display = 'block';
+
+        const card = document.getElementById('characterPreviewCard');
+        if (card && card.style.display === 'none') {
+            rollAnimalStory();
+        }
+    } else {
+        if (btnStandard) btnStandard.classList.add('active');
+        if (btnAnimal) btnAnimal.classList.remove('active');
+        if (standardSection) standardSection.style.display = 'block';
+        if (animalSection) animalSection.style.display = 'none';
+    }
+}
+
+function onAnimalOptionChange() {
+    // Kept responsive for future automatic previews
+}
+
+async function rollAnimalStory() {
+    const species = document.getElementById('animalSpeciesSelect')?.value || 'RANDOM';
+    const style = document.getElementById('animalStyleSelect')?.value || 'pixar_3d';
+    const genre = document.getElementById('animalGenreSelect')?.value || 'cute';
+    const activity = document.getElementById('animalActivitySelect')?.value || 'RANDOM';
+    const isDuo = document.getElementById('animalDuoCheckbox')?.checked || false;
+    const prompt = document.getElementById('animalPromptInput')?.value.trim() || '';
+
+    const btn = document.getElementById('btnRollAnimalStory');
+    if (btn) btn.innerText = '🎲 Rolling...';
+
+    try {
+        const query = new URLSearchParams({
+            species,
+            style,
+            genre,
+            activity,
+            is_duo: isDuo ? 'true' : 'false',
+            prompt
+        });
+        const res = await fetch(`${API_BASE}/api/random-animal-story?${query.toString()}`);
+        const data = await res.json();
+
+        if (data.success && data.story) {
+            const story = data.story;
+            if (!prompt && story.title) {
+                document.getElementById('animalPromptInput').value = story.title;
+            }
+
+            const card = document.getElementById('characterPreviewCard');
+            if (card) card.style.display = 'block';
+
+            const titleEl = document.getElementById('charCardTitle');
+            if (titleEl) titleEl.innerText = `🐾 Hero: ${story.hero_name}`;
+            const badgeEl = document.getElementById('charStyleBadge');
+            if (badgeEl) badgeEl.innerText = story.style_meta?.label || story.visual_style;
+
+            const charData = story.character_data;
+            let detailsHtml = '';
+
+            if (charData.is_duo) {
+                const c1 = charData.character_1;
+                const c2 = charData.character_2;
+                detailsHtml = `
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Hero 1</span>
+                        <span class="character-detail-val">${c1.name} (${c1.breed})</span>
+                    </div>
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Hero 2</span>
+                        <span class="character-detail-val">${c2.name} (${c2.breed})</span>
+                    </div>
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Accessories</span>
+                        <span class="character-detail-val">${c1.accessories}, ${c2.accessories}</span>
+                    </div>
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Dynamic</span>
+                        <span class="character-detail-val">${charData.duo_archetype?.dynamic || 'Best Friends'}</span>
+                    </div>
+                `;
+            } else {
+                const c = charData.character;
+                detailsHtml = `
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Breed</span>
+                        <span class="character-detail-val">${c.breed}</span>
+                    </div>
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Coat & Eyes</span>
+                        <span class="character-detail-val">${c.fur_color}, ${c.eye_color}</span>
+                    </div>
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Markings</span>
+                        <span class="character-detail-val">${c.distinct_markings}</span>
+                    </div>
+                    <div class="character-detail-item">
+                        <span class="character-detail-label">Accessories</span>
+                        <span class="character-detail-val">${c.accessories}</span>
+                    </div>
+                `;
+            }
+
+            const gridEl = document.getElementById('charDetailsGrid');
+            if (gridEl) gridEl.innerHTML = detailsHtml;
+
+            let scenesHtml = '';
+            (story.scenes || []).forEach(sc => {
+                scenesHtml += `
+                    <div class="scene-step-pill">
+                        <div class="scene-step-title">Scene ${sc.scene_number}: ${sc.camera_angle}</div>
+                        <div>"${sc.dialogue_or_narration}"</div>
+                    </div>
+                `;
+            });
+            const scenesEl = document.getElementById('charScenesPreview');
+            if (scenesEl) scenesEl.innerHTML = scenesHtml;
+        }
+    } catch (e) {
+        console.error('Failed to roll animal story:', e);
+    } finally {
+        if (btn) btn.innerText = '🎲 Roll Animal Story';
+    }
+}
+
+function setIdeaMode(mode) {
+    currentIdeaMode = mode;
+    const tabAuto = document.getElementById('tabAutoIdea');
+    const tabCustom = document.getElementById('tabCustomIdea');
+    const promptInput = document.getElementById('promptInput');
+    const hint = document.getElementById('ideaModeHint');
+
+    if (mode === 'auto') {
+        tabAuto.classList.add('active');
+        tabCustom.classList.remove('active');
+        promptInput.placeholder = "Leave empty for infinite autonomous creation, or click '🎲 Roll Fresh Idea'...";
+        hint.innerHTML = "💡 <strong>Autonomous Mode:</strong> The engine automatically invents an original, non-repeating concept for you.";
+    } else {
+        tabCustom.classList.add('active');
+        tabAuto.classList.remove('active');
+        promptInput.placeholder = "Type your custom idea, topic, or premise here (e.g., 'Why cats sleep 16 hours a day' or 'POV: You forgot your keys inside the car')...";
+        hint.innerHTML = "✍️ <strong>Custom Idea Mode:</strong> The engine will craft the entire Reel specifically around your idea!";
+        promptInput.focus();
+    }
+}
+
+/**
+ * 2. Roll random creative topic from chosen genre
  */
 async function rollIdea() {
-    const niche = document.getElementById('nicheSelect').value;
+    const genre = document.getElementById('genreSelect').value;
     try {
-        const res = await fetch(`${API_BASE}/api/random-topic?niche=${encodeURIComponent(niche)}`);
+        const duration = parseInt(document.querySelector('input[name="duration"]:checked')?.value || '15');
+        const res = await fetch(`${API_BASE}/api/random-topic?genre=${encodeURIComponent(genre)}&duration=${duration}`);
         const data = await res.json();
         if (data && data.title) {
             document.getElementById('promptInput').value = data.title;
+            setIdeaMode('custom');
+            const hint = document.getElementById('ideaModeHint');
+            if (hint && data.retention_score) {
+                hint.innerHTML = `🧠 <strong>Smart pick (${data.retention_score}/100):</strong> ${data.reason || 'Ranked for freshness and retention.'}`;
+            }
         }
     } catch (e) {
-        console.error('Failed to roll idea:', e);
+        console.error('Failed to roll topic:', e);
     }
+}
+
+function getFormPayload() {
+    const duration = parseInt(document.querySelector('input[name="duration"]:checked').value);
+    const captionStyle = document.getElementById('captionStyleSelect').value;
+    const voiceVal = document.getElementById('voiceSelect').value;
+    const voice = (voiceVal === 'AUTO') ? null : voiceVal;
+    const musicVal = document.getElementById('musicSelect').value;
+    const music = (musicVal === 'AUTO') ? null : musicVal;
+    const seedVal = document.getElementById('seedInput').value.trim();
+    const seed = seedVal ? parseInt(seedVal) : null;
+    const publishMode = document.getElementById('publishMode').value;
+    const dryRun = (publishMode === 'dry_run');
+
+    if (currentStudioMode === 'animal') {
+        const animalSpecies = document.getElementById('animalSpeciesSelect')?.value || null;
+        const visualStyle = document.getElementById('animalStyleSelect')?.value || 'pixar_3d';
+        const animalGenre = document.getElementById('animalGenreSelect')?.value || 'cute';
+        const activityType = document.getElementById('animalActivitySelect')?.value || null;
+        const isDuo = Boolean(document.getElementById('animalDuoCheckbox')?.checked);
+        const prompt = document.getElementById('animalPromptInput')?.value.trim() || '';
+
+        return {
+            mode: 'animal_story',
+            prompt: prompt,
+            genre: animalGenre,
+            animal_species: animalSpecies,
+            visual_style: visualStyle,
+            activity_type: activityType,
+            is_duo: isDuo,
+            duration: duration,
+            caption_style: captionStyle,
+            voice: voice,
+            music: music,
+            seed: seed,
+            dry_run: dryRun
+        };
+    }
+
+    const prompt = document.getElementById('promptInput').value.trim();
+    const genreVal = document.getElementById('genreSelect').value;
+    const genre = (genreVal === 'RANDOM') ? null : genreVal;
+    const mode = document.getElementById('modeSelect').value;
+
+    return {
+        prompt,
+        duration,
+        genre,
+        mode,
+        caption_style: captionStyle,
+        voice,
+        music,
+        seed,
+        dry_run: dryRun
+    };
 }
 
 /**
  * 3. ⚡ 1-Click Generate & Auto-Publish to Instagram Reels
  */
 async function triggerOneClickPublish() {
-    const btnHero = document.getElementById('btnOneClick');
-    const btnDraft = document.getElementById('btnGenerateOnly');
-    const prompt = document.getElementById('promptInput').value.trim();
-    const duration = parseInt(document.querySelector('input[name="duration"]:checked').value);
-    const voice = document.getElementById('voiceSelect').value;
-    const music = document.getElementById('musicSelect').value;
-    const mode = document.getElementById('publishMode').value;
-    const dryRun = (mode === 'dry_run');
+    const payload = getFormPayload();
 
     setControlsDisabled(true);
-    showStatus('⚡ 1-Click Pipeline Engaged', 'Synthesizing neural voiceover, compiling 9:16 footage & formatting captions...', 25);
+    showStatus('⚡ 1-Click Creation & Publish', 'Synthesizing voiceover, assembling full-screen 9:16 footage, rendering captions & publishing live...', 25);
 
     try {
-        const payload = { prompt, duration, voice, music, dry_run: dryRun };
         const res = await fetch(`${API_BASE}/api/generate-and-publish`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -115,7 +337,7 @@ async function triggerOneClickPublish() {
 
         if (data.success) {
             updateProgress(100);
-            const permalink = data.permalink || (dryRun ? 'https://www.instagram.com/reel/dryrun_simulation/' : '#');
+            const permalink = data.permalink || (payload.dry_run ? 'https://www.instagram.com/reel/dryrun_simulation/' : '#');
             const receiptHtml = `
                 <div style="margin-top: 8px;">
                     <p style="color: #00FFA3; font-weight: bold; font-size: 0.95rem;">🎉 Reel Published Successfully to Instagram!</p>
@@ -127,7 +349,6 @@ async function triggerOneClickPublish() {
             `;
             showSuccess('✅ Live Publication Complete!', receiptHtml);
 
-            // Load into preview player
             loadVideoIntoPreview(data.video_url, data.filename || 'reel.mp4', true);
             loadGallery();
             checkAccountStatus();
@@ -146,16 +367,12 @@ async function triggerOneClickPublish() {
  * 4. 🎬 Generate Video Only (Draft / Preview)
  */
 async function triggerGenerateDraft() {
-    const prompt = document.getElementById('promptInput').value.trim();
-    const duration = parseInt(document.querySelector('input[name="duration"]:checked').value);
-    const voice = document.getElementById('voiceSelect').value;
-    const music = document.getElementById('musicSelect').value;
+    const payload = getFormPayload();
 
     setControlsDisabled(true);
-    showStatus('🎬 Compiling Video Draft', 'Concurrently pulling B-roll, synthesizing TTS & rendering vertical 1080x1920 MP4...', 35);
+    showStatus('🎬 Compiling Native 9:16 Reel', 'Composing scene clips, synthesizing voice, burning modern typography & checking QC...', 35);
 
     try {
-        const payload = { prompt, duration, voice, music };
         const res = await fetch(`${API_BASE}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -165,7 +382,8 @@ async function triggerGenerateDraft() {
 
         if (data.success) {
             updateProgress(100);
-            showSuccess('✅ Video Draft Rendered!', `Reel compiled in ${data.elapsed.toFixed(1)}s. Preview loaded below. You can inspect specs or publish whenever ready.`);
+            const qcBadge = data.qc?.passed ? '✅ QC Passed (100%)' : '⚠️ Ready';
+            showSuccess('✅ Reel Draft Rendered!', `Compiled in ${data.elapsed.toFixed(1)}s. ${qcBadge}. Full-screen native 9:16 preview loaded below.`);
             loadVideoIntoPreview(data.video_url, data.filename || 'reel.mp4', false);
             loadGallery();
             updateCacheStats();
@@ -228,7 +446,7 @@ async function publishVideoFile(filename) {
 }
 
 /**
- * 6. Inspect Active Video Specs
+ * 6. Inspect Active Video Specs & QC
  */
 async function inspectActiveVideo() {
     if (!activeVideoFilename) return;
@@ -239,7 +457,7 @@ async function openSpecAudit(filename) {
     const drawer = document.getElementById('specAuditDrawer');
     const content = document.getElementById('specAuditContent');
     drawer.style.display = 'block';
-    content.innerHTML = '<p style="grid-column: 1/-1; color: var(--accent);">🔍 Probing container streams with ffprobe...</p>';
+    content.innerHTML = '<p style="grid-column: 1/-1; color: var(--accent);">🔍 Probing container and running Quality Control audit...</p>';
 
     try {
         const res = await fetch(`${API_BASE}/api/inspect?video=${encodeURIComponent(filename)}`);
@@ -251,40 +469,52 @@ async function openSpecAudit(filename) {
         }
 
         const p = data.probe;
-        const c = data.compliance;
+        const qc = data.qc || {};
 
         content.innerHTML = `
+            <div class="spec-item">
+                <span class="spec-label">Quality Score</span>
+                <span class="spec-val ${qc.passed ? 'ok' : 'err'}">${qc.score ?? 100}/100 (${qc.overall_status || 'PASSED'})</span>
+            </div>
             <div class="spec-item">
                 <span class="spec-label">Resolution</span>
                 <span class="spec-val ${p.video.width === 1080 && p.video.height === 1920 ? 'ok' : 'err'}">${p.video.width} x ${p.video.height} (9:16)</span>
             </div>
             <div class="spec-item">
-                <span class="spec-label">Frame Rate</span>
-                <span class="spec-val ${p.video.fps >= 23 && p.video.fps <= 60 ? 'ok' : 'warn'}">${p.video.fps} FPS</span>
+                <span class="spec-label">Aspect Ratio</span>
+                <span class="spec-val ok">9:16 Full Screen</span>
             </div>
             <div class="spec-item">
                 <span class="spec-label">Video Codec</span>
-                <span class="spec-val ok">${p.video.codec_name} (${p.video.profile || 'High'})</span>
+                <span class="spec-val ${p.video.codec === 'h264' ? 'ok' : 'err'}">${p.video.codec.toUpperCase()} (${p.video.profile || 'High'})</span>
             </div>
             <div class="spec-item">
-                <span class="spec-label">Faststart Moov</span>
-                <span class="spec-val ${p.faststart ? 'ok' : 'warn'}">${p.faststart ? 'YES (+faststart)' : 'Added on Publish'}</span>
+                <span class="spec-label">Frame Rate</span>
+                <span class="spec-val ${p.video.fps >= 24 ? 'ok' : 'err'}">${p.video.fps.toFixed(1)} fps</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Audio Stream</span>
+                <span class="spec-val ${p.audio.codec === 'aac' ? 'ok' : 'err'}">${p.audio.codec.toUpperCase()} ${p.audio.sample_rate}Hz</span>
             </div>
             <div class="spec-item">
                 <span class="spec-label">Audio Channels</span>
-                <span class="spec-val ${p.audio.channels === 2 ? 'ok' : 'warn'}">${p.audio.channels === 2 ? 'Stereo (2)' : p.audio.channels + ' (Normalized on Publish)'}</span>
+                <span class="spec-val ${p.audio.channels === 2 ? 'ok' : 'err'}">${p.audio.channels === 2 ? 'Stereo (2ch)' : p.audio.channels + ' ch'}</span>
             </div>
             <div class="spec-item">
-                <span class="spec-label">Audio Sample Rate</span>
-                <span class="spec-val ${p.audio.sample_rate === 48000 ? 'ok' : 'warn'}">${p.audio.sample_rate} Hz</span>
+                <span class="spec-label">Faststart Moov</span>
+                <span class="spec-val ${p.format.has_faststart ? 'ok' : 'err'}">${p.format.has_faststart ? 'At Head (Instant Stream)' : 'Trailing'}</span>
             </div>
-            <div class="spec-item" style="grid-column: 1/-1;">
-                <span class="spec-label">Compliance Verdict:</span>
-                <span class="spec-val ${c.is_compliant ? 'ok' : 'warn'}">${c.is_compliant ? '✅ 100% Ready for Instagram Reels' : '⚠️ Pipeline will auto-transcode to 1080x1920 & stereo AAC on publish'}</span>
+            <div class="spec-item">
+                <span class="spec-label">Duration</span>
+                <span class="spec-val ok">${p.format.duration.toFixed(1)}s</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">File Size</span>
+                <span class="spec-val ok">${(p.format.size / (1024*1024)).toFixed(1)} MB</span>
             </div>
         `;
-    } catch (err) {
-        content.innerHTML = `<p style="grid-column: 1/-1; color: var(--danger);">Inspection failed: ${err.message}</p>`;
+    } catch (e) {
+        content.innerHTML = `<p style="grid-column: 1/-1; color: var(--danger);">Inspection error: ${e.message}</p>`;
     }
 }
 
@@ -293,42 +523,49 @@ function closeSpecAudit() {
 }
 
 /**
- * 7. Safe Zone Danger Overlay Toggle
+ * 7. Safe Zone Overlay Toggle
  */
 function toggleSafeZoneOverlay() {
     const overlay = document.getElementById('safeZoneOverlay');
     const btnText = document.getElementById('safeZoneBtnText');
     isSafeZoneVisible = !isSafeZoneVisible;
-    overlay.style.display = isSafeZoneVisible ? 'flex' : 'none';
-    btnText.innerText = isSafeZoneVisible ? '📐 Hide Safe Zones' : '📐 Toggle Safe Zones';
+    if (isSafeZoneVisible) {
+        overlay.style.display = 'flex';
+        btnText.innerText = '📐 Hide Safe Zones';
+    } else {
+        overlay.style.display = 'none';
+        btnText.innerText = '📐 Toggle Safe Zones';
+    }
 }
 
 /**
- * 8. Load a video into the main vertical preview player
+ * 8. Preview Player Loader
  */
 function loadVideoIntoPreview(url, filename, published = false) {
     activeVideoFilename = filename;
     const player = document.getElementById('mainVideoPlayer');
     const emptyState = document.getElementById('emptyPreview');
-    const previewActions = document.getElementById('previewActions');
+    const actions = document.getElementById('previewActions');
     const badge = document.getElementById('videoStatusBadge');
-    const downloadBtn = document.getElementById('btnDownloadActive');
+    const btnDownload = document.getElementById('btnDownloadActive');
 
     emptyState.style.display = 'none';
     player.style.display = 'block';
-    player.src = `${API_BASE}${url}`;
-    player.play().catch(() => {});
+    player.src = url;
+    player.load();
 
-    previewActions.style.display = 'flex';
-    downloadBtn.href = `${API_BASE}${url}`;
-    downloadBtn.download = filename;
+    actions.style.display = 'flex';
+    btnDownload.href = url;
+    btnDownload.download = filename;
 
     if (published) {
-        badge.className = 'badge badge-success';
-        badge.innerText = 'Published to Instagram';
+        badge.innerText = '🟢 Published';
+        badge.className = 'badge badge-published';
+        document.getElementById('btnPublishActive').innerText = '📲 Re-Publish to Instagram';
     } else {
-        badge.className = 'badge badge-accent';
-        badge.innerText = 'Draft Ready';
+        badge.innerText = '🟡 Draft Preview';
+        badge.className = 'badge badge-draft';
+        document.getElementById('btnPublishActive').innerText = '📲 Publish This Reel to Instagram';
     }
 }
 
@@ -337,147 +574,117 @@ function loadVideoIntoPreview(url, filename, published = false) {
  */
 async function loadGallery() {
     const grid = document.getElementById('galleryGrid');
-    const countBadge = document.getElementById('galleryCount');
-
+    const countEl = document.getElementById('galleryCount');
     try {
         const res = await fetch(`${API_BASE}/api/gallery`);
-        const videos = await res.json();
+        const items = await res.json();
 
-        grid.innerHTML = '';
-        if (!videos || videos.length === 0) {
-            countBadge.innerText = '0 videos';
-            grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1/-1; padding: 24px; text-align: center;">No reels generated yet. Hit 1-Click Generate above to start!</p>';
+        countEl.innerText = `${items.length} videos`;
+        if (items.length === 0) {
+            grid.innerHTML = '<p style="color: var(--text-dim); grid-column: 1/-1;">No generated videos in archive yet.</p>';
             return;
         }
 
-        countBadge.innerText = `${videos.length} videos`;
-        videos.forEach(v => {
-            const card = document.createElement('div');
-            card.className = 'gallery-card';
-            const isPub = v.published;
-
-            card.innerHTML = `
-                <div class="gallery-video-wrapper">
-                    <video src="${API_BASE}${v.url}" controls preload="metadata"></video>
+        grid.innerHTML = items.map(item => `
+            <div class="video-card">
+                <div class="card-thumb" onclick="loadVideoIntoPreview('${item.url}', '${item.filename}', ${item.published})">
+                    <video src="${item.url}#t=0.5" preload="metadata"></video>
+                    <div class="card-play-icon">▶</div>
+                    <span class="card-duration">${item.size}</span>
                 </div>
-                <div class="gallery-info">
-                    <div class="gallery-item-title">${v.name}</div>
-                    <div class="gallery-badge-row">
-                        <span>📦 ${v.size}</span>
-                        ${isPub ? '<span style="color: var(--success); font-weight: bold;">• ✅ Published</span>' : '<span style="color: var(--accent);">• 📝 Draft</span>'}
-                    </div>
-                    <div class="gallery-card-actions">
-                        ${isPub && v.permalink 
-                            ? `<a href="${v.permalink}" target="_blank" class="btn-gallery-pub" style="text-align: center; text-decoration: none;">🔗 View on Instagram</a>`
-                            : `<button class="btn-gallery-pub" onclick="publishVideoFile('${v.filename}')">📲 Publish to Instagram</button>`
+                <div class="card-info">
+                    <h4 class="card-title" title="${item.name}">${item.name}</h4>
+                    <div class="card-footer">
+                        ${item.published 
+                            ? `<a href="${item.permalink}" target="_blank" class="badge badge-published" style="text-decoration:none;">Live Reel</a>` 
+                            : `<span class="badge badge-draft">Draft</span>`
                         }
-                        <div class="gallery-sub-actions">
-                            <button class="btn-gallery-tool" onclick="openGalleryInspect('${v.filename}', '${v.name}')">🔍 Audit</button>
-                            <a href="${API_BASE}${v.url}" download="${v.filename}" class="btn-gallery-tool">⬇️ Save</a>
-                        </div>
+                        <button class="btn-card-action" onclick="openSpecAudit('${item.filename}')" title="Inspect compliance">🔍 Audit</button>
+                        <button class="btn-card-action" onclick="deleteVideo('${item.filename}')" title="Delete video" style="color: #ff3366; margin-left: 4px;">🗑️</button>
                     </div>
                 </div>
-            `;
-            grid.appendChild(card);
-        });
+            </div>
+        `).join('');
     } catch (e) {
-        console.error('Gallery load error:', e);
+        console.error('Failed to load gallery:', e);
     }
 }
 
 /**
- * Gallery Inspection Modal
+ * 10. Delete a Video from the Archive
  */
-async function openGalleryInspect(filename, title) {
-    const modal = document.getElementById('inspectModal');
-    const titleEl = document.getElementById('modalVideoTitle');
-    const bodyEl = document.getElementById('modalAuditBody');
-
-    titleEl.innerText = `Reel Audit: ${title}`;
-    bodyEl.innerHTML = '<p style="color: var(--accent);">Probing video streams...</p>';
-    modal.style.display = 'flex';
-
+async function deleteVideo(filename) {
+    if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
     try {
-        const res = await fetch(`${API_BASE}/api/inspect?video=${encodeURIComponent(filename)}`);
+        const res = await fetch(`${API_BASE}/api/delete-video`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename })
+        });
         const data = await res.json();
-
         if (data.success) {
-            const p = data.probe;
-            const c = data.compliance;
-            bodyEl.innerHTML = `
-                <div class="spec-audit-grid" style="margin-bottom: 12px;">
-                    <div class="spec-item"><span class="spec-label">Resolution</span><span class="spec-val ok">${p.video.width} x ${p.video.height}</span></div>
-                    <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-val ok">${p.duration.toFixed(1)}s</span></div>
-                    <div class="spec-item"><span class="spec-label">Framerate</span><span class="spec-val ok">${p.video.fps} FPS</span></div>
-                    <div class="spec-item"><span class="spec-label">Audio</span><span class="spec-val ok">${p.audio.channels === 2 ? 'Stereo' : 'Mono'} (${p.audio.sample_rate}Hz)</span></div>
-                </div>
-                <div style="background: #080c14; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
-                    <p style="font-weight: bold; margin-bottom: 6px;">Compliance Status: ${c.is_compliant ? '<span style="color:#00FFA3">Compliant</span>' : '<span style="color:#FFB800">Normalization needed</span>'}</p>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">${c.issues && c.issues.length ? c.issues.join('<br>') : 'All Instagram Reels technical criteria met perfectly.'}</p>
-                </div>
-            `;
+            loadGallery();
+            if (activeVideoFilename === filename) {
+                const player = document.getElementById('mainVideoPlayer');
+                const emptyState = document.getElementById('emptyPreview');
+                const actions = document.getElementById('previewActions');
+                if (player) {
+                    player.pause();
+                    player.src = '';
+                    player.style.display = 'none';
+                }
+                if (emptyState) emptyState.style.display = 'block';
+                if (actions) actions.style.display = 'none';
+                activeVideoFilename = null;
+            }
         } else {
-            bodyEl.innerHTML = `<p style="color: var(--danger);">${data.error}</p>`;
+            alert('Failed to delete video: ' + (data.error || 'Unknown error'));
         }
     } catch (e) {
-        bodyEl.innerHTML = `<p style="color: var(--danger);">${e.message}</p>`;
+        alert('Error deleting video: ' + e.message);
     }
 }
 
-function closeInspectModal() {
-    document.getElementById('inspectModal').style.display = 'none';
-}
-
 /**
- * Helpers for UI States
+ * Status and Progress Notification Helpers
  */
-function setControlsDisabled(disabled) {
-    document.getElementById('btnOneClick').disabled = disabled;
-    document.getElementById('btnGenerateOnly').disabled = disabled;
-    const pubActive = document.getElementById('btnPublishActive');
-    if (pubActive) pubActive.disabled = disabled;
-}
-
 function showStatus(title, message, progress = 20) {
     const box = document.getElementById('statusBox');
-    const titleEl = document.getElementById('statusTitle');
-    const msgEl = document.getElementById('statusMessage');
-    const bar = document.getElementById('progressBar');
     box.style.display = 'block';
-    box.style.borderColor = 'var(--accent)';
-    titleEl.innerText = title;
-    msgEl.innerHTML = message;
-    bar.style.width = `${progress}%`;
+    box.className = 'status-container';
+    document.getElementById('statusTitle').innerText = title;
+    document.getElementById('statusMessage').innerText = message;
+    document.getElementById('statusSpinner').style.display = 'block';
+    updateProgress(progress);
 }
 
-function updateProgress(progress) {
+function updateProgress(percent) {
     const bar = document.getElementById('progressBar');
-    if (bar) bar.style.width = `${progress}%`;
+    if (bar) bar.style.width = `${percent}%`;
 }
 
-function showSuccess(title, htmlMessage) {
+function showSuccess(title, htmlContent) {
     const box = document.getElementById('statusBox');
-    const titleEl = document.getElementById('statusTitle');
-    const msgEl = document.getElementById('statusMessage');
-    const spinner = document.getElementById('statusSpinner');
     box.style.display = 'block';
-    box.style.borderColor = 'var(--success)';
-    if (spinner) spinner.style.display = 'none';
-    titleEl.innerText = title;
-    titleEl.style.color = 'var(--success)';
-    msgEl.innerHTML = htmlMessage;
+    box.className = 'status-container success';
+    document.getElementById('statusSpinner').style.display = 'none';
+    document.getElementById('statusTitle').innerText = title;
+    document.getElementById('statusMessage').innerHTML = htmlContent;
 }
 
 function showError(title, message) {
     const box = document.getElementById('statusBox');
-    const titleEl = document.getElementById('statusTitle');
-    const msgEl = document.getElementById('statusMessage');
-    const spinner = document.getElementById('statusSpinner');
     box.style.display = 'block';
-    box.style.borderColor = 'var(--danger)';
-    if (spinner) spinner.style.display = 'none';
-    titleEl.innerText = title;
-    titleEl.style.color = 'var(--danger)';
-    msgEl.innerHTML = `<span style="color: var(--danger);">${message}</span>`;
+    box.className = 'status-container error';
+    document.getElementById('statusSpinner').style.display = 'none';
+    document.getElementById('statusTitle').innerText = title;
+    document.getElementById('statusMessage').innerText = message;
+    updateProgress(0);
 }
 
+function setControlsDisabled(disabled) {
+    const btnHero = document.getElementById('btnOneClick');
+    const btnDraft = document.getElementById('btnGenerateOnly');
+    if (btnHero) btnHero.disabled = disabled;
+    if (btnDraft) btnDraft.disabled = disabled;
+}

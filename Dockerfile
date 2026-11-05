@@ -36,6 +36,6 @@ USER user
 # Expose default container port
 EXPOSE 7860
 
-# Run ReelPublisher Server
+# Run AutoReelStudio Server
 CMD ["python3", "server.py"]
 

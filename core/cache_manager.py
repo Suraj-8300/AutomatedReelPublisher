@@ -217,3 +217,4 @@ class CacheManager:
             "freed_mb": round(freed_bytes / (1024 * 1024), 2),
             "deleted_count": deleted_count
         }
+
