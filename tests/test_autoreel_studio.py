@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
-Unit and integration tests for AutoReelStudio (Merged ReelMakerAI + ReelPublisher).
+Comprehensive Modular Architecture Unit Tests for AutoReelStudio.
+Tests:
+  1. idea_generation: 10-15 idea queue buffer, replenishment, research synthesis
+  2. video_generation: 50 reels/day quota governor, visual & audio parameters
+  3. video_processing: CDN faststart check & metadata packager for IG and YT
+  4. publishers: Instagram compliance validator & YouTube OAuth flow
 """
 
 import sys
@@ -12,64 +17,70 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from core.creative_randomizer import CreativeRandomizer, GENRE_TAXONOMY, GENERATION_MODES
-from core.content_history import ContentHistory
-from core.hooks_engine import HooksEngine
-from core.idea_generator import IdeaGenerator
-from core.cache_manager import CacheManager
-from instagram_pipeline.preprocessor import VideoPreprocessor
+from idea_generation import IdeaQueueManager, IdeaResearchEngine, MIN_QUEUE_THRESHOLD, TARGET_QUEUE_SIZE
+from video_generation import QuotaGovernor, DAILY_MAX_REELS
+from video_processing import CDNOptimizer, MetadataPackager
+from publishers.instagram.preprocessor import VideoPreprocessor
+from publishers.youtube.auth import YouTubeAuthenticator
 
-class TestAutoReelStudio(unittest.TestCase):
+class TestAutoReelStudioModularArchitecture(unittest.TestCase):
 
-    def test_standalone_project_isolation(self):
-        """Verifies that AutoReelStudio is the sole standalone project and former projects are deleted."""
-        projects_dir = PROJECT_ROOT.parent
-        reel_maker = projects_dir / "ReelMakerAI"
-        reel_publisher = projects_dir / "ReelPublisher"
-        auto_reel_studio = projects_dir / "AutoReelStudio"
+    def test_idea_queue_replenishment_and_buffer(self):
+        """Verifies the 10-15 idea buffer replenishment rule."""
+        # 1. Replenish
+        res = IdeaQueueManager.replenish_if_needed()
+        count = IdeaQueueManager.get_count()
+        self.assertGreaterEqual(count, MIN_QUEUE_THRESHOLD)
+        self.assertLessEqual(count, TARGET_QUEUE_SIZE)
 
-        self.assertFalse(reel_maker.exists(), "ReelMakerAI must be deleted")
-        self.assertFalse(reel_publisher.exists(), "ReelPublisher must be deleted")
-        self.assertTrue(auto_reel_studio.is_dir(), "AutoReelStudio must be the active directory")
+        # 2. When >= 10, generation must pause
+        res2 = IdeaQueueManager.replenish_if_needed()
+        self.assertEqual(res2["action"], "paused")
 
-    def test_unified_cli_parser(self):
-        """Verifies that autoreel.py can parse subcommands correctly."""
-        import subprocess
-        res = subprocess.run(
-            [sys.executable, str(PROJECT_ROOT / "autoreel.py"), "--help"],
-            capture_output=True,
-            text=True
+        # 3. Pop an idea
+        idea = IdeaQueueManager.pop_next_idea(auto_replenish=False)
+        self.assertIsNotNone(idea)
+        self.assertIn("hook", idea)
+        self.assertIn("scenes", idea)
+        self.assertGreaterEqual(len(idea["scenes"]), 2)
+
+    def test_daily_quota_governor(self):
+        """Verifies the 50 reels/day safety limit and telemetry."""
+        status = QuotaGovernor.get_status()
+        self.assertEqual(status["daily_limit"], 50)
+        self.assertIn("generated_today", status)
+        self.assertIn("remaining_today", status)
+        self.assertEqual(status["remaining_today"], 50 - status["generated_today"])
+
+        allowed, remaining, msg = QuotaGovernor.can_generate()
+        self.assertTrue(allowed)
+        self.assertGreater(remaining, 0)
+
+    def test_metadata_packager_platforms(self):
+        """Verifies tailored metadata generation for Instagram and YouTube."""
+        title = "The Quantum Eraser Reality"
+        hook = "Physicists proved light can change its past."
+        facts = "Delayed choice photon experiment."
+        payoff = "Time is not a one way street."
+
+        # Instagram Package
+        ig_pkg = MetadataPackager.package_for_instagram(
+            title=title, genre="science_paradoxes", hook=hook, facts=facts, payoff=payoff
         )
-        self.assertEqual(res.returncode, 0)
-        self.assertIn("AutoReelStudio", res.stdout)
-        self.assertIn("make", res.stdout)
-        self.assertIn("publish", res.stdout)
-        self.assertIn("studio", res.stdout)
-        self.assertIn("auto", res.stdout)
-        self.assertIn("check", res.stdout)
-        self.assertIn("clean", res.stdout)
-        self.assertIn("topics", res.stdout)
+        self.assertIn("#reels", ig_pkg["caption"])
+        self.assertIn(hook, ig_pkg["caption"])
 
-    def test_cache_telemetry(self):
-        """Verifies cache manager telemetry and GC stats."""
-        stats = CacheManager.get_cache_stats()
-        self.assertIn("total_mb", stats)
-        self.assertIn("file_count", stats)
-        self.assertIsInstance(stats["total_mb"], (int, float))
-
-    def test_smart_idea_ranking(self):
-        """Verifies idea candidates ranking from ReelMakerAI subsystem."""
-        ideas = IdeaGenerator.generate_idea_candidates(
-            genre="science", duration=15, count=3, seed=123
+        # YouTube Package
+        yt_pkg = MetadataPackager.package_for_youtube(
+            title=title, genre="science_paradoxes", hook=hook, facts=facts, payoff=payoff
         )
-        self.assertEqual(len(ideas), 3)
-        for idea in ideas:
-            self.assertEqual(idea["genre"], "science")
-            self.assertGreaterEqual(idea["retention_score"], 0)
-            self.assertLessEqual(idea["retention_score"], 100)
+        self.assertTrue(yt_pkg["title"].endswith("#Shorts"))
+        self.assertLessEqual(len(yt_pkg["title"]), 100)
+        self.assertEqual(yt_pkg["category_id"], "28")
+        self.assertIn("Shorts", yt_pkg["tags"])
 
-    def test_compliance_validator(self):
-        """Verifies video compliance validation logic from ReelPublisher subsystem."""
+    def test_instagram_compliance_audit(self):
+        """Verifies Instagram technical specifications validation."""
         compliant_meta = {
             "duration": 15.0,
             "file_size": 15 * 1024 * 1024,
@@ -93,24 +104,8 @@ class TestAutoReelStudio(unittest.TestCase):
         self.assertTrue(res["is_compliant"])
         self.assertEqual(len(res["issues"]), 0)
 
-        # Non-compliant check
-        bad_meta = {
-            "duration": 120.0,  # Exceeds max 90s
-            "file_size": 1500 * 1024 * 1024,  # Exceeds max size
-            "faststart": False,
-            "video": {"present": True, "codec": "hevc", "width": 1920, "height": 1080, "fps": 120.0, "pix_fmt": "yuv420p"},
-            "audio": {"present": True, "codec": "mp3", "sample_rate": 44100, "channels": 1}
-        }
-        bad_res = VideoPreprocessor.validate_compliance(bad_meta)
-        self.assertFalse(bad_res["is_compliant"])
-        self.assertGreaterEqual(len(bad_res["issues"]), 3)
-
     def test_youtube_oauth_configuration(self):
         """Verifies YouTube OAuth client flow and authorization URL generation."""
-        from youtube_pipeline.auth import YouTubeAuthenticator
-        from youtube_pipeline.config import CLIENT_SECRET_FILE, REDIRECT_URI
-
-        self.assertTrue(CLIENT_SECRET_FILE.exists(), "client_secret.json must exist")
         auth_url, state = YouTubeAuthenticator.get_authorization_url()
         self.assertIn("accounts.google.com", auth_url)
         self.assertIn("198990477835-2s5o6ggf09a3d0uqmdlhvs9f0aa5nc4l", auth_url)

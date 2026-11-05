@@ -1,222 +1,200 @@
-# ⚡ AutoReelStudio — Autonomous AI Video Generator & Meta Reels Publisher
+# ⚡ AutoReelStudio — Autonomous 4-Stage Multi-Platform Video Production Studio
 
-> **AutoReelStudio merges ReelMakerAI and ReelPublisher into a unified, 100% open-source autonomous vertical video production studio and direct Meta Graph API publisher for Instagram Reels (1080x1920 9:16). Runs entirely on local hardware or within containerized cloud environments.**
+> **AutoReelStudio is an enterprise-grade autonomous vertical video production studio and multi-platform social publisher for Instagram Reels and YouTube Shorts (1080x1920 9:16). Built on a modular 4-stage pipeline that handles everything from autonomous curiosity research to direct API publishing.**
 
-[![GitHub](https://img.shields.io/badge/GitHub-Suraj--8300%2FAutomatedReelPublisher-blue?logo=github)](https://github.com/Suraj-8300/AutomatedReelPublisher)
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.14-blue.svg)](https://python.org)
 [![FFmpeg](https://img.shields.io/badge/FFmpeg-6.0%2B-green.svg)](https://ffmpeg.org)
 [![Meta Graph API](https://img.shields.io/badge/Meta%20Graph%20API-v21.0-4267B2?logo=facebook)](https://developers.facebook.com)
-[![Instagram](https://img.shields.io/badge/Instagram%20Reels-@sun__27417-E4405F?logo=instagram)](https://instagram.com)
+[![YouTube Data API](https://img.shields.io/badge/YouTube%20Data%20API-v3-FF0000?logo=youtube)](https://developers.google.com/youtube)
+[![Instagram Reels](https://img.shields.io/badge/Instagram%20Reels-@sun__27417-E4405F?logo=instagram)](https://instagram.com)
 
 ---
 
-## 🏛️ The Merger: ReelMakerAI + ReelPublisher = AutoReelStudio
+## 🏛️ Modular 4-Stage Pipeline Architecture
 
-AutoReelStudio consolidates two previously distinct workflows into a cohesive, full-lifecycle social media studio:
+AutoReelStudio is organized into four decoupled, industrial-grade stages:
 
 ```mermaid
 flowchart TD
-    subgraph ReelMakerAI["🎨 ReelMakerAI (Autonomous Generation Engine)"]
-        A1["🧠 Smart Idea Generator<br/>(10 Genres + Anti-Repetition)"] --> A2["📜 Viral Hook & Scriptwriter"]
-        A2 --> A3["🐾 Animal Storyteller & Characters"]
-        A3 --> A4["🎙️ Neural Voiceover (Edge-TTS)"]
-        A4 --> A5["🎵 Procedural Soundtrack Engine"]
-        A5 --> A6["✍️ Dynamic Typography (6 ASS Styles)"]
-        A6 --> A7["🎥 9:16 Vertical Video Composer<br/>(1080x1920 @ 30fps)"]
-        A7 --> A8["🔍 Automated QC Engine<br/>(Specs, Audio, Safe-Zone)"]
+    subgraph S1["💡 STAGE 1: Idea Generation & Research Queue"]
+        A1["🧠 Curiosity Research Engine<br/>(8 High-Retention Domains)"] --> A2["📜 Viral 3-Act Script & AI Visual Prompts"]
+        A2 --> A3["📥 Persistent Idea Queue Buffer<br/>(Maintains 10-15 Ready Ideas)"]
+        A3 -->|Queue < 10| A1
+        A3 -->|Queue >= 10: Pause| A4["🚦 Replenishment Gate"]
+        A5["📈 Performance Feedback Learner"] -.->|Weights & Insights| A1
     end
 
-    subgraph AutoReelStudioHub["⚡ AutoReelStudio Core & Web Dashboard"]
-        B1["🖥️ Web Studio Interface (Port 8080)"]
-        B2["🕹️ Unified CLI (autoreel.py)"]
-        B3["💾 Storage & LRU Cache Garbage Collector"]
-        B4["📺 Real-Time Preview & QC Inspector"]
+    subgraph S2["🎥 STAGE 2: Video Generation & AI Visuals"]
+        B1["🎯 50 Reels/Day Safety Quota Gate"] --> B2["🎙️ Natural Neural Voice (Edge-TTS)"]
+        B2 --> B3["🎨 Authentic AI Image Generation (Flux/SDXL)"]
+        B3 --> B4["🎬 Ken Burns Camera Motion (Pan/Zoom/Parallax)"]
+        B4 --> B5["🎵 Procedural Soundtrack & Dynamic Audio Ducking (-14dB)"]
+        B5 --> B6["✍️ Dynamic Typography (Karaoke Pop / Safe-Zone)"]
+        B6 --> B7["🎞️ Full-Screen 9:16 Video Compositor (1080x1920 @ 30fps)"]
     end
 
-    subgraph ReelPublisher["🚀 ReelPublisher (Distribution & Publishing Pipeline)"]
-        C1["📥 Multi-Queue Manager<br/>(inbox / processing / archive / failed)"] --> C2["📐 Video Normalizer & Aspect Conformance"]
-        C2 --> C3["🏷️ Metadata Linker & Caption Generator"]
-        C3 --> C4["⚡ Direct Binary Resumable Ingestion<br/>(rupload.facebook.com)"]
-        C4 --> C5["📱 Meta Graph API Live Publisher"]
+    subgraph S3["⚙️ STAGE 3: CDN Video Processing & Packaging"]
+        C1["⚡ Faststart moov-Atom Placement<br/>(Instant zero-buffer streaming)"] --> C2["📐 1080x1920 Conformance & 48kHz Audio"]
+        C2 --> C3["📸 Instagram Metadata Packager<br/>(Hook, Body, CTA & 5-8 Hashtags)"]
+        C2 --> C4["▶️ YouTube Shorts Metadata Packager<br/>(Title < 100c with #Shorts, 15-20 Tags)"]
     end
 
-    ReelMakerAI --> AutoReelStudioHub
-    AutoReelStudioHub --> ReelPublisher
+    subgraph S4["🚀 STAGE 4: Dedicated Platform Publishers"]
+        D1["📸 Instagram Publisher<br/>(Meta Graph API v21.0 Resumable Binary Ingestion)"]
+        D2["▶️ YouTube Shorts Publisher<br/>(YouTube Data API v3 Resumable Chunked Ingestion)"]
+    end
+
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 -.->|Views, Likes, Retention| A5
 ```
 
 ---
 
-## 🌟 Key Subsystems & Capabilities
+## 🌟 Deep Dive into the 4 Stages
 
-### 1. 🎨 ReelMakerAI Subsystem (Creation Engine)
-* **🧠 Smart Autonomous Idea Engine**: Ranks fresh candidates across 10 genres using hook strength, script fit, and persistent anti-repetition history before selecting the optimal concept.
-* **🐾 AI Animal & Character Storytelling Studio**: Creates mini-movies featuring animal characters performing human activities (village bakeries, toy car cruises, camping under stars) across 6 cinematic styles (*Photorealistic 8K, Pixar-Inspired 3D, Ghibli 2D, Makoto Shinkai Anime, Stop-Motion, and Bioluminescent Fantasy*).
-* **🤝 Unusual Animal Duos**: Odd-couple archetypes (e.g., Master Baker Kitten & Taster Duckling, Zen Capybara & Baby Chick) with character consistency signatures across cuts.
-* **✍️ Custom Prompt Mode**: Input ANY custom idea, question, or premise to synthesize a tailored 9:16 vertical Reel.
-* **🎨 6 Modern Subtitle Styles**: Word-by-word active pop *Karaoke*, bold *High-Impact Flash*, *Clean Minimal*, *Cinematic*, *Dynamic Phrase*, and *Meme* with adaptive contrast and safe-zone compliance.
-* **🎵 Procedural Soundtrack Engine**: Genre-tailored audio beds (*cyber_pulse, deep_mystery, curiosity_lofi, comedy_bounce, emotional_piano, action_hybrid*).
-* **🔍 Automated Quality Control**: Multi-stage QC auditing resolution (1080x1920), audio health (48kHz stereo AAC), speech pacing, and faststart moov atoms.
-
-### 2. 🚀 ReelPublisher Subsystem (Distribution Engine)
-* **⚡ 1-Click Generate & Live Publish**: Autonomous end-to-end creation, synthesis, vertical 1080x1920 full-screen composition, and live publishing to Instagram Reels via official Meta Graph API v21.0.
-* **⚡ Direct Binary Ingestion (`rupload.facebook.com`)**: Streams local video binaries directly into Meta's official resumable upload servers via HTTPS, eliminating slow third-party tunnels or paid cloud storage.
-* **📥 Multi-Queue Operations**: Safe file state handling across `reels_inbox/`, `reels_processing/`, `reels_archive/`, and `reels_failed/`.
-* **🛡️ Safe-Zone Compliance**: Guarantees captions, avatars, and visual focal points avoid Instagram UI overlays (top header 220px, bottom metadata 420px).
+### 1. 💡 Stage 1: `idea_generation/` (Research & Queue Engine)
+* **Industry-Grade Curiosity Research**: Replaced hardcoded static templates with deep dynamic curiosity mining across 8 high-engagement categories (*Science Paradoxes, Dark Psychology & Cognitive Quirks, Ancient Baffling Tech, Ocean Abyss & Cosmic Anomalies, Deep Tech & DNA Storage, Nature Wonders*).
+* **Viral 3-Act Narrative Architecture**:
+  - **Act 1 (0-3s)**: High-retention pattern-interrupt hook sentence to stop thumb scrolling.
+  - **Act 2 (3-12s)**: Escalation of the mystery with surprising verified mechanics.
+  - **Act 3 (12-15s)**: Memorable philosophical, scientific, or emotional payoff.
+* **Scene-by-Scene AI Visual Storyboards**: Generates detailed, photorealistic prompt descriptors for every scene (*8k, volumetric light, depth of field, Unreal Engine 5 aesthetic, 9:16 vertical*).
+* **10-to-15 Buffer Queue Policy**:
+  - Maintains a persistent pool of **10 to 15 pre-approved, ready-to-produce ideas** (`data/idea_queue.json`).
+  - **Auto-Replenish**: If queue drops below 10 ideas, it autonomously initiates research and replenishes back to 15.
+  - **Auto-Pause**: If queue has 10 or more ideas, generation pauses to preserve resources.
+* **Feedback Learner**: Logs past published reel performance and computes dynamic multipliers to prioritize trending topics.
 
 ---
 
-## 🖥️ Web Studio Interface
+### 2. 🎥 Stage 2: `video_generation/` (AI Visuals & Natural Audio)
+* **50 Reels/Day Safety Quota Gate**:
+  - Strictly enforces the user safety ceiling of **50 reels generated per calendar day** (`data/daily_quota.json`) to prevent API throttling and maintain high quality.
+* **Authentic AI Visual Generation (Zero Stock Footage)**:
+  - Generates bespoke, high-definition AI imagery per scene using Flux / SDXL neural architectures with aesthetic procedural fallbacks.
+  - Animates static AI frames into breathing vertical video clips using smooth **Ken Burns zoom-ins, zoom-outs, horizontal pans, and parallax camera movements** at 30/60 FPS.
+* **Natural Voice Synthesis**:
+  - High-fidelity Microsoft Neural Speech models (*Christopher, Guy, Jenny, Ava, Andrew*) with natural conversational cadence and sub-word timestamp extraction.
+* **Audio Ducking (-14dB)**:
+  - Procedural multitrack music bed is dynamically attenuated by **-14dB** during narration, surging back up during dramatic pauses and the outro.
+* **Dynamic Typography (ASS Subtitles)**:
+  - Word-by-word active pop *Karaoke*, *High-Impact Flash*, or *Clean Minimal* subtitles positioned safely above Instagram and YouTube UI buttons (bottom margin $\ge$ 450px).
 
-Launch the studio with a single command:
+---
 
-```bash
-python3 server.py
-# or
-python3 autoreel.py studio
-```
+### 3. ⚙️ Stage 3: `video_processing/` (CDN Optimization & Metadata Packaging)
+* **Faststart `moov` Placement**:
+  - Re-encodes container with `-movflags +faststart` placing header metadata at the head of the file for instant, zero-buffer playback on mobile CDNs.
+* **Technical Conformance**:
+  - Verifies exact 1080x1920 9:16 vertical geometry, H.264 profile, YUV420p chroma, and 48kHz stereo AAC audio.
+* **Tailored Platform Metadata Packaging**:
+  - **Instagram Package**: Generates narrative paragraphs, engagement CTA, and 5-8 targeted hashtags.
+  - **YouTube Shorts Package**: Generates click-worthy title ($<$ 100 characters) ending with `#Shorts`, rich description, and 15-20 viral tags (`Shorts`, `YouTubeShorts`, `Science`, `Viral`, `DidYouKnow`).
 
-Open **`http://localhost:8080`** in your browser to access:
-- **Autonomous Mode**: Click **"🎲 Roll Fresh Idea"** to let the engine invent fresh concepts.
-- **Custom Idea Mode**: Type any topic (e.g. *"Why cats sleep 16 hours a day"*) to craft a tailored Reel.
-- **Animal Story Studio**: Toggle the Animal & Character Studio to craft procedural animated animal stories.
-- **Hero 1-Click Generate & Publish**: Autonomous end-to-end creation and live posting to Instagram.
-- **Draft Generator**: Video preview and instant spec & QC inspection without uploading.
-- **Safe-Zone Overlay**: Real-time visualization of Meta's header and caption safe areas.
-- **Archive Gallery**: Browse past generated videos, inspect QC specs, and re-publish anytime.
-- **Cache Manager**: Real-time monitoring and 1-click storage cleaning.
+---
+
+### 4. 🚀 Stage 4: `publishers/` (Platform Publishing)
+* **Instagram Publisher (`publishers/instagram/`)**:
+  - Direct Meta Graph API v21.0 binary upload to `rupload.facebook.com`.
+  - 4-tier operational queue (`reels_inbox/`, `reels_processing/`, `reels_archive/`, `reels_failed/`).
+* **YouTube Shorts Publisher (`publishers/youtube/`)**:
+  - YouTube Data API v3 OAuth 2.0 flow & token management (`client_secret.json`).
+  - Resumable chunked video upload (`videos.insert`) with `#Shorts` classification.
 
 ---
 
 ## 🛠️ Unified CLI Reference (`autoreel.py`)
 
-AutoReelStudio provides a unified CLI that brings together both generator and publisher workflows:
-
 ```bash
-# 1. Start AutoReelStudio Web Dashboard
-python3 autoreel.py studio --port 8080
+# 1. Inspect the 10-15 idea buffer queue
+./venv/bin/python3 autoreel.py queue
 
-# 2. Generate a Reel autonomously with default smart engine
-python3 autoreel.py make -d 15
+# 2. Force replenish idea queue to 15 ideas
+./venv/bin/python3 autoreel.py queue replenish
 
-# 3. Generate an AI Animal Story Reel (Pixar 3D style kitten making pancakes)
-python3 autoreel.py make --animal kitten --style pixar_3d -d 15
+# 3. Check today's 50-reels quota telemetry
+./venv/bin/python3 autoreel.py quota
 
-# 4. Generate an Unusual Duo Reel (Capybara & Baby Chick in Anime style)
-python3 autoreel.py make --duo --style anime -d 15
+# 4. Generate video from next idea in queue with AI visuals
+./venv/bin/python3 autoreel.py make -d 15
 
-# 5. Generate a Reel from custom prompt with specific subtitle style
-python3 autoreel.py make -p "Why cats sleep 16 hours every day" -g comedy -c high_impact -d 10
+# 5. Generate video from a custom prompt
+./venv/bin/python3 autoreel.py make -p "The quantum eraser experiment" -d 15
 
-# 6. 1-Click Autonomous Generate and Live Publish to Instagram
-python3 autoreel.py auto -d 15
+# 6. Run CDN processing and generate metadata packages
+./venv/bin/python3 autoreel.py process output/sample.mp4
 
-# 7. Audit any existing MP4 file against Instagram Reels technical specs
-python3 autoreel.py check output/my_video.mp4
+# 7. Publish to Instagram Reels or YouTube Shorts
+./venv/bin/python3 autoreel.py publish instagram output/sample.mp4
+./venv/bin/python3 autoreel.py publish youtube output/sample.mp4
 
-# 8. Publish an existing video file to Instagram Reels
-python3 autoreel.py publish output/my_video.mp4
+# 8. 1-Click Autonomous Multi-Platform Pipeline
+# (Pops Idea -> Checks Quota -> Generates Video -> CDN Prep -> Publishes to Both)
+./venv/bin/python3 autoreel.py auto --target both -d 15
 
-# 9. Watch reels_inbox/ for incoming footage and auto-publish
-python3 autoreel.py watch
-
-# 10. Run cache garbage collection and storage telemetry
-python3 autoreel.py clean
-
-# 11. List catalog topics across all supported genres
-python3 autoreel.py topics
-```
-
-### Backwards-Compatible Standalone CLIs
-
-Existing scripts and commands continue to work without modification:
-* **`python3 generate.py`** — Direct ReelMakerAI video generator
-* **`python3 reel_publisher.py`** — Direct ReelPublisher Meta pipeline
-
----
-
-## ⚙️ Configuration (`.env`)
-
-AutoReelStudio reads credentials and pipeline configurations from `.env`:
-
-```ini
-# Meta Graph API Configuration
-META_GRAPH_API_VERSION=v21.0
-INSTAGRAM_ACCOUNT_ID=17841476861770479
-META_ACCESS_TOKEN="YOUR_META_LONG_LIVED_TOKEN"
-
-# Cloud Bridge: "tunnel" (100% Free Zero-Card TLS Bridge) or "r2" / "s3"
-STORAGE_PROVIDER=tunnel
-AUTO_DELETE_CLOUD_OBJECT=true
-
-# Video Transcoding Options
-DEFAULT_SCALING_MODE=pad
-VIDEO_TARGET_BITRATE=4.5M
-VIDEO_MAX_BITRATE=5.0M
-AUDIO_SAMPLE_RATE=48000
-AUDIO_CHANNELS=2
+# 9. Launch AutoReelStudio Web Dashboard
+./venv/bin/python3 autoreel.py studio --port 8080
 ```
 
 ---
 
-## 🐳 Docker / Container Deployment
+## 📺 How to Connect YouTube Shorts (Step-by-Step)
 
-Build and run AutoReelStudio in Docker or on Hugging Face Spaces:
+You already configured Google Cloud Project `reelautomation-513818` and provided `client_secret.json`. To complete the one-time channel link:
 
-```bash
-# Build Docker image
-docker build -t autoreelstudio .
-
-# Run container on port 7860
-docker run -p 7860:7860 --env-file .env autoreelstudio
-```
+1. In your terminal, run the authorization helper:
+   ```bash
+   ./venv/bin/python3 autoreel.py auth-youtube
+   ```
+2. The terminal will print your Google authorization link:
+   ```text
+   👉 https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=198990477835...
+   ```
+3. Open the link in your browser, select your YouTube channel account, and click **Allow**.
+4. The local listener on port `8000` (`http://localhost:8000/auth/youtube/callback`) will capture the token and save `youtube_token.json`.
+5. You are ready! You can now publish to YouTube Shorts with `./venv/bin/python3 autoreel.py auto --target both`.
 
 ---
 
-## 📁 Project Structure
+## 📁 Modular Directory Structure
 
 ```text
 AutoReelStudio/
-├── autoreel.py                  # Unified AutoReelStudio CLI (make, publish, studio, auto, check, clean)
-├── generate.py                  # ReelMakerAI Generation Pipeline CLI
-├── reel_publisher.py            # ReelPublisher Meta Reels Publisher CLI
-├── server.py                    # AutoReelStudio Web Server & API Handler
-├── Dockerfile                   # Production & Hugging Face Spaces Container definition
-├── requirements.txt             # Python dependencies
-├── core/                        # ReelMakerAI Generation Subsystem
-│   ├── animal_storyteller.py    # Animal story scripts & visual prompt generator
-│   ├── animal_visual_pipeline.py# Visual assets & style composition
-│   ├── broll_engine.py          # B-roll footage provider & fallback clips
-│   ├── cache_manager.py         # Automated cache GC & LRU retention cleaner
-│   ├── character_director.py    # Character consistency & archetypes
-│   ├── config.py                # Video, audio, voice, and color palettes
-│   ├── content_history.py       # Anti-repetition database & novelty scorer
-│   ├── creative_randomizer.py   # Deterministic creative seeds & genre taxonomy
-│   ├── genre_catalog.py         # Curated catalog of topics & subgenres
-│   ├── hooks_engine.py          # Retention-engineered hooks & narrative starters
-│   ├── idea_generator.py        # Smart candidate ranking & LLM synthesis
-│   ├── music_engine.py          # Procedural multitrack synthesizer
-│   ├── prompt_enhancer.py       # Storyboard & prompt structuring
-│   ├── quality_control.py       # 1080x1920 9:16 vertical video spec auditor
-│   ├── subtitle_engine.py       # Dynamic ASS subtitle generator (6 typography styles)
-│   ├── tts_engine.py            # Edge-TTS neural speech synthesis & word timing
-│   ├── video_composer.py        # FFmpeg full-screen vertical 9:16 compositor
-│   └── visual_engine.py         # Scene visual builder & motion animator
-├── instagram_pipeline/          # ReelPublisher Ingestion & Publishing Subsystem
-│   ├── blueprint_generator.py   # Shot list & viral blueprint generator
-│   ├── cloud_bridge.py          # Direct binary ingestion & resumable uploader
-│   ├── config.py                # Instagram technical limits & safe-zone metrics
-│   ├── metadata_linker.py       # Caption, hashtag, and location metadata builder
-│   ├── preprocessor.py          # Aspect-ratio normalizer & audio resampler
-│   ├── publisher.py             # Meta Graph API v21.0 container creator & publisher
-│   └── queue_manager.py         # Multi-queue file state controller
-├── static/                      # Studio Web Frontend Assets
-│   ├── css/style.css            # Dark-mode studio styling & safe-zone guides
-│   ├── js/main.js               # Reactive frontend logic & REST client
-│   └── preview.webp             # Portfolio preview thumbnail
-├── templates/
-│   └── index.html               # AutoReelStudio dashboard UI template
-└── tests/
-    └── test_generation_engine.py# Automated test suite
+├── autoreel.py                  # Master CLI Orchestrator
+├── client_secret.json           # Google OAuth credentials (gitignored)
+├── requirements.txt             # Dependencies
+├── server.py                    # Web Studio Server & REST APIs
+├── data/                        # Persistent Storage
+│   ├── idea_queue.json          # 10-15 Idea Buffer Queue
+│   ├── daily_quota.json         # 50 Reels/Day Quota Tracker
+│   └── performance_history.json # Learning & Feedback Telemetry
+├── idea_generation/             # STAGE 1: Ideation & Research
+│   ├── research_engine.py       # Curiosity Mining & Storyboard Synthesizer
+│   ├── queue_manager.py         # 10-15 Buffer Queue Controller
+│   └── feedback_learner.py      # Insights & Dynamic Weights
+├── video_generation/            # STAGE 2: AI Video & Natural Audio
+│   ├── quota_governor.py        # 50 Reels/Day Ceiling Gate
+│   ├── ai_visual_engine.py      # AI Image Synthesis & Ken Burns Camera Motion
+│   ├── voice_engine.py          # Edge Neural TTS & Word Timings
+│   ├── audio_master.py          # Soundtracks & -14dB Audio Ducking
+│   ├── subtitle_engine.py       # Dynamic ASS Subtitle Generator
+│   ├── composer.py              # Full-Screen 9:16 Video Assembler
+│   └── generator.py             # Video Synthesis Pipeline
+├── video_processing/            # STAGE 3: CDN Processing & Metadata
+│   ├── cdn_optimizer.py         # Faststart moov-Atom & 1080x1920 Conformance
+│   └── metadata_packager.py     # Instagram & YouTube Metadata Tailorer
+├── publishers/                  # STAGE 4: Dedicated Publishers
+│   ├── instagram/               # Meta Graph API v21.0 Publisher
+│   │   ├── publisher.py         # Direct Ruploade Binary Streamer
+│   │   └── queue_manager.py     # Multi-Queue State Manager
+│   └── youtube/                 # YouTube Data API v3 Shorts Publisher
+│       ├── auth.py              # OAuth 2.0 Flow & Port 8000 Listener
+│       └── publisher.py         # Resumable Chunked Video Uploader
+├── static/                      # Studio Web Dashboard Assets
+├── templates/                   # Studio HTML UI
+└── tests/                       # Unit & Modular Architecture Tests
 ```
 
 ---

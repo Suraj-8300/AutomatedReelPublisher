@@ -13,6 +13,8 @@ let isSafeZoneVisible = false;
 document.addEventListener('DOMContentLoaded', () => {
     checkAccountStatus();
     checkYouTubeStatus();
+    updateIdeaQueueStatus();
+    updateDailyQuotaStatus();
     updateCacheStats();
     loadGallery();
 
@@ -25,6 +27,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Fetch 10-15 Idea Queue Buffer Status
+ */
+async function updateIdeaQueueStatus() {
+    try {
+        const res = await fetch(`${API_BASE}/api/queue`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success) {
+            const el = document.getElementById('queueBufferText');
+            if (el) el.innerText = `Queue: ${data.count}/15 ideas`;
+        }
+    } catch (e) {
+        console.warn('Could not fetch queue status:', e);
+    }
+}
+
+/**
+ * Trigger Idea Queue Replenishment
+ */
+async function replenishIdeaQueue() {
+    const el = document.getElementById('queueBufferText');
+    if (el) el.innerText = 'Replenishing...';
+    try {
+        const res = await fetch(`${API_BASE}/api/queue/replenish`, { method: 'POST' });
+        const data = await res.json();
+        updateIdeaQueueStatus();
+        showSuccess('💡 Idea Queue Updated', data.message || 'Queue replenished.');
+    } catch (e) {
+        showError('Replenish Failed', e.message);
+    }
+}
+
+/**
+ * Fetch 50 Reels/Day Quota Telemetry
+ */
+async function updateDailyQuotaStatus() {
+    try {
+        const res = await fetch(`${API_BASE}/api/quota`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && data.quota) {
+            const el = document.getElementById('dailyQuotaText');
+            if (el) el.innerText = `Daily: ${data.quota.generated_today}/50`;
+        }
+    } catch (e) {
+        console.warn('Could not fetch quota status:', e);
+    }
+}
 
 /**
  * Fetch storage & cache stats

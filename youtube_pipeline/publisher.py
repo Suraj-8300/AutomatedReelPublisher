@@ -135,3 +135,4 @@ class YouTubePublisher:
             "privacy_status": privacy_status,
             "file_size_mb": round(file_size_mb, 2)
         }
+

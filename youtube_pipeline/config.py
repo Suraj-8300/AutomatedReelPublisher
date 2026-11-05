@@ -25,3 +25,4 @@ REDIRECT_URI = f"http://localhost:{REDIRECT_PORT}{REDIRECT_PATH}"
 DEFAULT_PRIVACY_STATUS = os.getenv("YOUTUBE_PRIVACY_STATUS", "public")
 DEFAULT_CATEGORY_ID = os.getenv("YOUTUBE_CATEGORY_ID", "24")  # 24 = Entertainment, 28 = Science & Tech
 DEFAULT_TAGS = ["Shorts", "Viral", "Reels", "AI", "Trending", "Story"]
+

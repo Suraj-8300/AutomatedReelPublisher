@@ -239,7 +239,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         # 11b. API: YouTube Channel Status & Auth URL
         elif url.path == "/api/youtube/status":
             try:
-                from youtube_pipeline.auth import YouTubeAuthenticator
+                from publishers.youtube.auth import YouTubeAuthenticator
                 is_auth = YouTubeAuthenticator.is_authenticated()
                 auth_url = ""
                 if not is_auth:
@@ -257,6 +257,32 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self._set_cors_headers()
             self.end_headers()
             self.wfile.write(json.dumps(info).encode("utf-8"))
+
+        # 11c. API: 10-15 Creative Idea Queue Buffer
+        elif url.path == "/api/queue":
+            from idea_generation import IdeaQueueManager
+            queue = IdeaQueueManager.get_queue()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "count": len(queue),
+                "min_threshold": 10,
+                "target_size": 15,
+                "queue": queue
+            }).encode("utf-8"))
+
+        # 11d. API: 50 Reels/Day Quota Telemetry
+        elif url.path == "/api/quota":
+            from video_generation import QuotaGovernor
+            status = QuotaGovernor.get_status()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "quota": status}).encode("utf-8"))
 
         # 12. API: Animal Storytelling Studio Options
         elif url.path == "/api/animal-options":
@@ -363,7 +389,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         # 3b. API: Publish an Existing Video File to YouTube Shorts
         elif url.path == "/api/youtube/publish":
             try:
-                from youtube_pipeline.publisher import YouTubePublisher
+                from publishers.youtube.publisher import YouTubePublisher
                 video_filename = data.get("video_filename", "")
                 src_video = OUTPUT_DIR / Path(video_filename).name
                 if not src_video.exists():
@@ -377,6 +403,16 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             except Exception as e:
                 res = {"success": False, "error": str(e)}
 
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3c. API: Replenish Idea Queue Buffer (10-15 Target)
+        elif url.path == "/api/queue/replenish":
+            from idea_generation import IdeaQueueManager
+            res = IdeaQueueManager.replenish_if_needed()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self._set_cors_headers()
@@ -561,6 +597,10 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
 
         start = time.time()
         try:
+            from video_generation import QuotaGovernor
+            allowed, remaining, msg = QuotaGovernor.can_generate()
+            if not allowed:
+                return {"success": False, "error": msg}
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             video_file, storyboard, qc_result = loop.run_until_complete(run_pipeline(
@@ -624,6 +664,10 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
 
         start = time.time()
         try:
+            from video_generation import QuotaGovernor
+            allowed, remaining, msg = QuotaGovernor.can_generate()
+            if not allowed:
+                return {"success": False, "error": msg}
             # 1. Synthesize Draft Video
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)

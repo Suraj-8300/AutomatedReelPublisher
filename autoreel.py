@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-AutoReelStudio — Unified Autonomous AI Video Generation & Meta Reels Publishing CLI
-Integrates:
-  - ReelMakerAI: Autonomous AI video storyboarding, voiceover, music, subtitles, and rendering
-  - ReelPublisher: Direct Meta Graph API publisher, resumable ingestion, queue manager, and QC
+AutoReelStudio — Unified Autonomous AI Video Generation & Social Publishing Platform
+Modular Architecture:
+  1. idea_generation/  -> Research, Ideation, 10-15 Buffer Queue, Feedback Learner
+  2. video_generation/ -> AI Visuals, Natural Voice, Ducked Audio, 50/day Quota Gate, Composer
+  3. video_processing/ -> CDN Video Optimization (faststart), Metadata Packager (IG + YT)
+  4. publishers/       -> Dedicated Platform Publishers (Instagram Meta Graph API + YouTube Data API v3)
 """
 
 import sys
@@ -16,234 +18,288 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from core.creative_randomizer import GENRE_TAXONOMY, GENERATION_MODES
-from core.genre_catalog import get_catalog_topics
-from core.cache_manager import CacheManager
+from idea_generation import IdeaQueueManager, IdeaResearchEngine, FeedbackLearner
+from video_generation import VideoGenerator, QuotaGovernor, DAILY_MAX_REELS
+from video_processing import CDNOptimizer, MetadataPackager
+from publishers import InstagramPublisher, InstagramQueueManager, YouTubePublisher, YouTubeAuthenticator
 
 BANNER = r"""
    ___        __        ___          _ ___ _           _ _     
   / _ \      / /_____  / _ \___ ___ / / __/ |_ _  _ __| (_)___ 
  / /_\ \    / // _ \ \/ // -_) -_) // _\ |  _| || / _` | / _ \
 /_/   \_\  /_/ \___/\__/\__/\__/\___/|___/\__|\_,_\__,_|_\___/
-      Autonomous AI Video Generator (ReelMakerAI)
-           & Meta Reels Publisher (ReelPublisher)
+      Autonomous 4-Stage Multi-Platform Video Studio
+       [Ideation -> Generation -> CDN Prep -> Publishing]
 """
 
 def print_banner():
     print(BANNER)
 
-def cmd_make(args):
-    """Generates an intelligent Instagram Reel via ReelMakerAI pipeline."""
-    from generate import run_pipeline, send_to_instagram_inbox
+# ==============================================================================
+# SUBCOMMAND HANDLERS
+# ==============================================================================
 
-    output_video, storyboard, qc_result = asyncio.run(run_pipeline(
-        prompt=args.prompt,
-        duration=args.duration,
-        genre=args.genre,
-        subgenre=args.subgenre,
-        mode=args.mode,
-        voice=args.voice,
-        music_style=args.music,
-        caption_style=args.caption_style,
-        theme=args.theme,
-        seed=args.seed,
-        run_qc=not args.no_qc,
-        animal_species=args.animal,
-        visual_style=args.style,
-        activity_type=args.activity,
-        is_duo=args.duo
+def cmd_queue(args):
+    """Inspects and manages the 10-15 creative idea buffer queue."""
+    if args.action == "replenish":
+        res = IdeaQueueManager.replenish_if_needed()
+        print(f"💡 [Queue Replenish] {res['message']}")
+    elif args.action == "pop":
+        idea = IdeaQueueManager.pop_next_idea()
+        if idea:
+            print(f"🎬 Popped Idea: [{idea.get('genre', '').upper()}] {idea.get('title')}")
+            print(f"   Hook: \"{idea.get('hook')}\"")
+        else:
+            print("⚠️ Queue is currently empty.")
+    else:
+        # Default: list queue
+        queue = IdeaQueueManager.get_queue()
+        print("\n" + "=" * 65)
+        print(f"📋 AUTOREELSTUDIO IDEA QUEUE ({len(queue)} ideas in buffer)")
+        print("   Rule: Buffer maintains 10-15 ideas. If < 10, auto-replenishes.")
+        print("=" * 65)
+        if not queue:
+            print("  (Queue is empty. Run 'python3 autoreel.py queue replenish' to generate 15 ideas)")
+        for idx, item in enumerate(queue, 1):
+            print(f"  {idx:02d}. [{item.get('genre', 'curiosity').upper():18s}] {item.get('title')}")
+            print(f"      Hook: \"{item.get('hook', '')[:65]}...\"")
+        print("=" * 65)
+
+def cmd_quota(args):
+    """Displays today's 50-reels generation quota telemetry."""
+    status = QuotaGovernor.get_status()
+    print("\n" + "=" * 65)
+    print("📊 DAILY REEL GENERATION QUOTA TELEMETRY")
+    print("=" * 65)
+    print(f"📅 Date (UTC):       {status['date']}")
+    print(f"🎯 Daily Limit:      {status['daily_limit']} Reels (Safety ceiling)")
+    print(f"⚡ Generated Today:  {status['generated_today']} Reels")
+    print(f"🔋 Remaining Today:  {status['remaining_today']} Reels")
+    print(f"📈 Capacity Used:    {status['percent_used']}%")
+    print(f"🚦 Status:           {'ALLOWED' if status['allowed'] else 'BLOCKED (Limit Reached)'}")
+    print("=" * 65)
+
+def cmd_make(args):
+    """Generates an AI video from the idea queue or a custom prompt."""
+    if args.prompt:
+        idea = IdeaResearchEngine._synthesize_from_custom_prompt(args.prompt, duration=args.duration)
+    else:
+        idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+        if not idea:
+            print("💡 Queue was empty. Replenishing and selecting fresh idea...")
+            IdeaQueueManager.replenish_if_needed()
+            idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+
+    video_path, telemetry = asyncio.run(VideoGenerator.generate_reel(
+        idea=idea,
+        voice_override=args.voice,
+        music_override=args.music,
+        caption_override=args.caption_style
     ))
 
-    if args.to_inbox or args.publish:
-        send_to_instagram_inbox(
-            output_mp4=output_video,
-            storyboard=storyboard,
-            auto_publish=args.publish,
-            dry_run=args.dry_run
-        )
-    return output_video
+    # Optional CDN Optimization
+    if not args.skip_cdn:
+        print("\n⚙️ Running CDN Video Optimization (faststart moov atom, 1080x1920)...")
+        cdn_video = CDNOptimizer.optimize_for_cdn(video_path)
+        print(f"✅ CDN Optimized Master: {cdn_video.name}")
+
+    return video_path
+
+def cmd_process(args):
+    """Runs CDN video processing and formats platform metadata packages."""
+    video_path = Path(args.video).resolve()
+    print(f"\n🔍 Probing and optimizing: {video_path.name}")
+    cdn_video = CDNOptimizer.optimize_for_cdn(video_path)
+    specs = CDNOptimizer.probe_video(cdn_video)
+
+    ig_meta = MetadataPackager.package_for_instagram(
+        title=video_path.stem.replace("_", " "),
+        genre="curiosity",
+        hook="Did you know this fascinating truth?"
+    )
+
+    yt_meta = MetadataPackager.package_for_youtube(
+        title=video_path.stem.replace("_", " "),
+        genre="curiosity",
+        hook="Did you know this fascinating truth?"
+    )
+
+    print("\n" + "=" * 65)
+    print("📱 INSTAGRAM METADATA PACKAGE")
+    print("=" * 65)
+    print(ig_meta["caption"][:180] + "...\n")
+
+    print("=" * 65)
+    print("▶️ YOUTUBE SHORTS METADATA PACKAGE")
+    print("=" * 65)
+    print(f"Title: {yt_meta['title']}")
+    print(f"Tags:  {', '.join(yt_meta['tags'][:6])}...")
+    print("=" * 65)
 
 def cmd_publish(args):
-    """Processes and publishes a video file to Instagram Reels via ReelPublisher pipeline."""
-    from reel_publisher import cmd_process
-    cmd_process(args)
+    """Publishes a video to Instagram Reels or YouTube Shorts."""
+    video_path = Path(args.video).resolve()
+    platform = args.platform.lower()
+
+    if platform in ["instagram", "ig"]:
+        print(f"\n📸 Publishing to Instagram Reels: {video_path.name}")
+        queue_mgr = InstagramQueueManager()
+        # Copy to inbox and process
+        inbox_dir = PROJECT_ROOT / "reels_inbox"
+        inbox_dir.mkdir(exist_ok=True)
+        target = inbox_dir / video_path.name
+        import shutil
+        shutil.copy(str(video_path), str(target))
+        res = queue_mgr.process_video_file(target, dry_run=args.dry_run)
+        print(f"Result: {res}")
+    elif platform in ["youtube", "yt"]:
+        print(f"\n▶️ Publishing to YouTube Shorts: {video_path.name}")
+        if not YouTubeAuthenticator.is_authenticated():
+            print("⚠️ YouTube channel not authorized. Run 'python3 autoreel.py auth-youtube' first.")
+            return
+        pub = YouTubePublisher()
+        title = args.title or video_path.stem.replace("_", " ")
+        res = pub.upload_short(video_path, title=title, privacy_status="public" if not args.dry_run else "private")
+        print(f"Result: {res}")
+
+def cmd_auto(args):
+    """
+    1-Click Autonomous Multi-Platform Pipeline:
+    Idea Queue -> Daily Quota Check -> Video Generation -> CDN Prep -> Instagram & YouTube Publishing.
+    """
+    allowed, remaining, msg = QuotaGovernor.can_generate()
+    if not allowed:
+        print(f"\n{msg}")
+        return
+
+    print("🚀 [AutoReelStudio] Starting Full Autonomous Production & Distribution Run...")
+    if args.prompt:
+        idea = IdeaResearchEngine._synthesize_from_custom_prompt(args.prompt, duration=args.duration)
+    else:
+        idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+        if not idea:
+            IdeaQueueManager.replenish_if_needed()
+            idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+
+    video_path, telemetry = asyncio.run(VideoGenerator.generate_reel(idea=idea))
+
+    # CDN Optimization
+    print("\n⚙️ [AutoReelStudio] Optimizing for CDN Streaming...")
+    cdn_video = CDNOptimizer.optimize_for_cdn(video_path)
+
+    # Packaging Metadata
+    ig_meta = MetadataPackager.package_for_instagram(
+        title=idea.get("title", ""),
+        genre=idea.get("genre", "science"),
+        hook=idea.get("hook", ""),
+        facts=idea.get("facts", ""),
+        payoff=idea.get("payoff", "")
+    )
+    yt_meta = MetadataPackager.package_for_youtube(
+        title=idea.get("title", ""),
+        genre=idea.get("genre", "science"),
+        hook=idea.get("hook", ""),
+        facts=idea.get("facts", ""),
+        payoff=idea.get("payoff", "")
+    )
+
+    dest = args.target.lower()
+
+    # Publish to Instagram
+    if dest in ["instagram", "both", "all"]:
+        print("\n📸 [AutoReelStudio] Dispatching to Instagram Reels...")
+        inbox_dir = PROJECT_ROOT / "reels_inbox"
+        inbox_dir.mkdir(exist_ok=True)
+        target = inbox_dir / cdn_video.name
+        import shutil
+        shutil.copy(str(cdn_video), str(target))
+        # Write companion caption
+        with open(target.with_suffix(".txt"), "w", encoding="utf-8") as f:
+            f.write(ig_meta["caption"])
+        queue_mgr = InstagramQueueManager()
+        res_ig = queue_mgr.process_video_file(target, dry_run=args.dry_run)
+        print(f"Instagram Result: {res_ig}")
+
+    # Publish to YouTube Shorts
+    if dest in ["youtube", "both", "all"]:
+        print("\n▶️ [AutoReelStudio] Dispatching to YouTube Shorts...")
+        if not YouTubeAuthenticator.is_authenticated():
+            print("⚠️ YouTube not authenticated. Run 'python3 autoreel.py auth-youtube' to connect.")
+        else:
+            pub = YouTubePublisher()
+            res_yt = pub.upload_short(
+                video_path=cdn_video,
+                title=yt_meta["title"],
+                description=yt_meta["description"],
+                tags=yt_meta["tags"],
+                privacy_status="public" if not args.dry_run else "private"
+            )
+            print(f"YouTube Result: {res_yt}")
+
+def cmd_auth_youtube(args):
+    """Starts local server to complete OAuth 2.0 authorization for YouTube."""
+    YouTubeAuthenticator.run_local_auth_server(timeout_secs=args.timeout)
 
 def cmd_studio(args):
-    """Launches the AutoReelStudio Web Interface."""
+    """Starts the AutoReelStudio Web Interface."""
     from server import start_server
     port = args.port or int(os.environ.get("PORT", 8080))
     start_server(port=port)
 
-def cmd_auto(args):
-    """Autonomous generation and publication to Instagram Reels and/or YouTube Shorts."""
-    from generate import run_pipeline, send_to_instagram_inbox
-
-    print("🚀 [AutoReelStudio] Initiating Autonomous Generate & Publish Pipeline...")
-    output_video, storyboard, qc_result = asyncio.run(run_pipeline(
-        prompt=args.prompt,
-        duration=args.duration,
-        genre=args.genre,
-        mode=args.mode,
-        caption_style=args.caption_style,
-        animal_species=args.animal,
-        visual_style=args.style,
-        activity_type=args.activity,
-        is_duo=args.duo,
-        run_qc=True
-    ))
-
-    dest = getattr(args, "target", "instagram")
-
-    # 1. Instagram Reels Publishing
-    if dest in ["instagram", "both", "all"]:
-        print(f"\n📤 [AutoReelStudio] Dispatching rendered video to Instagram Reels...")
-        send_to_instagram_inbox(
-            output_mp4=output_video,
-            storyboard=storyboard,
-            auto_publish=True,
-            dry_run=args.dry_run
-        )
-
-    # 2. YouTube Shorts Publishing
-    if dest in ["youtube", "both", "all"]:
-        from youtube_pipeline.auth import YouTubeAuthenticator
-        from youtube_pipeline.publisher import YouTubePublisher
-        if not YouTubeAuthenticator.is_authenticated():
-            print("⚠️ [YouTube] YouTube channel not authorized. Run 'python3 autoreel.py auth-youtube' first.")
-        else:
-            print(f"\n📤 [AutoReelStudio] Uploading rendered video to YouTube Shorts...")
-            pub = YouTubePublisher()
-            title = storyboard.get("title", "Autonomous AI Reel")
-            script = storyboard.get("script", "")
-            pub.upload_short(
-                video_path=Path(output_video),
-                title=title,
-                description=script,
-                privacy_status="public" if not args.dry_run else "private"
-            )
-
-def cmd_auth_youtube(args):
-    """Starts local server to complete OAuth 2.0 authorization for YouTube."""
-    from youtube_pipeline.auth import YouTubeAuthenticator
-    YouTubeAuthenticator.run_local_auth_server(timeout_secs=args.timeout)
-
-def cmd_publish_youtube(args):
-    """Publishes a video file directly to YouTube Shorts."""
-    from youtube_pipeline.publisher import YouTubePublisher
-    title = args.title or Path(args.video).stem.replace("_", " ")
-    pub = YouTubePublisher()
-    pub.upload_short(
-        video_path=Path(args.video),
-        title=title,
-        description=args.desc or "",
-        privacy_status=args.privacy
-    )
-
-def cmd_check(args):
-    """Audits video against Instagram Reels technical specs."""
-    from reel_publisher import cmd_check as check_fn
-    check_fn(args)
-
-def cmd_watch(args):
-    """Watches reels_inbox/ and publishes incoming videos."""
-    from reel_publisher import cmd_watch as watch_fn
-    watch_fn(args)
-
-def cmd_clean(args):
-    """Cleans temporary cache files and reports storage telemetry."""
-    print("🧹 [AutoReelStudio] Running Cache Garbage Collection...")
-    res = CacheManager.purge_all(keep_stock_clips=2)
-    stats = CacheManager.get_cache_stats()
-    print(f"  • Files removed:   {res['deleted_count']}")
-    print(f"  • Storage freed:   {res['freed_mb']} MB")
-    print(f"  • Current cache:   {stats['total_mb']} MB ({stats['file_count']} files)")
-
-def cmd_topics(args):
-    """Lists pre-built catalog topics across genres."""
-    print("\n📚 Available AutoReelStudio Catalog Topics:")
-    for t in get_catalog_topics():
-        print(f"  • [{t['genre'].upper():12s}] {t['title']} ({t.get('subgenre', '')})")
+# ==============================================================================
+# MAIN CLI DISPATCHER
+# ==============================================================================
 
 def main():
     parser = argparse.ArgumentParser(
         prog="autoreel",
-        description="AutoReelStudio: Unified Autonomous AI Video Generator (ReelMakerAI) & Meta Reels Publisher (ReelPublisher)",
+        description="AutoReelStudio: Autonomous 4-Stage Multi-Platform Video Production & Social Publisher",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    subparsers = parser.add_subparsers(dest="command", help="AutoReelStudio Subcommands")
+    subparsers = parser.add_subparsers(dest="command", help="AutoReelStudio Commands")
 
-    # Command: make (ReelMakerAI)
-    p_make = subparsers.add_parser("make", aliases=["generate", "create"], help="Generate fresh Reel (ReelMakerAI engine)")
-    p_make.add_argument("-p", "--prompt", default=None, help="Custom prompt / concept (or leave empty for autonomous engine)")
+    # Command: queue
+    p_queue = subparsers.add_parser("queue", aliases=["ideas"], help="Inspect and manage the 10-15 idea buffer queue")
+    p_queue.add_argument("action", nargs="?", default="list", choices=["list", "replenish", "pop"], help="Queue action")
+
+    # Command: quota
+    subparsers.add_parser("quota", help="Check today's 50-reels generation quota telemetry")
+
+    # Command: make
+    p_make = subparsers.add_parser("make", aliases=["generate"], help="Synthesize video from idea queue or custom prompt with AI visuals")
+    p_make.add_argument("-p", "--prompt", default=None, help="Custom prompt (or leave empty to pop from idea queue)")
     p_make.add_argument("-d", "--duration", type=int, choices=[10, 15, 30, 60], default=15, help="Video duration in seconds")
-    p_make.add_argument("-g", "--genre", default=None, choices=list(GENRE_TAXONOMY.keys()), help="Creative genre")
-    p_make.add_argument("--subgenre", default=None, help="Specific subgenre within selected genre")
-    p_make.add_argument("-m", "--mode", default="balanced", choices=list(GENERATION_MODES.keys()), help="Creative mode")
-    p_make.add_argument("-c", "--caption-style", default=None, choices=["karaoke", "high_impact", "clean_minimal", "cinematic", "dynamic_phrase", "meme"], help="Subtitle typography")
-    p_make.add_argument("-v", "--voice", default=None, help="Voice actor")
-    p_make.add_argument("--music", default=None, help="Soundtrack style")
-    p_make.add_argument("-t", "--theme", default=None, help="Color theme")
-    p_make.add_argument("--seed", type=int, default=None, help="Deterministic seed")
-    p_make.add_argument("--no-qc", action="store_true", help="Skip quality control check")
-    p_make.add_argument("--to-inbox", action="store_true", help="Queue into Instagram Reels inbox")
-    p_make.add_argument("--publish", action="store_true", help="Publish directly to Instagram Reels")
-    p_make.add_argument("--dry-run", action="store_true", help="Simulate Meta Graph API publishing in dry-run mode")
-    p_make.add_argument("--animal", default=None, help="Animal species for Animal Storytelling mode")
-    p_make.add_argument("--style", default=None, choices=["photorealistic", "pixar_3d", "cartoon_2d", "anime", "stop_motion", "fantasy_world"], help="Visual style")
-    p_make.add_argument("--activity", default=None, help="Human-like animal activity")
-    p_make.add_argument("--duo", action="store_true", help="Generate an unusual animal duo story")
+    p_make.add_argument("-v", "--voice", default=None, help="Voice actor override")
+    p_make.add_argument("-m", "--music", default=None, help="Music style override")
+    p_make.add_argument("-c", "--caption-style", default=None, choices=["karaoke", "high_impact", "clean_minimal", "cinematic"], help="Subtitle style")
+    p_make.add_argument("--skip-cdn", action="store_true", help="Skip CDN faststart optimization")
 
-    # Command: publish (ReelPublisher)
-    p_pub = subparsers.add_parser("publish", aliases=["post"], help="Publish video to Instagram Reels (ReelPublisher engine)")
-    p_pub.add_argument("video", help="Path to input MP4 video file")
-    p_pub.add_argument("--mode", choices=["pad", "crop", "blur_pad"], default="pad", help="Aspect scaling mode")
-    p_pub.add_argument("--dry-run", action="store_true", help="Simulate Meta Graph API publishing in dry-run mode")
+    # Command: process
+    p_proc = subparsers.add_parser("process", help="CDN video optimization and metadata packaging")
+    p_proc.add_argument("video", help="Path to input MP4 video file")
 
-    # Command: studio (Web UI)
-    p_studio = subparsers.add_parser("studio", aliases=["web", "serve", "ui"], help="Start AutoReelStudio Web Dashboard")
-    p_studio.add_argument("--port", type=int, default=8080, help="Port to run web server on (default: 8080)")
+    # Command: publish
+    p_pub = subparsers.add_parser("publish", help="Publish video to Instagram Reels or YouTube Shorts")
+    p_pub.add_argument("platform", choices=["instagram", "ig", "youtube", "yt"], help="Target platform")
+    p_pub.add_argument("video", help="Path to video file")
+    p_pub.add_argument("--title", default=None, help="Optional title")
+    p_pub.add_argument("--dry-run", action="store_true", help="Simulate API upload in dry-run mode")
 
-    # Command: auto (1-Click Generate + Live Publish)
-    p_auto = subparsers.add_parser("auto", help="1-Click autonomous generation and direct publishing")
-    p_auto.add_argument("-p", "--prompt", default=None, help="Custom prompt or leave empty for creative engine")
-    p_auto.add_argument("-d", "--duration", type=int, choices=[10, 15, 30, 60], default=15, help="Video duration in seconds")
-    p_auto.add_argument("-g", "--genre", default=None, choices=list(GENRE_TAXONOMY.keys()), help="Creative genre")
-    p_auto.add_argument("-m", "--mode", default="balanced", choices=list(GENERATION_MODES.keys()), help="Creative mode")
-    p_auto.add_argument("-c", "--caption-style", default=None, choices=["karaoke", "high_impact", "clean_minimal", "cinematic", "dynamic_phrase", "meme"], help="Subtitle typography")
-    p_auto.add_argument("--animal", default=None, help="Animal species")
-    p_auto.add_argument("--style", default=None, choices=["photorealistic", "pixar_3d", "cartoon_2d", "anime", "stop_motion", "fantasy_world"], help="Visual style")
-    p_auto.add_argument("--activity", default=None, help="Human-like animal activity")
-    p_auto.add_argument("--duo", action="store_true", help="Generate animal duo story")
-    p_auto.add_argument("--target", default="instagram", choices=["instagram", "youtube", "both", "all"], help="Destination platform: instagram, youtube, or both")
-    p_auto.add_argument("--dry-run", action="store_true", help="Simulate publishing in dry-run mode")
+    # Command: auto
+    p_auto = subparsers.add_parser("auto", help="1-Click end-to-end: Idea -> Quota Check -> Video -> CDN -> Multi-Platform Publish")
+    p_auto.add_argument("-p", "--prompt", default=None, help="Custom prompt or leave empty to consume from 10-15 buffer queue")
+    p_auto.add_argument("-d", "--duration", type=int, default=15, choices=[10, 15, 30, 60], help="Duration")
+    p_auto.add_argument("--target", default="both", choices=["both", "instagram", "youtube", "all"], help="Publish destination")
+    p_auto.add_argument("--dry-run", action="store_true", help="Simulate publishing APIs")
 
-    # Command: auth-youtube (OAuth 2.0 Flow)
-    p_auth_yt = subparsers.add_parser("auth-youtube", help="Authorize YouTube channel via Google OAuth 2.0 (port 8000)")
-    p_auth_yt.add_argument("--timeout", type=int, default=180, help="Authorization timeout in seconds (default: 180)")
+    # Command: auth-youtube
+    p_auth = subparsers.add_parser("auth-youtube", help="Authorize YouTube channel via Google OAuth 2.0 (port 8000)")
+    p_auth.add_argument("--timeout", type=int, default=180, help="Timeout in seconds")
 
-    # Command: publish-youtube (Direct Shorts Upload)
-    p_pub_yt = subparsers.add_parser("publish-youtube", help="Publish a video file to YouTube Shorts")
-    p_pub_yt.add_argument("video", help="Path to input MP4 video file")
-    p_pub_yt.add_argument("--title", default=None, help="Shorts title")
-    p_pub_yt.add_argument("--desc", default=None, help="Shorts description")
-    p_pub_yt.add_argument("--privacy", default="public", choices=["public", "private", "unlisted"], help="Video privacy")
-
-    # Command: check (QC / Compliance)
-    p_check = subparsers.add_parser("check", aliases=["audit", "inspect"], help="Check video compliance against Instagram Reels specifications")
-    p_check.add_argument("video", help="Path to video file")
-
-    # Command: watch (Folder Ingestion Daemon)
-    p_watch = subparsers.add_parser("watch", help="Watch reels_inbox/ for incoming footage and auto-publish")
-    p_watch.add_argument("--interval", type=float, default=5.0, help="Poll interval in seconds")
-    p_watch.add_argument("--mode", choices=["pad", "crop", "blur_pad"], default="pad", help="Scaling mode")
-    p_watch.add_argument("--dry-run", action="store_true", help="Simulate Meta Graph API publishing")
-
-    # Command: clean (Storage & Cache GC)
-    subparsers.add_parser("clean", help="Clean render cache and temp clips")
-
-    # Command: topics (Catalog topics)
-    subparsers.add_parser("topics", aliases=["catalog"], help="List pre-built catalog topics across genres")
+    # Command: studio
+    p_studio = subparsers.add_parser("studio", aliases=["web", "ui"], help="Start AutoReelStudio Web Dashboard")
+    p_studio.add_argument("--port", type=int, default=8080, help="Web server port (default: 8080)")
 
     args = parser.parse_args()
 
@@ -252,26 +308,22 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    if args.command in ["make", "generate", "create"]:
+    if args.command in ["queue", "ideas"]:
+        cmd_queue(args)
+    elif args.command == "quota":
+        cmd_quota(args)
+    elif args.command in ["make", "generate"]:
         cmd_make(args)
-    elif args.command in ["publish", "post"]:
+    elif args.command == "process":
+        cmd_process(args)
+    elif args.command == "publish":
         cmd_publish(args)
-    elif args.command in ["studio", "web", "serve", "ui"]:
-        cmd_studio(args)
     elif args.command == "auto":
         cmd_auto(args)
     elif args.command == "auth-youtube":
         cmd_auth_youtube(args)
-    elif args.command == "publish-youtube":
-        cmd_publish_youtube(args)
-    elif args.command in ["check", "audit", "inspect"]:
-        cmd_check(args)
-    elif args.command == "watch":
-        cmd_watch(args)
-    elif args.command == "clean":
-        cmd_clean(args)
-    elif args.command in ["topics", "catalog"]:
-        cmd_topics(args)
+    elif args.command in ["studio", "web", "ui"]:
+        cmd_studio(args)
 
 if __name__ == "__main__":
     main()

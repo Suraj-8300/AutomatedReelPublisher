@@ -19,6 +19,19 @@
                     </div>
                 </div>
                 <div class="header-pills">
+                    <!-- Idea Queue Buffer Indicator -->
+                    <div class="storage-pill" id="ideaQueuePill" title="Creative Ideas Buffer (Maintains 10-15 ideas)">
+                        <span class="storage-icon">💡</span>
+                        <span id="queueBufferText">Queue: 14 ideas</span>
+                        <button class="btn-clean-cache" onclick="replenishIdeaQueue()" title="Replenish idea queue if below 10">🔄</button>
+                    </div>
+
+                    <!-- Daily 50-Reel Quota Indicator -->
+                    <div class="storage-pill" id="dailyQuotaPill" title="Daily Generation Safety Cap (50/day)">
+                        <span class="storage-icon">🎯</span>
+                        <span id="dailyQuotaText">Daily: 0/50</span>
+                    </div>
+
                     <!-- Storage & Cache Monitor -->
                     <div class="storage-pill" id="storagePill" title="Temporary render clips & audio cache">
                         <span class="storage-icon">💾</span>
