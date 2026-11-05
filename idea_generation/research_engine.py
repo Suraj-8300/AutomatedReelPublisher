@@ -258,7 +258,7 @@ class IdeaResearchEngine:
             "facts": raw_concept.get("facts", ""),
             "payoff": raw_concept.get("payoff", ""),
             "visual_style": raw_concept.get("style", "photorealistic"),
-            "suggested_voice": random.choice(["en-US-ChristopherNeural", "en-US-GuyNeural", "en-US-JennyNeural"]),
+            "suggested_voice": random.choice(["en-US-AndrewMultilingualNeural", "en-US-BrianMultilingualNeural", "en-US-ChristopherNeural"]),
             "suggested_music": random.choice(["cyber_pulse", "deep_mystery", "curiosity_lofi", "action_hybrid"]),
             "caption_style": random.choice(["karaoke", "high_impact", "clean_minimal", "cinematic"]),
             "duration": duration,

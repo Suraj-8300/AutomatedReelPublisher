@@ -1,38 +1,5 @@
 [
   {
-    "id": "f752db071ddb",
-    "title": "The Ocean Floating 400 Miles Under Earth's Crust",
-    "genre": "science_paradoxes",
-    "hook": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined.",
-    "script": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined. Trapped four hundred miles down inside glowing blue ringwoodite crystals, water is locked at molecular scale under extreme pressure. This means Earth's oceans did not arrive on icy asteroids — they were born right inside our own planet's core.",
-    "scenes": [
-      {
-        "text": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined.",
-        "visual_prompt": "Cross-section of planet Earth showing glowing subterranean ocean layers glowing with azure light 400 miles beneath continents, cinematic space documentary style, 8k resolution, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Trapped four hundred miles down inside glowing blue ringwoodite crystals, water is locked at molecular scale under extreme pressure.",
-        "visual_prompt": "Macro shot of glowing bioluminescent deep blue ringwoodite crystal glowing under subterranean magma cavern, steam fissures, ultra-realistic texture, 9:16 vertical aspect ratio",
-        "motion": "pan_left"
-      },
-      {
-        "text": "This means Earth's oceans did not arrive on icy asteroids — they were born right inside our own planet's core.",
-        "visual_prompt": "Epic cinematic vista of primordial Earth with glowing oceans emerging from volcanic fissures, ancient sunrise, stunning atmospheric clouds, photorealistic 8k, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "400 miles beneath North America, seismic data revealed water trapped inside a rare blue mineral called ringwoodite. It doesn't slosh around as liquid; it exists as hydroxide ions locked within the crystal lattice under 1,000 degrees heat.",
-    "payoff": "This discovery proves Earth's surface oceans didn't arrive via comets — they literally seeped out from inside our own mantle.",
-    "visual_style": "fantasy_world",
-    "suggested_voice": "en-US-JennyNeural",
-    "suggested_music": "cyber_pulse",
-    "caption_style": "high_impact",
-    "duration": 15,
-    "created_at": 1793906956.9959662,
-    "status": "ready"
-  },
-  {
     "id": "da74c1092b1e",
     "title": "The Crows That Pass Grudges Down Generations",
     "genre": "nature_and_animals",
@@ -91,7 +58,7 @@
     "facts": "WASP-76b is tidally locked to its star. On the dayside, temperatures reach 2,400 degrees Celsius, vaporizing iron metal into gas. Fierce atmospheric winds blow iron vapor to the cooler nightside, where it condenses and pours down as liquid metal rain.",
     "payoff": "The universe contains extreme environments that make science fiction look tame.",
     "visual_style": "photorealistic",
-    "suggested_voice": "en-US-JennyNeural",
+    "suggested_voice": "en-US-AndrewMultilingualNeural",
     "suggested_music": "deep_mystery",
     "caption_style": "clean_minimal",
     "duration": 15,
