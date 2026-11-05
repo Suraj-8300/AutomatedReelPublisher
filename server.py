@@ -82,6 +82,35 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         self._set_cors_headers()
         self.end_headers()
 
+    def do_HEAD(self):
+        url = urlparse(self.path)
+        params = parse_qs(url.query)
+
+        if url.path.startswith("/output/"):
+            filename = Path(url.path).name
+            file_path = OUTPUT_DIR / filename
+            if not file_path.exists():
+                for alt_dir in [PROJECT_ROOT / "reels_inbox", PROJECT_ROOT / "reels_processing", PROJECT_ROOT / "reels_archive"]:
+                    candidate = alt_dir / filename
+                    if candidate.exists() and candidate.is_file():
+                        file_path = candidate
+                        break
+            if file_path.exists() and file_path.suffix.lower() == ".mp4":
+                self._serve_video_file(file_path, is_head=True)
+                return
+            self.send_error(404, f"Video {filename} not found")
+            return
+
+        elif url.path == "/api/video/stream":
+            file_path = self._resolve_video_target(params)
+            if file_path and file_path.exists() and file_path.suffix.lower() == ".mp4":
+                self._serve_video_file(file_path, is_head=True)
+                return
+            self.send_error(404, "Requested video not found")
+            return
+
+        super().do_HEAD()
+
     def do_GET(self):
         url = urlparse(self.path)
         params = parse_qs(url.query)
@@ -138,10 +167,24 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         elif url.path.startswith("/output/"):
             filename = Path(url.path).name
             file_path = OUTPUT_DIR / filename
+            if not file_path.exists():
+                for alt_dir in [PROJECT_ROOT / "reels_inbox", PROJECT_ROOT / "reels_processing", PROJECT_ROOT / "reels_archive"]:
+                    candidate = alt_dir / filename
+                    if candidate.exists() and candidate.is_file():
+                        file_path = candidate
+                        break
             if file_path.exists() and file_path.suffix.lower() == ".mp4":
                 self._serve_video_file(file_path)
             else:
                 self.send_error(404, f"Video {filename} not found")
+
+        # 3b. Dedicated Video Stream API (Supports ?id=pub_... or ?file=...)
+        elif url.path == "/api/video/stream":
+            file_path = self._resolve_video_target(params)
+            if file_path and file_path.exists() and file_path.suffix.lower() == ".mp4":
+                self._serve_video_file(file_path)
+            else:
+                self.send_error(404, "Requested video not found")
 
         # 4. Cache Files
         elif url.path.startswith("/cache/"):
@@ -670,7 +713,59 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         else:
             self.send_error(404)
 
-    def _serve_video_file(self, file_path: Path):
+    def _resolve_video_target(self, params: Dict[str, List[str]]) -> Optional[Path]:
+        item_id = params.get("id", [""])[0].strip()
+        filename = params.get("file", params.get("filename", [""]))[0].strip()
+
+        # 1. If item id provided, look up in publishing queue or recently published
+        if item_id:
+            try:
+                from publishers.dispatch_queue import PublishingQueueManager
+                for itm in PublishingQueueManager.get_queue():
+                    if itm.get("id") == item_id:
+                        vp = Path(itm.get("video_path", ""))
+                        if vp.exists() and vp.is_file():
+                            return vp
+                        fn = itm.get("filename", "")
+                        if fn:
+                            filename = fn
+                        break
+            except Exception:
+                pass
+
+            if not filename:
+                try:
+                    from publishers.recently_published import RecentlyPublishedManager
+                    for itm in RecentlyPublishedManager.get_items():
+                        if itm.get("id") == item_id:
+                            vp = Path(itm.get("video_path", ""))
+                            if vp.exists() and vp.is_file():
+                                return vp
+                            fn = itm.get("filename", "")
+                            if fn:
+                                filename = fn
+                            break
+                except Exception:
+                    pass
+
+        # 2. If filename provided, safely check candidate directories
+        if filename:
+            clean_name = Path(filename).name
+            candidate_dirs = [
+                OUTPUT_DIR,
+                PROJECT_ROOT / "reels_inbox",
+                PROJECT_ROOT / "reels_processing",
+                PROJECT_ROOT / "reels_archive",
+                CACHE_DIR
+            ]
+            for c_dir in candidate_dirs:
+                cand = c_dir / clean_name
+                if cand.exists() and cand.is_file():
+                    return cand
+
+        return None
+
+    def _serve_video_file(self, file_path: Path, is_head: bool = False):
         try:
             file_size = file_path.stat().st_size
             range_header = self.headers.get("Range")
@@ -691,9 +786,10 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 self._set_cors_headers()
                 self.end_headers()
 
-                with open(file_path, "rb") as f:
-                    f.seek(start)
-                    self.wfile.write(f.read(chunk_len))
+                if not is_head:
+                    with open(file_path, "rb") as f:
+                        f.seek(start)
+                        self.wfile.write(f.read(chunk_len))
                 return
 
             # Full stream
@@ -704,9 +800,10 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self._set_cors_headers()
             self.end_headers()
 
-            with open(file_path, "rb") as f:
-                while chunk := f.read(128 * 1024):
-                    self.wfile.write(chunk)
+            if not is_head:
+                with open(file_path, "rb") as f:
+                    while chunk := f.read(128 * 1024):
+                        self.wfile.write(chunk)
         except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
             pass
 

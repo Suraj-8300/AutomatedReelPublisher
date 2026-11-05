@@ -191,6 +191,19 @@ async function cancelQueueItem(itemId) {
     }
 }
 
+// Global preview item registry
+let allKnownItems = new Map();
+let currentPreviewItem = null;
+
+function trackItems(items) {
+    if (!Array.isArray(items)) return;
+    items.forEach(itm => {
+        if (itm && itm.id) {
+            allKnownItems.set(itm.id, itm);
+        }
+    });
+}
+
 /**
  * Fetch Ready Videos Publishing Queue
  */
@@ -199,6 +212,8 @@ async function fetchPublishingQueue() {
         const res = await fetch(`${API_BASE}/api/publishing-queue`);
         if (!res.ok) return;
         const data = await res.json();
+
+        trackItems(data.queue || []);
 
         const queue = (data.queue || []).filter(item => item.status === 'scheduled' || item.status === 'pending');
         queueItems = queue;
@@ -228,7 +243,7 @@ async function fetchPublishingQueue() {
 }
 
 /**
- * Render Queue List
+ * Render Queue List (Interactive Click-to-Play Web Video Preview)
  */
 function renderQueueList(items) {
     const list = document.getElementById('queueList');
@@ -251,20 +266,31 @@ function renderQueueList(items) {
         const hasYt = platforms.includes('youtube');
 
         return `
-            <div class="md3-item-row">
+            <div class="md3-item-row" onclick="openVideoPreview('${item.id}')" title="Click to watch '${escapeHtml(item.title)}' preview in player">
                 <div class="item-left">
-                    <span class="item-badge-index">${index + 1}</span>
+                    <div class="item-play-thumbnail" title="Click to watch preview">
+                        <span class="material-symbols-outlined play-icon">play_arrow</span>
+                        <span class="item-badge-index">${index + 1}</span>
+                    </div>
                     <div class="item-info">
                         <span class="item-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
                         <div class="item-meta-row">
                             <span>⏱️ Scheduled: ${timeFormatted}</span>
+                            <span>•</span>
+                            <span class="meta-preview-hint">
+                                <span class="material-symbols-outlined" style="font-size: 13px;">smart_display</span> Watch Preview
+                            </span>
                             <span>•</span>
                             ${hasIg ? '<span class="meta-chip ig">📸 Instagram</span>' : ''}
                             ${hasYt ? '<span class="meta-chip yt">▶️ YouTube</span>' : ''}
                         </div>
                     </div>
                 </div>
-                <div class="item-actions">
+                <div class="item-actions" onclick="event.stopPropagation()">
+                    <button class="btn-item-action btn-preview-watch" onclick="openVideoPreview('${item.id}')" title="Preview video in web player">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
+                        <span>Watch</span>
+                    </button>
                     <button class="btn-item-action btn-upload-now" onclick="uploadQueueItemNow('${item.id}')" title="Publish this reel immediately">
                         <span class="material-symbols-outlined" style="font-size: 16px;">bolt</span>
                         <span>Publish Now</span>
@@ -286,6 +312,8 @@ async function fetchRecentlyPublished() {
         const res = await fetch(`${API_BASE}/api/recently-published`);
         if (!res.ok) return;
         const data = await res.json();
+
+        trackItems(data.items || []);
 
         const items = data.items || [];
         const chipElem = document.getElementById('recentCountChip');
@@ -324,18 +352,29 @@ function renderRecentList(items) {
         const igError = item.errors?.instagram || '';
 
         return `
-            <div class="md3-item-row">
+            <div class="md3-item-row" onclick="openVideoPreview('${item.id}')" title="Click to watch '${escapeHtml(item.title)}' in player">
                 <div class="item-left">
-                    <span class="item-badge-index" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">${index + 1}</span>
+                    <div class="item-play-thumbnail" title="Click to watch">
+                        <span class="material-symbols-outlined play-icon">play_arrow</span>
+                        <span class="item-badge-index" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">${index + 1}</span>
+                    </div>
                     <div class="item-info">
                         <span class="item-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
                         <div class="item-meta-row">
                             <span>✨ Published ${timeAgo}</span>
-                            ${igError ? `<span style="color: #f87171; font-size: 11px;">⚠️ IG: ${escapeHtml(igError.slice(0, 45))}...</span>` : ''}
+                            <span>•</span>
+                            <span class="meta-preview-hint">
+                                <span class="material-symbols-outlined" style="font-size: 13px;">smart_display</span> Watch
+                            </span>
+                            ${igError ? `<span>•</span><span style="color: #f87171; font-size: 11px;">⚠️ IG: ${escapeHtml(igError.slice(0, 45))}...</span>` : ''}
                         </div>
                     </div>
                 </div>
-                <div class="item-actions">
+                <div class="item-actions" onclick="event.stopPropagation()">
+                    <button class="btn-item-action btn-preview-watch" onclick="openVideoPreview('${item.id}')" title="Watch reel in web player">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
+                        <span>Watch</span>
+                    </button>
                     ${igLink ? `
                         <a href="${igLink}" target="_blank" class="btn-item-action btn-link-ig" title="View reel on Instagram">
                             <span class="material-symbols-outlined" style="font-size: 16px;">photo_camera</span>
@@ -358,6 +397,163 @@ function renderRecentList(items) {
         `;
     }).join('');
 }
+
+/**
+ * Open Video Preview Modal (Watch On Web)
+ */
+function openVideoPreview(itemId) {
+    const item = allKnownItems.get(itemId) || (queueItems || []).find(i => i.id === itemId);
+    if (!item) {
+        showSnackbar('Reel item details not found', 'error');
+        return;
+    }
+
+    currentPreviewItem = item;
+
+    const modalBackdrop = document.getElementById('videoModalBackdrop');
+    const modalTitle = document.getElementById('modalVideoTitle');
+    const modalSubtitle = document.getElementById('modalVideoSubtitle');
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    const videoSource = document.getElementById('modalVideoSource');
+    const schedulePill = document.getElementById('modalScheduleTime');
+    const hookBox = document.getElementById('modalHookText');
+    const captionBox = document.getElementById('modalCaptionText');
+    const publishBtn = document.getElementById('modalBtnPublishNow');
+    const downloadBtn = document.getElementById('modalBtnDownload');
+    const chipIg = document.getElementById('modalChipIg');
+    const chipYt = document.getElementById('modalChipYt');
+
+    if (!modalBackdrop || !videoPlayer) return;
+
+    // Set title and subtitle
+    if (modalTitle) modalTitle.innerText = item.title || 'Untitled Reel';
+    
+    const isScheduled = item.status === 'scheduled' || item.status === 'pending';
+    const isPublished = item.status === 'published';
+    
+    if (modalSubtitle) {
+        if (isScheduled && item.scheduled_time) {
+            modalSubtitle.innerText = `Scheduled: ${new Date(item.scheduled_time).toLocaleString()} · 1080x1920 (9:16 Shorts/Reels)`;
+        } else if (isPublished && item.published_at) {
+            modalSubtitle.innerText = `Published: ${new Date(item.published_at).toLocaleString()} · Live on Social Channels`;
+        } else {
+            modalSubtitle.innerText = `Status: ${item.status || 'Active'} · 1080x1920 (9:16 Shorts/Reels)`;
+        }
+    }
+
+    // Set status pill
+    if (schedulePill) {
+        if (isScheduled) {
+            schedulePill.innerText = `Scheduled Drop: ${item.scheduled_time ? new Date(item.scheduled_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Paced Next'}`;
+        } else if (isPublished) {
+            schedulePill.innerText = `Live Published Drop`;
+        } else {
+            schedulePill.innerText = `Status: ${item.status || 'Queued'}`;
+        }
+    }
+
+    // Set platform chips visibility
+    const platforms = item.platforms || ['instagram', 'youtube'];
+    if (chipIg) chipIg.style.display = platforms.includes('instagram') ? 'inline-flex' : 'none';
+    if (chipYt) chipYt.style.display = platforms.includes('youtube') ? 'inline-flex' : 'none';
+
+    // Set Hook
+    const igCap = item.instagram_meta?.caption || '';
+    const ytDesc = item.youtube_meta?.description || '';
+    const firstLine = igCap.split('\n')[0] || ytDesc.split('\n')[0] || item.title;
+    if (hookBox) hookBox.innerText = `"${firstLine}"`;
+
+    // Set Caption
+    const fullCaption = igCap || ytDesc || 'Autonomous metadata generated for Instagram & YouTube.';
+    if (captionBox) captionBox.innerText = fullCaption;
+
+    // Set Video Stream Source
+    const videoUrl = item.filename 
+        ? `${API_BASE}/output/${encodeURIComponent(item.filename)}`
+        : `${API_BASE}/api/video/stream?id=${encodeURIComponent(item.id)}`;
+
+    videoSource.src = videoUrl;
+    videoPlayer.load();
+    const playPromise = videoPlayer.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(err => {
+            console.log('Autoplay waiting for user gesture:', err);
+        });
+    }
+
+    // Download button
+    if (downloadBtn) {
+        downloadBtn.href = videoUrl;
+        downloadBtn.download = item.filename || `${item.id}.mp4`;
+    }
+
+    // Publish button state
+    if (publishBtn) {
+        if (isPublished) {
+            publishBtn.style.display = 'none';
+        } else {
+            publishBtn.style.display = 'inline-flex';
+        }
+    }
+
+    // Show modal
+    modalBackdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Close Video Preview Modal
+ */
+function closeVideoModal(event) {
+    if (event && event.target && event.target.id !== 'videoModalBackdrop' && !event.target.closest('.md3-btn-icon-close') && !event.target.closest('.md3-btn-text-sm')) {
+        return;
+    }
+
+    const modalBackdrop = document.getElementById('videoModalBackdrop');
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    const videoSource = document.getElementById('modalVideoSource');
+
+    if (videoPlayer) {
+        videoPlayer.pause();
+        if (videoSource) videoSource.src = '';
+    }
+
+    if (modalBackdrop) {
+        modalBackdrop.classList.remove('active');
+    }
+
+    document.body.style.overflow = '';
+    currentPreviewItem = null;
+}
+
+/**
+ * Modal Publish Current Reel Action
+ */
+async function modalPublishCurrentReel() {
+    if (!currentPreviewItem || !currentPreviewItem.id) return;
+    const itm = currentPreviewItem;
+    closeVideoModal();
+    await uploadQueueItemNow(itm.id);
+}
+
+/**
+ * Keyboard shortcuts for preview modal
+ */
+window.addEventListener('keydown', (e) => {
+    const modalBackdrop = document.getElementById('videoModalBackdrop');
+    if (!modalBackdrop || !modalBackdrop.classList.contains('active')) return;
+
+    if (e.key === 'Escape') {
+        closeVideoModal();
+    } else if (e.key === ' ' && document.activeElement && !['input', 'textarea', 'button'].includes(document.activeElement.tagName.toLowerCase())) {
+        e.preventDefault();
+        const videoPlayer = document.getElementById('modalVideoPlayer');
+        if (videoPlayer) {
+            if (videoPlayer.paused) videoPlayer.play();
+            else videoPlayer.pause();
+        }
+    }
+});
 
 // Global quota state
 let currentQuota = {
