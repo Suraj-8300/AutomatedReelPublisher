@@ -94,3 +94,4 @@ class PowerInhibitor:
             "lid_policy": "run_when_closed",
             "reason": "Continuous Video Generation & Scheduled 5-Hour Publishing"
         }
+

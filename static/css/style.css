@@ -166,6 +166,14 @@ body.md3-body {
     font-size: 16px;
 }
 
+.md3-chip-power .chip-icon {
+    color: #38bdf8;
+}
+
+.md3-chip-compliance .chip-icon {
+    color: #2dd4bf;
+}
+
 .md3-chip-ig .chip-icon {
     color: #e1306c;
 }
