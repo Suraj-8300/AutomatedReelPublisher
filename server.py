@@ -480,10 +480,15 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         # 3f. API: Enqueue Video to Publishing Queue
         elif url.path == "/api/publishing-queue/enqueue":
             from publishers.dispatch_queue import PublishingQueueManager
-            video_filename = data.get("video_filename", "")
-            src_video = OUTPUT_DIR / Path(video_filename).name
-            if not src_video.exists():
-                res = {"success": False, "error": f"Video file {video_filename} not found"}
+            raw_target = data.get("video_filename") or data.get("video_path") or data.get("filename") or ""
+            target_path = Path(raw_target)
+            if target_path.is_absolute() and target_path.is_file():
+                src_video = target_path
+            else:
+                src_video = OUTPUT_DIR / target_path.name
+
+            if not src_video.is_file():
+                res = {"success": False, "error": f"Video file '{raw_target}' not found or is not a file"}
             else:
                 platforms = data.get("platforms", ["instagram", "youtube"])
                 title = data.get("title", src_video.stem.replace("_", " "))

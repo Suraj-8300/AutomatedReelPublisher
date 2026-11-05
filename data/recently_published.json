@@ -1,5 +1,55 @@
 [
   {
+    "id": "pub_7e5e250d22",
+    "title": "Verification Test Short #Shorts",
+    "filename": "Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "platforms": [
+      "youtube"
+    ],
+    "published_at": "2026-11-05T20:06:32.089667+00:00",
+    "receipts": {
+      "youtube": {
+        "success": true,
+        "video_id": "T4q-1JEIx0w",
+        "shorts_url": "https://youtube.com/shorts/T4q-1JEIx0w",
+        "watch_url": "https://www.youtube.com/watch?v=T4q-1JEIx0w",
+        "title": "Verification Test Short #Shorts",
+        "privacy_status": "public",
+        "file_size_mb": 2.6
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/T4q-1JEIx0w",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=T4q-1JEIx0w",
+    "youtube_video_id": "T4q-1JEIx0w"
+  },
+  {
+    "id": "pub_b1a978393c",
+    "title": "Why One Line of Code Costs Millions #Shorts",
+    "filename": "cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "platforms": [
+      "youtube"
+    ],
+    "published_at": "2026-11-05T20:00:56.310444+00:00",
+    "receipts": {
+      "youtube": {
+        "success": true,
+        "video_id": "5lwhgdwC3p0",
+        "shorts_url": "https://youtube.com/shorts/5lwhgdwC3p0",
+        "watch_url": "https://www.youtube.com/watch?v=5lwhgdwC3p0",
+        "title": "Why One Line of Code Costs Millions #Shorts",
+        "privacy_status": "public",
+        "file_size_mb": 1.41
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/5lwhgdwC3p0",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=5lwhgdwC3p0",
+    "youtube_video_id": "5lwhgdwC3p0"
+  },
+  {
     "id": "pub_yt_x3DdF2g5U2U",
     "title": "Why Small Typos Break Everything #Shorts",
     "filename": "cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",

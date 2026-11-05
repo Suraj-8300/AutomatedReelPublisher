@@ -183,3 +183,4 @@ class RecentlyPublishedManager:
                         pass
 
         return deleted
+

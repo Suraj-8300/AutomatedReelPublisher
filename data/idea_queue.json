@@ -1,137 +1,5 @@
 [
   {
-    "id": "8a94b9fcdbe8",
-    "title": "The Blind Spot Your Brain Is Lying To You About",
-    "genre": "cognitive_illusions",
-    "hook": "You have a hole the size of a coin in your vision right now, and your brain is actively fabricating reality to hide it.",
-    "script": "You have a coin-sized hole in your vision right now, and your brain is actively fabricating reality to hide it. Where the optic nerve connects to your retina, there are zero light receptors — literally a blank void. Your visual cortex samples surrounding pixels and paints over the hole in real-time — you never see raw reality.",
-    "scenes": [
-      {
-        "text": "You have a coin-sized hole in your vision right now, and your brain is actively fabricating reality to hide it.",
-        "visual_prompt": "Macro cinematic shot of human eye pupil reflecting colorful ambient light, subtle glitch geometric visual showing where the optic nerve blindspot lies, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Where the optic nerve connects to your retina, there are zero light receptors — literally a blank void.",
-        "visual_prompt": "Anatomical cross section of eye showing glowing retina and optic nerve disk void with zero rod and cone cells, medical science 3D visual, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "Your visual cortex samples surrounding pixels and paints over the hole in real-time — you never see raw reality.",
-        "visual_prompt": "First-person view of urban street where pixels seamlessly stitch together over an invisible void, hyper-real cinematic atmosphere, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "Where the optic nerve passes through the retina, there are zero photoreceptor cells. Your brain uses predictive processing to invent colors and textures from surrounding vision to paint over the black hole continuously.",
-    "payoff": "You don't see reality as it is — you see your brain's best guess of what reality should be.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-ChristopherNeural",
-    "suggested_music": "deep_mystery",
-    "caption_style": "karaoke",
-    "duration": 15,
-    "created_at": 1793906278.7707691,
-    "status": "ready"
-  },
-  {
-    "id": "031a023a9811",
-    "title": "The Quantum Eraser That Rewrites The Past",
-    "genre": "science_paradoxes",
-    "hook": "Physicists built an experiment that proves a photon's past can be changed after it already landed.",
-    "script": "Physicists built an experiment that proves a photon's past can be changed after it already landed. When researchers erase the measurement data, photons that already registered as particles instantly rewrite their behavior into waves. At the quantum scale, time is not a one-way street — the future literally decides what the past did.",
-    "scenes": [
-      {
-        "text": "Physicists built an experiment that proves a photon's past can be changed after it already landed.",
-        "visual_prompt": "Cinematic visual of quantum light beam splitting through beam splitters and laser mirrors in a dark optical laboratory, neon laser reflections, dramatic haze, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "When researchers erase the measurement data, photons that already registered as particles instantly rewrite their behavior into waves.",
-        "visual_prompt": "Abstract visual representation of particle waves collapsing and re-emerging through glowing quantum fabric, ethereal aesthetic, 8k render, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "At the quantum scale, time is not a one-way street — the future literally decides what the past did.",
-        "visual_prompt": "A glowing holographic clock face dissolving into radiant starlight particles and quantum strings, breathtaking cosmic atmosphere, cinematic masterpiece, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "In the Delayed Choice Quantum Eraser experiment, particles act as waves when paths are unknown, but collapse into solid particles if measurement info is preserved — even if that measurement happens AFTER the particle hits the sensor.",
-    "payoff": "It challenges the fundamental notion of cause and effect in classical reality.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-GuyNeural",
-    "suggested_music": "curiosity_lofi",
-    "caption_style": "karaoke",
-    "duration": 15,
-    "created_at": 1793906278.770841,
-    "status": "ready"
-  },
-  {
-    "id": "c2f1c743a336",
-    "title": "Why Your Brain Loves Hearing Unfinished Stories",
-    "genre": "dark_psychology",
-    "hook": "There is a psychological glitch that makes you obsess over unfinished tasks until you finish them.",
-    "script": "There is a psychological glitch that makes you obsess over unfinished tasks until you finish them. Known as the Zeigarnik Effect, uncompleted actions generate persistent mental tension in your prefrontal cortex. This psychological loop is the exact mechanism Hollywood and TikTok use to keep your thumb locked for hours.",
-    "scenes": [
-      {
-        "text": "There is a psychological glitch that makes you obsess over unfinished tasks until you finish them.",
-        "visual_prompt": "Cinematic shot of glowing unfinished puzzle piece floating in front of human eyes in dim room, dramatic chiaroscuro lighting, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Known as the Zeigarnik Effect, uncompleted actions generate persistent mental tension in your prefrontal cortex.",
-        "visual_prompt": "Detailed 3D anatomical visualization of human brain with glowing blue prefrontal cortex radiating gentle cognitive waves, 8k render, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "This psychological loop is the exact mechanism Hollywood and TikTok use to keep your thumb locked for hours.",
-        "visual_prompt": "Glowing phone screen illuminating a person's focused face in dark room with endless cascading feed of dynamic visual streams, cinematic 8k, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "The Zeigarnik Effect: Russian psychologist Bluma Zeigarnik noticed waiters remember complex unpaid orders perfectly, but forget them completely the second the bill is paid. Unfinished tasks produce cognitive tension.",
-    "payoff": "This exact mental open loop is why Netflix cliffhangers and TikTok hooks are so violently addictive.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-ChristopherNeural",
-    "suggested_music": "cyber_pulse",
-    "caption_style": "high_impact",
-    "duration": 15,
-    "created_at": 1793906278.770854,
-    "status": "ready"
-  },
-  {
-    "id": "b6dfe842a30f",
-    "title": "DNA Data Storage (Your Whole Life On A Salt Grain)",
-    "genre": "deep_tech",
-    "hook": "All the digital data ever created by humanity could fit inside a teaspoon of DNA.",
-    "script": "All the digital data ever created by humanity could fit inside a teaspoon of DNA. With an information density of over two hundred petabytes per gram, DNA can preserve data uncorrupted for ten thousand years. Massive football-field-sized cloud server farms could soon be replaced by a single refrigerated vial of synthetic genetic code.",
-    "scenes": [
-      {
-        "text": "All the digital data ever created by humanity could fit inside a teaspoon of DNA.",
-        "visual_prompt": "Macro shot of a glass vial filled with glowing iridescent DNA strands surrounded by floating holographic data matrices, dark high-tech laboratory, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "With an information density of over two hundred petabytes per gram, DNA can preserve data uncorrupted for ten thousand years.",
-        "visual_prompt": "Ultra-detailed 3D animation of DNA double-helix unwinding into glowing binary 1s and 0s, Unreal Engine 5 scientific visualization, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "Massive football-field-sized cloud server farms could soon be replaced by a single refrigerated vial of synthetic genetic code.",
-        "visual_prompt": "Futuristic clean minimalist datacenter with glowing vials of bio-data processors replacing server racks, sleek neon cyan aesthetic, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "DNA has an information density of 215 petabytes per gram. Scientists have already encoded entire operating systems, Shakespeare plays, and movies into synthetic DNA strands that survive undamaged for 10,000 years.",
-    "payoff": "In ten years, cold storage cloud server farms might be replaced by a single refrigerated vial of liquid.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-JennyNeural",
-    "suggested_music": "cyber_pulse",
-    "caption_style": "karaoke",
-    "duration": 15,
-    "created_at": 1793906956.9958725,
-    "status": "ready"
-  },
-  {
     "id": "c2496a508246",
     "title": "The Unbreakable Roman Concrete That Heals Itself",
     "genre": "ancient_mysteries",
@@ -426,6 +294,138 @@
     "caption_style": "clean_minimal",
     "duration": 15,
     "created_at": 1793908468.63476,
+    "status": "ready"
+  },
+  {
+    "id": "75f6774a1316",
+    "title": "The Blind Spot Your Brain Is Lying To You About",
+    "genre": "cognitive_illusions",
+    "hook": "You have a hole the size of a coin in your vision right now, and your brain is actively fabricating reality to hide it.",
+    "script": "You have a coin-sized hole in your vision right now, and your brain is actively fabricating reality to hide it. Where the optic nerve connects to your retina, there are zero light receptors — literally a blank void. Your visual cortex samples surrounding pixels and paints over the hole in real-time — you never see raw reality.",
+    "scenes": [
+      {
+        "text": "You have a coin-sized hole in your vision right now, and your brain is actively fabricating reality to hide it.",
+        "visual_prompt": "Macro cinematic shot of human eye pupil reflecting colorful ambient light, subtle glitch geometric visual showing where the optic nerve blindspot lies, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Where the optic nerve connects to your retina, there are zero light receptors — literally a blank void.",
+        "visual_prompt": "Anatomical cross section of eye showing glowing retina and optic nerve disk void with zero rod and cone cells, medical science 3D visual, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "Your visual cortex samples surrounding pixels and paints over the hole in real-time — you never see raw reality.",
+        "visual_prompt": "First-person view of urban street where pixels seamlessly stitch together over an invisible void, hyper-real cinematic atmosphere, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "Where the optic nerve passes through the retina, there are zero photoreceptor cells. Your brain uses predictive processing to invent colors and textures from surrounding vision to paint over the black hole continuously.",
+    "payoff": "You don't see reality as it is — you see your brain's best guess of what reality should be.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "curiosity_lofi",
+    "caption_style": "karaoke",
+    "duration": 15,
+    "created_at": 1793909059.7367544,
+    "status": "ready"
+  },
+  {
+    "id": "4a809cb31711",
+    "title": "The Quantum Eraser That Rewrites The Past",
+    "genre": "science_paradoxes",
+    "hook": "Physicists built an experiment that proves a photon's past can be changed after it already landed.",
+    "script": "Physicists built an experiment that proves a photon's past can be changed after it already landed. When researchers erase the measurement data, photons that already registered as particles instantly rewrite their behavior into waves. At the quantum scale, time is not a one-way street — the future literally decides what the past did.",
+    "scenes": [
+      {
+        "text": "Physicists built an experiment that proves a photon's past can be changed after it already landed.",
+        "visual_prompt": "Cinematic visual of quantum light beam splitting through beam splitters and laser mirrors in a dark optical laboratory, neon laser reflections, dramatic haze, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "When researchers erase the measurement data, photons that already registered as particles instantly rewrite their behavior into waves.",
+        "visual_prompt": "Abstract visual representation of particle waves collapsing and re-emerging through glowing quantum fabric, ethereal aesthetic, 8k render, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "At the quantum scale, time is not a one-way street — the future literally decides what the past did.",
+        "visual_prompt": "A glowing holographic clock face dissolving into radiant starlight particles and quantum strings, breathtaking cosmic atmosphere, cinematic masterpiece, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "In the Delayed Choice Quantum Eraser experiment, particles act as waves when paths are unknown, but collapse into solid particles if measurement info is preserved — even if that measurement happens AFTER the particle hits the sensor.",
+    "payoff": "It challenges the fundamental notion of cause and effect in classical reality.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "curiosity_lofi",
+    "caption_style": "clean_minimal",
+    "duration": 15,
+    "created_at": 1793909059.7367744,
+    "status": "ready"
+  },
+  {
+    "id": "7a3a4b8ab0dc",
+    "title": "DNA Data Storage (Your Whole Life On A Salt Grain)",
+    "genre": "deep_tech",
+    "hook": "All the digital data ever created by humanity could fit inside a teaspoon of DNA.",
+    "script": "All the digital data ever created by humanity could fit inside a teaspoon of DNA. With an information density of over two hundred petabytes per gram, DNA can preserve data uncorrupted for ten thousand years. Massive football-field-sized cloud server farms could soon be replaced by a single refrigerated vial of synthetic genetic code.",
+    "scenes": [
+      {
+        "text": "All the digital data ever created by humanity could fit inside a teaspoon of DNA.",
+        "visual_prompt": "Macro shot of a glass vial filled with glowing iridescent DNA strands surrounded by floating holographic data matrices, dark high-tech laboratory, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "With an information density of over two hundred petabytes per gram, DNA can preserve data uncorrupted for ten thousand years.",
+        "visual_prompt": "Ultra-detailed 3D animation of DNA double-helix unwinding into glowing binary 1s and 0s, Unreal Engine 5 scientific visualization, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "Massive football-field-sized cloud server farms could soon be replaced by a single refrigerated vial of synthetic genetic code.",
+        "visual_prompt": "Futuristic clean minimalist datacenter with glowing vials of bio-data processors replacing server racks, sleek neon cyan aesthetic, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "DNA has an information density of 215 petabytes per gram. Scientists have already encoded entire operating systems, Shakespeare plays, and movies into synthetic DNA strands that survive undamaged for 10,000 years.",
+    "payoff": "In ten years, cold storage cloud server farms might be replaced by a single refrigerated vial of liquid.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "cyber_pulse",
+    "caption_style": "cinematic",
+    "duration": 15,
+    "created_at": 1793909059.736786,
+    "status": "ready"
+  },
+  {
+    "id": "b5b254b2c172",
+    "title": "The Sound of Black Holes Singing in Perseus",
+    "genre": "ocean_and_cosmos",
+    "hook": "NASA recorded the actual sound of a supermassive black hole, and it sounds like a cosmic choir.",
+    "script": "NASA recorded the actual sound of a supermassive black hole, and it sounds like an ancient cosmic choir. Acoustic pressure waves ripple through millions of light-years of intergalactic hot gas, generating an ultra-deep B-flat note. When NASA scaled up these frequencies, humanity could finally hear the fifty-seven octave song of the universe.",
+    "scenes": [
+      {
+        "text": "NASA recorded the actual sound of a supermassive black hole, and it sounds like an ancient cosmic choir.",
+        "visual_prompt": "Massive swirling black hole with glowing golden accretion disk distorting spacetime in the center of the Perseus galaxy cluster, volumetric relativistic jet, 8k Hubble space photography, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Acoustic pressure waves ripple through millions of light-years of intergalactic hot gas, generating an ultra-deep B-flat note.",
+        "visual_prompt": "Glowing cosmic soundwave ripples propagating through vast intergalactic purple gas clouds, awe-inspiring scientific visualization, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "When NASA scaled up these frequencies, humanity could finally hear the fifty-seven octave song of the universe.",
+        "visual_prompt": "Cosmic audio visualizer interface displaying glowing spectral soundwaves overlaid on deep space galaxy cluster, dark futuristic aesthetic, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "The black hole at the center of the Perseus galaxy cluster emits pressure waves that cause acoustic ripples in surrounding hot gas. NASA scaled up these sound waves by 57 octaves to bring them within human hearing range.",
+    "payoff": "Space is not completely silent — dense galaxy clusters are vibrating with deep cosmic bass.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "cyber_pulse",
+    "caption_style": "clean_minimal",
+    "duration": 15,
+    "created_at": 1793909059.7368512,
     "status": "ready"
   }
 ]
