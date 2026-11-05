@@ -230,7 +230,17 @@ class PublishingQueueManager:
         item["errors"] = errors
         item["status"] = "published" if overall_success else ("failed" if not receipts else "partially_published")
         item["published_at"] = datetime.now(timezone.utc).isoformat()
-        cls._save_data(items)
+
+        if receipts:
+            # Successfully published: remove from queue and add to rolling recently published (last 10)
+            items.pop(target_idx)
+            cls._save_data(items)
+            from .recent_manager import RecentlyPublishedManager
+            RecentlyPublishedManager.record_published(item)
+            print(f"📦 [PublishingQueue] Removed '{item['title']}' from ready queue & added to Recently Published (rolling 10 limit).")
+        else:
+            # Failed to publish to any platform, retain in queue marked failed
+            cls._save_data(items)
 
         return {
             "success": overall_success,

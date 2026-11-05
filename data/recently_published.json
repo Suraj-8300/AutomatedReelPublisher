@@ -1,0 +1,44 @@
+[
+  {
+    "id": "pub_yt_x3DdF2g5U2U",
+    "title": "Why Small Typos Break Everything #Shorts",
+    "filename": "cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "video_path": "output/cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "platforms": [
+      "youtube"
+    ],
+    "published_at": "2026-11-05T19:45:55Z",
+    "receipts": {
+      "youtube": {
+        "video_id": "x3DdF2g5U2U",
+        "shorts_url": "https://youtube.com/shorts/x3DdF2g5U2U",
+        "watch_url": "https://www.youtube.com/watch?v=x3DdF2g5U2U"
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/x3DdF2g5U2U",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=x3DdF2g5U2U",
+    "youtube_video_id": "x3DdF2g5U2U"
+  },
+  {
+    "id": "pub_yt_r899gtozMqo",
+    "title": "Fixing One Typo In Production #Shorts",
+    "filename": "cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "video_path": "output/cdn_Fixing_One_Typo_In_Productio_4e2d8c.mp4",
+    "platforms": [
+      "youtube"
+    ],
+    "published_at": "2026-11-05T19:45:30Z",
+    "receipts": {
+      "youtube": {
+        "video_id": "r899gtozMqo",
+        "shorts_url": "https://youtube.com/shorts/r899gtozMqo",
+        "watch_url": "https://www.youtube.com/watch?v=r899gtozMqo"
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/r899gtozMqo",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=r899gtozMqo",
+    "youtube_video_id": "r899gtozMqo"
+  }
+]

@@ -1,137 +1,5 @@
 [
   {
-    "id": "91312c02ed50",
-    "title": "The Immortal Jellyfish (Turritopsis Dohrnii)",
-    "genre": "nature_and_animals",
-    "hook": "There is a creature in our oceans that is biologically incapable of dying of old age.",
-    "script": "There is a creature in our oceans that is biologically incapable of dying of old age. When injured or elderly, its cells undergo transdifferentiation, reverting back into juvenile polyp colonies. By resetting its biological clock over and over, this creature has been swimming continuously for centuries.",
-    "scenes": [
-      {
-        "text": "There is a creature in our oceans that is biologically incapable of dying of old age.",
-        "visual_prompt": "Bioluminescent tiny jellyfish Turritopsis dohrnii floating gracefully in deep indigo ocean water, translucent glowing bell, radiant tentacles, BBC Planet Earth cinematography, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "When injured or elderly, its cells undergo transdifferentiation, reverting back into juvenile polyp colonies.",
-        "visual_prompt": "Macro visual sequence of jellyfish cells morphing and regenerating into youthful glowing polyp clusters, cellular biology aesthetic, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "By resetting its biological clock over and over, this creature has been swimming continuously for centuries.",
-        "visual_prompt": "Vast ocean depth illuminated by millions of glowing immortal jellyfish drifting through deep twilight waters, magical natural wonder, 8k resolution, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "Turritopsis dohrnii can revert its entire cellular structure back into an adolescent polyp stage when stressed or aged. Through transdifferentiation, its adult cells transform back into stem cells, rebooting its lifecycle infinitely.",
-    "payoff": "It is the only known creature with biological immortality.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-ChristopherNeural",
-    "suggested_music": "action_hybrid",
-    "caption_style": "clean_minimal",
-    "duration": 15,
-    "created_at": 1793906031.5622146,
-    "status": "ready"
-  },
-  {
-    "id": "78f76b4b1a85",
-    "title": "The Diamond Battery That Lasts 28,000 Years",
-    "genre": "deep_tech",
-    "hook": "Engineers built a battery made of lab diamonds that produces clean electricity for 28,000 years.",
-    "script": "Engineers built a battery made of lab diamonds that produces clean electricity for twenty-eight thousand years. By trapping nuclear carbon waste inside an indestructible diamond crystal, it safely converts beta radiation directly into electricity. Pacemakers and deep space probes could soon run continuously without ever needing a recharge for thirty human generations.",
-    "scenes": [
-      {
-        "text": "Engineers built a battery made of lab diamonds that produces clean electricity for twenty-eight thousand years.",
-        "visual_prompt": "Macro shot of a glowing blue synthetic diamond battery emitting faint electrical sparks in a cleanroom laboratory, high-tech engineering aesthetic, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "By trapping nuclear carbon waste inside an indestructible diamond crystal, it safely converts beta radiation directly into electricity.",
-        "visual_prompt": "Close-up 3D scientific render of atomic diamond lattice trapping glowing radioactive isotopes with electrons flowing through semiconductors, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "Pacemakers and deep space probes could soon run continuously without ever needing a recharge for thirty human generations.",
-        "visual_prompt": "Deep space probe spacecraft gliding past Saturn's rings powered by a glowing diamond core, photorealistic space art, volumetric cosmic lighting, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "By encasing radioactive carbon-14 nuclear waste inside artificial diamonds, the radiation is converted into direct electric current through betavoltaics, while the diamond shell blocks 100% of radiation.",
-    "payoff": "Imagine pacemakers, space satellites, and IoT devices that never need to be plugged in or replaced for centuries.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-JennyNeural",
-    "suggested_music": "curiosity_lofi",
-    "caption_style": "high_impact",
-    "duration": 15,
-    "created_at": 1793906031.562242,
-    "status": "ready"
-  },
-  {
-    "id": "749610ea074e",
-    "title": "The Planet Where It Rains Molten Iron",
-    "genre": "ocean_and_cosmos",
-    "hook": "There is an exoplanet in our galaxy where nighttime literally rains scorching drops of molten iron.",
-    "script": "There is an exoplanet in our galaxy where nighttime literally rains scorching drops of molten iron. Dayside temperatures exceed twenty-four hundred degrees Celsius, boiling solid iron into thick metallic storm clouds. Hurricane-force winds sweep this metallic vapor to the nightside, condensing into blazing iron rain showers.",
-    "scenes": [
-      {
-        "text": "There is an exoplanet in our galaxy where nighttime literally rains scorching drops of molten iron.",
-        "visual_prompt": "Terrifying beautiful alien planet WASP-76b with blazing fiery dayside and stormy purple nightside where glowing droplets of molten liquid iron rain down onto dark basalt peaks, 8k space cinematography, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Dayside temperatures exceed twenty-four hundred degrees Celsius, boiling solid iron into thick metallic storm clouds.",
-        "visual_prompt": "Alien horizon with intense golden sun blazing down on boiling iron lakes vaporizing into amber sky, epic scale cinematic render, 9:16 vertical aspect ratio",
-        "motion": "pan_right"
-      },
-      {
-        "text": "Hurricane-force winds sweep this metallic vapor to the nightside, condensing into blazing iron rain showers.",
-        "visual_prompt": "Dramatic nightside view of alien mountains being pelted by glowing orange liquid iron raindrops with lightning strikes, otherworldly masterpiece, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "WASP-76b is tidally locked to its star. On the dayside, temperatures reach 2,400 degrees Celsius, vaporizing iron metal into gas. Fierce atmospheric winds blow iron vapor to the cooler nightside, where it condenses and pours down as liquid metal rain.",
-    "payoff": "The universe contains extreme environments that make science fiction look tame.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-ChristopherNeural",
-    "suggested_music": "action_hybrid",
-    "caption_style": "high_impact",
-    "duration": 15,
-    "created_at": 1793906031.5622787,
-    "status": "ready"
-  },
-  {
-    "id": "5279f45495ce",
-    "title": "The Sound of Black Holes Singing in Perseus",
-    "genre": "ocean_and_cosmos",
-    "hook": "NASA recorded the actual sound of a supermassive black hole, and it sounds like a cosmic choir.",
-    "script": "NASA recorded the actual sound of a supermassive black hole, and it sounds like an ancient cosmic choir. Acoustic pressure waves ripple through millions of light-years of intergalactic hot gas, generating an ultra-deep B-flat note. When NASA scaled up these frequencies, humanity could finally hear the fifty-seven octave song of the universe.",
-    "scenes": [
-      {
-        "text": "NASA recorded the actual sound of a supermassive black hole, and it sounds like an ancient cosmic choir.",
-        "visual_prompt": "Massive swirling black hole with glowing golden accretion disk distorting spacetime in the center of the Perseus galaxy cluster, volumetric relativistic jet, 8k Hubble space photography, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Acoustic pressure waves ripple through millions of light-years of intergalactic hot gas, generating an ultra-deep B-flat note.",
-        "visual_prompt": "Glowing cosmic soundwave ripples propagating through vast intergalactic purple gas clouds, awe-inspiring scientific visualization, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "When NASA scaled up these frequencies, humanity could finally hear the fifty-seven octave song of the universe.",
-        "visual_prompt": "Cosmic audio visualizer interface displaying glowing spectral soundwaves overlaid on deep space galaxy cluster, dark futuristic aesthetic, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "The black hole at the center of the Perseus galaxy cluster emits pressure waves that cause acoustic ripples in surrounding hot gas. NASA scaled up these sound waves by 57 octaves to bring them within human hearing range.",
-    "payoff": "Space is not completely silent — dense galaxy clusters are vibrating with deep cosmic bass.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-GuyNeural",
-    "suggested_music": "action_hybrid",
-    "caption_style": "clean_minimal",
-    "duration": 15,
-    "created_at": 1793906031.5622911,
-    "status": "ready"
-  },
-  {
     "id": "8a94b9fcdbe8",
     "title": "The Blind Spot Your Brain Is Lying To You About",
     "genre": "cognitive_illusions",
@@ -393,6 +261,171 @@
     "caption_style": "cinematic",
     "duration": 15,
     "created_at": 1793906956.9959788,
+    "status": "ready"
+  },
+  {
+    "id": "c05250bd39fd",
+    "title": "The Planet Where It Rains Molten Iron",
+    "genre": "ocean_and_cosmos",
+    "hook": "There is an exoplanet in our galaxy where nighttime literally rains scorching drops of molten iron.",
+    "script": "There is an exoplanet in our galaxy where nighttime literally rains scorching drops of molten iron. Dayside temperatures exceed twenty-four hundred degrees Celsius, boiling solid iron into thick metallic storm clouds. Hurricane-force winds sweep this metallic vapor to the nightside, condensing into blazing iron rain showers.",
+    "scenes": [
+      {
+        "text": "There is an exoplanet in our galaxy where nighttime literally rains scorching drops of molten iron.",
+        "visual_prompt": "Terrifying beautiful alien planet WASP-76b with blazing fiery dayside and stormy purple nightside where glowing droplets of molten liquid iron rain down onto dark basalt peaks, 8k space cinematography, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Dayside temperatures exceed twenty-four hundred degrees Celsius, boiling solid iron into thick metallic storm clouds.",
+        "visual_prompt": "Alien horizon with intense golden sun blazing down on boiling iron lakes vaporizing into amber sky, epic scale cinematic render, 9:16 vertical aspect ratio",
+        "motion": "pan_right"
+      },
+      {
+        "text": "Hurricane-force winds sweep this metallic vapor to the nightside, condensing into blazing iron rain showers.",
+        "visual_prompt": "Dramatic nightside view of alien mountains being pelted by glowing orange liquid iron raindrops with lightning strikes, otherworldly masterpiece, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "WASP-76b is tidally locked to its star. On the dayside, temperatures reach 2,400 degrees Celsius, vaporizing iron metal into gas. Fierce atmospheric winds blow iron vapor to the cooler nightside, where it condenses and pours down as liquid metal rain.",
+    "payoff": "The universe contains extreme environments that make science fiction look tame.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-JennyNeural",
+    "suggested_music": "deep_mystery",
+    "caption_style": "clean_minimal",
+    "duration": 15,
+    "created_at": 1793908468.6346421,
+    "status": "ready"
+  },
+  {
+    "id": "9609d7a5e7ab",
+    "title": "The Baader-Meinhof Illusion (Why You See It Everywhere)",
+    "genre": "dark_psychology",
+    "hook": "Ever learn a brand new word, and suddenly hear it four times the very next day?",
+    "script": "Ever learn a brand new word, and suddenly hear it four times the very next day? Your brain filters out ninety-nine percent of daily sensory data, until selective attention flags a pattern as important. The frequency did not increase — your subconscious pattern recognition simply turned on the spotlight.",
+    "scenes": [
+      {
+        "text": "Ever learn a brand new word, and suddenly hear it four times the very next day?",
+        "visual_prompt": "Close-up portrait of person sitting on crowded subway suddenly noticing glowing typography repeating across billboards and newspaper, cinematic street lighting, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Your brain filters out ninety-nine percent of daily sensory data, until selective attention flags a pattern as important.",
+        "visual_prompt": "Cinematic artistic visualization of human neural pathways glowing with electric neon pulses processing incoming street symbols, dark aesthetic, 9:16 vertical aspect ratio",
+        "motion": "pan_right"
+      },
+      {
+        "text": "The frequency did not increase — your subconscious pattern recognition simply turned on the spotlight.",
+        "visual_prompt": "Cinematic silhouette walking down night city avenue illuminated by glowing geometric light beams, moody cyberpunk atmosphere, 8k photography, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "This frequency illusion happens because your brain's selective attention highlights the new pattern, and confirmation bias tricks you into believing it's occurring more frequently in reality.",
+    "payoff": "The world didn't change overnight — your subconscious pattern filter just turned the spotlight on.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-ChristopherNeural",
+    "suggested_music": "action_hybrid",
+    "caption_style": "cinematic",
+    "duration": 15,
+    "created_at": 1793908468.63467,
+    "status": "ready"
+  },
+  {
+    "id": "a4e312dd042b",
+    "title": "The Whale Song That Circle The Earth",
+    "genre": "nature_and_animals",
+    "hook": "Fin whales emit low frequency pulses so loud they travel halfway around the globe.",
+    "script": "Fin whales emit low frequency pulses so loud they travel halfway around the globe. Entering the ocean's deep sound channel, acoustic waves bounce between cold water layers with almost zero energy loss. Before diesel ship propellers polluted the seas, a whale in New York could hold a conversation with another in Ireland.",
+    "scenes": [
+      {
+        "text": "Fin whales emit low frequency pulses so loud they travel halfway around the globe.",
+        "visual_prompt": "Majestic giant blue fin whale gliding through dark sapphire ocean depths with visible luminous sonic soundwaves rippling through the water, cinematic 8k BBC documentary, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Entering the ocean's deep sound channel, acoustic waves bounce between cold water layers with almost zero energy loss.",
+        "visual_prompt": "Cross section diagram of deep ocean SOFAR channel with glowing gold acoustic sonic pulses traveling thousands of miles beneath waves, scientific visualization, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "Before diesel ship propellers polluted the seas, a whale in New York could hold a conversation with another in Ireland.",
+        "visual_prompt": "Two distant whales swimming in twilight sunbeams beneath calm ocean surface, ethereal atmospheric lighting, cinematic masterpiece, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "At 20 Hertz, low-frequency whale songs enter the deep sound channel (SOFAR layer) of the ocean where temperature and salinity trap acoustic waves, allowing calls to traverse 4,000 miles across entire ocean basins.",
+    "payoff": "Whales were literally communicating across entire oceans before humans invented the telegraph.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-ChristopherNeural",
+    "suggested_music": "curiosity_lofi",
+    "caption_style": "cinematic",
+    "duration": 15,
+    "created_at": 1793908468.6346862,
+    "status": "ready"
+  },
+  {
+    "id": "2eb47db20bf9",
+    "title": "The 2,000-Year-Old Baghdad Battery",
+    "genre": "ancient_mysteries",
+    "hook": "Archaeologists dug up a 2,000-year-old clay jar that produces real electric voltage.",
+    "script": "Archaeologists dug up a two-thousand-year-old clay jar that produces real electric voltage. When modern engineers reconstructed the Baghdad jars and added acidic wine, they generated nearly two volts of direct current. Centuries before electricity was officially invented, ancient metallurgists were already electroplating gold onto silver statues.",
+    "scenes": [
+      {
+        "text": "Archaeologists dug up a two-thousand-year-old clay jar that produces real electric voltage.",
+        "visual_prompt": "Archaeological excavation in desert tomb discovering an ancient terracotta clay jar with glowing faint electrical sparks between copper and iron rods, cinematic lighting, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "When modern engineers reconstructed the Baghdad jars and added acidic wine, they generated nearly two volts of direct current.",
+        "visual_prompt": "Macro cross-section view of ancient ceramic battery showing copper cylinder and iron core reacting with liquid, glowing voltage voltmeter reading, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "Centuries before electricity was officially invented, ancient metallurgists were already electroplating gold onto silver statues.",
+        "visual_prompt": "Ancient Persian craftsman workshop dipping glowing golden jewelry into ceramic electroplating bath, warm torches, photorealistic historical atmosphere, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "Found in Khujut Rabu near Baghdad, these terracotta jars housed a copper cylinder and an iron rod sealed with bitumen. When filled with lemon juice or wine, replicas generate 1.5 to 2 volts.",
+    "payoff": "Ancient artisans may have understood galvanic electroplating millennia before Volta and Faraday.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "curiosity_lofi",
+    "caption_style": "karaoke",
+    "duration": 15,
+    "created_at": 1793908468.6347063,
+    "status": "ready"
+  },
+  {
+    "id": "69d31655a4fa",
+    "title": "The Diamond Battery That Lasts 28,000 Years",
+    "genre": "deep_tech",
+    "hook": "Engineers built a battery made of lab diamonds that produces clean electricity for 28,000 years.",
+    "script": "Engineers built a battery made of lab diamonds that produces clean electricity for twenty-eight thousand years. By trapping nuclear carbon waste inside an indestructible diamond crystal, it safely converts beta radiation directly into electricity. Pacemakers and deep space probes could soon run continuously without ever needing a recharge for thirty human generations.",
+    "scenes": [
+      {
+        "text": "Engineers built a battery made of lab diamonds that produces clean electricity for twenty-eight thousand years.",
+        "visual_prompt": "Macro shot of a glowing blue synthetic diamond battery emitting faint electrical sparks in a cleanroom laboratory, high-tech engineering aesthetic, 9:16 vertical aspect ratio",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "By trapping nuclear carbon waste inside an indestructible diamond crystal, it safely converts beta radiation directly into electricity.",
+        "visual_prompt": "Close-up 3D scientific render of atomic diamond lattice trapping glowing radioactive isotopes with electrons flowing through semiconductors, 9:16 vertical aspect ratio",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "Pacemakers and deep space probes could soon run continuously without ever needing a recharge for thirty human generations.",
+        "visual_prompt": "Deep space probe spacecraft gliding past Saturn's rings powered by a glowing diamond core, photorealistic space art, volumetric cosmic lighting, 9:16 vertical aspect ratio",
+        "motion": "zoom_out"
+      }
+    ],
+    "facts": "By encasing radioactive carbon-14 nuclear waste inside artificial diamonds, the radiation is converted into direct electric current through betavoltaics, while the diamond shell blocks 100% of radiation.",
+    "payoff": "Imagine pacemakers, space satellites, and IoT devices that never need to be plugged in or replaced for centuries.",
+    "visual_style": "photorealistic",
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "cyber_pulse",
+    "caption_style": "clean_minimal",
+    "duration": 15,
+    "created_at": 1793908468.63476,
     "status": "ready"
   }
 ]

@@ -158,6 +158,19 @@ def cmd_publish(args):
         shutil.copy(str(video_path), str(target))
         res = queue_mgr.process_video_file(target, dry_run=args.dry_run)
         print(f"Result: {res}")
+        if res.get("success"):
+            from publishers.recent_manager import RecentlyPublishedManager
+            import uuid
+            from datetime import datetime, timezone
+            RecentlyPublishedManager.record_published({
+                "id": f"pub_{uuid.uuid4().hex[:10]}",
+                "title": args.title or video_path.stem.replace("_", " "),
+                "filename": video_path.name,
+                "video_path": str(video_path),
+                "platforms": ["instagram"],
+                "published_at": datetime.now(timezone.utc).isoformat(),
+                "receipts": {"instagram": res.get("receipt", {})}
+            })
     elif platform in ["youtube", "yt"]:
         print(f"\n▶️ Publishing to YouTube Shorts: {video_path.name}")
         if not YouTubeAuthenticator.is_authenticated():
@@ -168,6 +181,19 @@ def cmd_publish(args):
         privacy = args.privacy if not args.dry_run else "private"
         res = pub.upload_short(video_path, title=title, privacy_status=privacy)
         print(f"Result: {res}")
+        if res.get("success"):
+            from publishers.recent_manager import RecentlyPublishedManager
+            import uuid
+            from datetime import datetime, timezone
+            RecentlyPublishedManager.record_published({
+                "id": f"pub_{uuid.uuid4().hex[:10]}",
+                "title": title,
+                "filename": video_path.name,
+                "video_path": str(video_path),
+                "platforms": ["youtube"],
+                "published_at": datetime.now(timezone.utc).isoformat(),
+                "receipts": {"youtube": res}
+            })
 
 def cmd_auto(args):
     """
@@ -264,6 +290,26 @@ def cmd_auto(args):
             )
             print(f"YouTube Result: {res_yt}")
 
+    # Record to recently published if successful
+    receipts = {}
+    if 'res_ig' in locals() and res_ig and res_ig.get("success"):
+        receipts["instagram"] = res_ig.get("receipt", {})
+    if 'res_yt' in locals() and res_yt and res_yt.get("success"):
+        receipts["youtube"] = res_yt
+    if receipts:
+        from publishers.recent_manager import RecentlyPublishedManager
+        import uuid
+        from datetime import datetime, timezone
+        RecentlyPublishedManager.record_published({
+            "id": f"pub_{uuid.uuid4().hex[:10]}",
+            "title": idea.get("title", cdn_video.stem),
+            "filename": cdn_video.name,
+            "video_path": str(cdn_video),
+            "platforms": [dest] if dest not in ["both", "all"] else ["instagram", "youtube"],
+            "published_at": datetime.now(timezone.utc).isoformat(),
+            "receipts": receipts
+        })
+
 def cmd_pub_queue(args):
     """Inspects the scheduled ready video publishing queue."""
     if getattr(args, "action", None) == "due":
@@ -310,6 +356,25 @@ def cmd_upload_now(args):
         print("=" * 65)
     else:
         print("\n⚠️ No pending videos waiting in the publishing queue.")
+
+def cmd_published(args):
+    """Lists the last 10 published reels and their live URLs (rolling window)."""
+    from publishers.recent_manager import RecentlyPublishedManager
+    items = RecentlyPublishedManager.get_recent(limit=10)
+    print("\n" + "=" * 65)
+    print(f"🎬 RECENTLY PUBLISHED REELS (Last 10 Rolling Buffer)")
+    print("   Rule: Only the last 10 published reels are kept. Older reels are deleted forever.")
+    print("=" * 65)
+    if not items:
+        print("  (No published reels in archive yet)")
+    for idx, item in enumerate(items, 1):
+        print(f"  {idx:02d}. {item.get('title')}")
+        print(f"      Published At: {item.get('published_at')}")
+        if item.get("instagram_permalink"):
+            print(f"      📸 Instagram:  {item['instagram_permalink']}")
+        if item.get("youtube_shorts_url"):
+            print(f"      ▶️ YouTube:    {item['youtube_shorts_url']}")
+    print("=" * 65)
 
 def cmd_scheduler(args):
     """Runs continuous background scheduler loop checking every interval."""
@@ -391,6 +456,9 @@ def main():
     p_un.add_argument("id", nargs="?", default="next", help="Queue item ID or 'next' for earliest")
     p_un.add_argument("--dry-run", action="store_true", help="Simulate upload in dry-run mode")
 
+    # Command: published (Recently published reels rolling buffer)
+    subparsers.add_parser("published", aliases=["recent"], help="List the last 10 published reels (rolling buffer)")
+
     # Command: daemon / scheduler
     p_sched = subparsers.add_parser("daemon", aliases=["scheduler"], help="Start background scheduler daemon for paced releases")
     p_sched.add_argument("--interval", type=int, default=30, help="Check interval in seconds")
@@ -427,6 +495,8 @@ def main():
         cmd_pub_queue(args)
     elif args.command in ["upload-now", "publish-now"]:
         cmd_upload_now(args)
+    elif args.command in ["published", "recent"]:
+        cmd_published(args)
     elif args.command in ["daemon", "scheduler"]:
         cmd_scheduler(args)
     elif args.command == "auth-youtube":

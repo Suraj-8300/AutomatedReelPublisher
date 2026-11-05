@@ -440,6 +440,27 @@
             </div>
         </section>
 
+        <!-- Section 2.6: Recently Published Reels (Last 10 Rolling Buffer) -->
+        <section class="card recent-section" id="recentlyPublishedSection" style="margin-bottom: 24px;">
+            <div class="gallery-title-row">
+                <div class="section-title">
+                    <span>✨ Recently Published Reels</span>
+                    <span class="count-pill" id="recentPublishedBadge">0 / 10 Active</span>
+                    <span style="font-size: 12px; color: #8ca2c4; margin-left: 10px;">Rolling 10 Archive · Older Reels Automatically Deleted Forever</span>
+                </div>
+                <button class="btn-secondary" onclick="loadRecentlyPublished()">🔄 Refresh</button>
+            </div>
+
+            <div id="recentlyPublishedContainer">
+                <div class="empty-state" id="recentlyPublishedEmpty" style="padding: 24px; text-align: center; color: #536b8e;">
+                    <p style="margin: 0; font-size: 14px;">No published reels in rolling archive yet. Once reels are uploaded to Instagram or YouTube, the last 10 live reels appear here with their direct platform links.</p>
+                </div>
+                <div class="recent-published-grid" id="recentlyPublishedList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 14px;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
         <!-- Section 3: Generated Video Gallery -->
         <section class="card gallery-section">
             <div class="gallery-title-row">

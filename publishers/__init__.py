@@ -8,12 +8,14 @@ from .instagram.queue_manager import ReelQueueManager as InstagramQueueManager
 from .youtube.publisher import YouTubePublisher
 from .youtube.auth import YouTubeAuthenticator
 from .dispatch_queue import PublishingQueueManager
+from .recent_manager import RecentlyPublishedManager
 
 __all__ = [
     "InstagramPublisher",
     "InstagramQueueManager",
     "YouTubePublisher",
     "YouTubeAuthenticator",
-    "PublishingQueueManager"
+    "PublishingQueueManager",
+    "RecentlyPublishedManager"
 ]
 

@@ -17,10 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDailyQuotaStatus();
     updateCacheStats();
     loadPublishingQueue();
+    loadRecentlyPublished();
     loadGallery();
 
-    // Auto-refresh publishing queue every 15 seconds
-    setInterval(loadPublishingQueue, 15000);
+    // Auto-refresh publishing queue & recently published every 15 seconds
+    setInterval(() => {
+        loadPublishingQueue();
+        loadRecentlyPublished();
+    }, 15000);
 
     const promptInput = document.getElementById('promptInput');
     if (promptInput) {
@@ -970,5 +974,68 @@ function togglePublishingQueue() {
     const sec = document.getElementById('publishingQueueSection');
     if (sec) {
         sec.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+/**
+ * Recently Published Reels (Last 10 Rolling Buffer, Older Pruned Forever)
+ */
+async function loadRecentlyPublished() {
+    try {
+        const res = await fetch(`${API_BASE}/api/recently-published`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const badge = document.getElementById('recentPublishedBadge');
+        const emptyState = document.getElementById('recentlyPublishedEmpty');
+        const list = document.getElementById('recentlyPublishedList');
+
+        const items = data.items || [];
+        if (badge) badge.innerText = `${items.length} / 10 Active`;
+
+        if (items.length === 0) {
+            if (emptyState) emptyState.style.display = 'block';
+            if (list) list.innerHTML = '';
+            return;
+        }
+
+        if (emptyState) emptyState.style.display = 'none';
+        if (list) {
+            list.innerHTML = items.map(item => {
+                let pubTime = 'Recently';
+                if (item.published_at) {
+                    const dt = new Date(item.published_at);
+                    pubTime = `${dt.toLocaleDateString([], {month:'short', day:'numeric'})} at ${dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+                }
+
+                let links = [];
+                if (item.instagram_permalink) {
+                    links.push(`<a href="${item.instagram_permalink}" target="_blank" style="background: rgba(228,64,95,0.15); color: #ff4b72; border: 1px solid #ff4b72; padding: 4px 10px; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">📸 View Reel</a>`);
+                }
+                if (item.youtube_shorts_url) {
+                    links.push(`<a href="${item.youtube_shorts_url}" target="_blank" style="background: rgba(255,0,0,0.15); color: #ff4444; border: 1px solid #ff4444; padding: 4px 10px; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">▶️ View Short</a>`);
+                }
+
+                return `
+                    <div class="recent-reel-card" style="background: #0f1624; border: 1px solid #1a2536; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                                <span style="font-size: 11px; color: #00ffa3; font-weight: 700;">✅ PUBLISHED</span>
+                                <span style="font-size: 11px; color: #536b8e;">${pubTime}</span>
+                            </div>
+                            <h4 style="margin: 0; font-size: 13px; color: #f0f4fc; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${item.title}</h4>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #1a2536; padding-top: 10px; margin-top: 4px;">
+                            <div style="display: flex; gap: 6px;">
+                                ${links.join('') || '<span style="color:#8ca2c4; font-size: 11px;">Published Live</span>'}
+                            </div>
+                            <button onclick="previewVideoFile('${item.filename}')" class="btn-clean-cache" style="font-size: 11px; padding: 3px 8px; border-radius: 6px;" title="Preview local video">👁️ Preview</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (e) {
+        console.warn('Could not load recently published reels:', e);
     }
 }

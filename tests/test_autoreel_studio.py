@@ -23,6 +23,7 @@ from video_processing import CDNOptimizer, MetadataPackager
 from publishers.instagram.preprocessor import VideoPreprocessor
 from publishers.youtube.auth import YouTubeAuthenticator
 from publishers.dispatch_queue import PublishingQueueManager
+from publishers.recent_manager import RecentlyPublishedManager, MAX_RECENT_PUBLISHED
 
 class TestAutoReelStudioModularArchitecture(unittest.TestCase):
 
@@ -154,6 +155,46 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
         self.assertEqual(item_updated["status"], "cancelled")
         PublishingQueueManager.clear_completed()
         dummy_video.unlink(missing_ok=True)
+
+    def test_recently_published_rolling_10_and_pruning(self):
+        """Verifies rolling window of 10 published reels and physical disk deletion of pruned reels."""
+        # Create a dummy file that represents the 11th oldest video
+        test_old_file = Path(PROJECT_ROOT) / "output" / "test_prune_old_reel_9999.mp4"
+        test_old_file.touch()
+        self.assertTrue(test_old_file.exists())
+
+        # Seed with test_old_file
+        RecentlyPublishedManager.record_published({
+            "id": "pub_oldest_9999",
+            "title": "Oldest Pruned Reel",
+            "filename": test_old_file.name,
+            "video_path": str(test_old_file),
+            "platforms": ["youtube"],
+            "published_at": "2026-11-01T00:00:00Z"
+        })
+
+        # Add 10 new items to push the oldest item out of the rolling 10 buffer
+        for i in range(10):
+            RecentlyPublishedManager.record_published({
+                "id": f"pub_test_filler_{i}",
+                "title": f"Recent Reel {i}",
+                "filename": f"dummy_{i}.mp4",
+                "video_path": f"/tmp/dummy_{i}.mp4",
+                "platforms": ["instagram", "youtube"],
+                "published_at": f"2026-11-05T0{i}:00:00Z"
+            })
+
+        recent = RecentlyPublishedManager.get_recent(limit=20)
+        # Should be strictly capped at 10
+        self.assertEqual(len(recent), MAX_RECENT_PUBLISHED)
+        self.assertNotIn("pub_oldest_9999", [r["id"] for r in recent])
+
+        # The oldest file MUST be permanently deleted from disk
+        self.assertFalse(test_old_file.exists())
+
+        # Cleanup filler entries
+        for i in range(10):
+            RecentlyPublishedManager.delete_entry(f"pub_test_filler_{i}", delete_files=False)
 
 if __name__ == "__main__":
     unittest.main()

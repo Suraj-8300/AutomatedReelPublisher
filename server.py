@@ -300,6 +300,20 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 "queue": queue
             }).encode("utf-8"))
 
+        # 11f. API: Recently Published Reels (Last 10 rolling buffer, older pruned forever)
+        elif url.path == "/api/recently-published":
+            from publishers.recent_manager import RecentlyPublishedManager
+            items = RecentlyPublishedManager.get_recent(limit=10)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "count": len(items),
+                "items": items
+            }).encode("utf-8"))
+
         # 12. API: Animal Storytelling Studio Options
         elif url.path == "/api/animal-options":
             species_list = [
@@ -802,8 +816,25 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 except Exception as ex:
                     yt_receipt = {"success": False, "error": str(ex)}
 
-            if result.get("success"):
-                receipt = result.get("receipt", {})
+            if result.get("success") or (yt_receipt and yt_receipt.get("success")):
+                from publishers.recent_manager import RecentlyPublishedManager
+                import uuid
+                from datetime import datetime, timezone
+                receipt = result.get("receipt", {}) if result.get("success") else {}
+                rec_dict = {}
+                if receipt:
+                    rec_dict["instagram"] = receipt
+                if yt_receipt and yt_receipt.get("success"):
+                    rec_dict["youtube"] = yt_receipt
+                RecentlyPublishedManager.record_published({
+                    "id": f"pub_{uuid.uuid4().hex[:10]}",
+                    "title": storyboard.get("title", src_path.stem),
+                    "filename": src_path.name,
+                    "video_path": str(src_path),
+                    "platforms": destinations,
+                    "published_at": datetime.now(timezone.utc).isoformat(),
+                    "receipts": rec_dict
+                })
                 return {
                     "success": True,
                     "video_url": f"/output/{src_path.name}",
@@ -850,6 +881,18 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
 
             if result.get("success"):
                 receipt = result.get("receipt", {})
+                from publishers.recent_manager import RecentlyPublishedManager
+                import uuid
+                from datetime import datetime, timezone
+                RecentlyPublishedManager.record_published({
+                    "id": f"pub_{uuid.uuid4().hex[:10]}",
+                    "title": src_video.stem.replace("_", " "),
+                    "filename": src_video.name,
+                    "video_path": str(src_video),
+                    "platforms": ["instagram"],
+                    "published_at": datetime.now(timezone.utc).isoformat(),
+                    "receipts": {"instagram": receipt}
+                })
                 return {
                     "success": True,
                     "permalink": receipt.get("instagram_permalink"),
