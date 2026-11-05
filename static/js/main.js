@@ -16,7 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateIdeaQueueStatus();
     updateDailyQuotaStatus();
     updateCacheStats();
+    loadPublishingQueue();
     loadGallery();
+
+    // Auto-refresh publishing queue every 15 seconds
+    setInterval(loadPublishingQueue, 15000);
 
     const promptInput = document.getElementById('promptInput');
     if (promptInput) {
@@ -795,4 +799,176 @@ function setControlsDisabled(disabled) {
     const btnDraft = document.getElementById('btnGenerateOnly');
     if (btnHero) btnHero.disabled = disabled;
     if (btnDraft) btnDraft.disabled = disabled;
+}
+
+/**
+ * Ready Videos Publishing Queue & 1-Click Upload Now
+ */
+async function loadPublishingQueue() {
+    try {
+        const res = await fetch(`${API_BASE}/api/publishing-queue`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const pill = document.getElementById('publishingQueueText');
+        const countBadge = document.getElementById('publishingQueueCountBadge');
+        const emptyState = document.getElementById('publishingQueueEmpty');
+        const list = document.getElementById('publishingQueueList');
+
+        const scheduledCount = data.scheduled_count || 0;
+        if (pill) pill.innerText = `Publish Queue: ${scheduledCount}`;
+        if (countBadge) countBadge.innerText = `${scheduledCount} Scheduled`;
+
+        if (!data.queue || data.queue.length === 0) {
+            if (emptyState) emptyState.style.display = 'block';
+            if (list) list.innerHTML = '';
+            return;
+        }
+
+        if (emptyState) emptyState.style.display = 'none';
+        if (list) {
+            list.innerHTML = data.queue.map(item => {
+                const isPending = item.status === 'scheduled' || item.status === 'pending';
+                const isPublishing = item.status === 'publishing';
+                const isPublished = item.status === 'published';
+                
+                let timeDisplay = '';
+                if (item.scheduled_time) {
+                    const schedDate = new Date(item.scheduled_time);
+                    const now = new Date();
+                    const diffMins = Math.round((schedDate - now) / 60000);
+                    if (diffMins <= 0) {
+                        timeDisplay = `<span style="color:#00ffa3;font-weight:700;">⏰ Due Now!</span>`;
+                    } else {
+                        timeDisplay = `<span style="color:#8ca2c4;">⏰ In ${diffMins}m (${schedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})})</span>`;
+                    }
+                }
+
+                const platformBadges = (item.platforms || []).map(p => 
+                    `<span class="badge" style="background: ${p === 'instagram' ? 'rgba(228,64,95,0.2)' : 'rgba(255,0,0,0.2)'}; color: ${p === 'instagram' ? '#ff4b72' : '#ff4444'}; border: 1px solid currentColor; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-right: 4px;">${p === 'instagram' ? '📸 Instagram' : '▶️ YouTube'}</span>`
+                ).join('');
+
+                const statusColor = isPublished ? '#00ffa3' : (isPublishing ? '#00f0ff' : (item.status === 'failed' ? '#ff4444' : '#ffb703'));
+
+                let actionHtml = '';
+                if (isPending) {
+                    actionHtml = `
+                        <button class="btn-publish-direct" onclick="publishItemNow('${item.id}')" style="background: linear-gradient(135deg, #00f0ff, #7000ff); color: #fff; padding: 6px 14px; font-size: 12px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <span>⚡ Upload Now</span>
+                        </button>
+                        <button class="btn-clean-cache" onclick="cancelPublishingItem('${item.id}')" style="background: transparent; color: #8ca2c4; border: 1px solid #2a3952; padding: 4px 10px; border-radius: 6px; cursor: pointer;" title="Cancel release">✕</button>
+                    `;
+                } else if (isPublishing) {
+                    actionHtml = `<span style="color:#00f0ff; font-size: 12px; font-weight: 700;">⚡ Uploading...</span>`;
+                } else if (isPublished) {
+                    let links = [];
+                    if (item.receipts?.instagram?.instagram_permalink) {
+                        links.push(`<a href="${item.receipts.instagram.instagram_permalink}" target="_blank" style="color:#ff4b72;text-decoration:none;font-size:12px;font-weight:700;">📸 IG Reel</a>`);
+                    }
+                    if (item.receipts?.youtube?.shorts_url) {
+                        links.push(`<a href="${item.receipts.youtube.shorts_url}" target="_blank" style="color:#ff4444;text-decoration:none;font-size:12px;font-weight:700;">▶️ YouTube</a>`);
+                    }
+                    actionHtml = `<div style="display:flex;gap:8px;align-items:center;">${links.join('') || '<span style="color:#00ffa3;font-size:12px;">✅ Published</span>'}</div>`;
+                } else {
+                    actionHtml = `<span style="color:#ff4444;font-size:12px;">⚠️ ${item.errors?.instagram || item.errors?.youtube || 'Failed'}</span>`;
+                }
+
+                return `
+                    <div class="queue-item-card" style="display: flex; align-items: center; justify-content: space-between; background: #0f1624; border: 1px solid #1a2536; border-radius: 10px; padding: 12px 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="font-size: 20px;">🎬</span>
+                            <div style="min-width: 0;">
+                                <div style="font-weight: 600; color: #f0f4fc; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 12px;">
+                                    ${platformBadges}
+                                    ${timeDisplay}
+                                    <span style="color: ${statusColor}; font-weight: 600; font-size: 11px; text-transform: uppercase;">[${item.status}]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
+                            ${actionHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (e) {
+        console.warn('Could not load publishing queue:', e);
+    }
+}
+
+async function publishItemNow(itemId) {
+    if (!confirm('Upload this video right now? (Bypasses schedule time)')) return;
+    try {
+        showStatus('⚡ 1-Click Uploading Now', 'Dispatching video live to social platforms...', 60);
+        const res = await fetch(`${API_BASE}/api/publishing-queue/upload-now`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: itemId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            let linksHtml = '';
+            if (data.receipts?.instagram?.instagram_permalink) {
+                linksHtml += `<p><a href="${data.receipts.instagram.instagram_permalink}" target="_blank" style="color:#ff4b72;font-weight:700;">📸 View on Instagram</a></p>`;
+            }
+            if (data.receipts?.youtube?.shorts_url) {
+                linksHtml += `<p><a href="${data.receipts.youtube.shorts_url}" target="_blank" style="color:#ff4444;font-weight:700;">▶️ View on YouTube Shorts</a></p>`;
+            }
+            showSuccess('🎉 Reel Uploaded Successfully!', linksHtml || 'Video published live to connected accounts!');
+            loadPublishingQueue();
+            loadGallery();
+        } else {
+            showError('Upload Failed', data.error || JSON.stringify(data.errors));
+            loadPublishingQueue();
+        }
+    } catch (e) {
+        showError('Upload Error', e.message);
+    }
+}
+
+async function publishNextDueNow() {
+    try {
+        showStatus('⚡ 1-Click Uploading Next Due', 'Publishing earliest queued video...', 60);
+        const res = await fetch(`${API_BASE}/api/publishing-queue/upload-now`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSuccess('🎉 Next Reel Uploaded!', 'Video published live!');
+            loadPublishingQueue();
+            loadGallery();
+        } else {
+            showError('Upload Failed', data.error || 'No pending items in queue');
+        }
+    } catch (e) {
+        showError('Upload Error', e.message);
+    }
+}
+
+async function cancelPublishingItem(itemId) {
+    if (!confirm('Cancel scheduled release for this video?')) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/publishing-queue/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: itemId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            loadPublishingQueue();
+        }
+    } catch (e) {
+        console.warn('Error cancelling item:', e);
+    }
+}
+
+function togglePublishingQueue() {
+    const sec = document.getElementById('publishingQueueSection');
+    if (sec) {
+        sec.scrollIntoView({ behavior: 'smooth' });
+    }
 }

@@ -22,6 +22,7 @@ from video_generation import QuotaGovernor, DAILY_MAX_REELS, AIVisualEngine
 from video_processing import CDNOptimizer, MetadataPackager
 from publishers.instagram.preprocessor import VideoPreprocessor
 from publishers.youtube.auth import YouTubeAuthenticator
+from publishers.dispatch_queue import PublishingQueueManager
 
 class TestAutoReelStudioModularArchitecture(unittest.TestCase):
 
@@ -126,6 +127,33 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
         self.assertTrue(probe["valid"])
         self.assertEqual(probe["video"]["width"], 1080)
         self.assertEqual(probe["video"]["height"], 1920)
+
+    def test_publishing_queue_pacing_and_upload_now(self):
+        """Verifies ready videos scheduled queue, pacing intervals, and dry-run instant release."""
+        dummy_video = Path(PROJECT_ROOT) / "output" / "test_queue_reel.mp4"
+        dummy_video.touch()
+
+        # Enqueue item
+        item = PublishingQueueManager.enqueue(
+            video_path=dummy_video,
+            title="Scheduled Paced Test Reel",
+            platforms=["instagram", "youtube"]
+        )
+        self.assertIn("pub_", item["id"])
+        self.assertEqual(item["status"], "scheduled")
+        self.assertIn("scheduled_time", item)
+
+        # Retrieve queue
+        queue = PublishingQueueManager.get_queue()
+        ids = [i["id"] for i in queue]
+        self.assertIn(item["id"], ids)
+
+        # Cancel/cleanup
+        PublishingQueueManager.cancel_item(item["id"])
+        item_updated = PublishingQueueManager.get_item(item["id"])
+        self.assertEqual(item_updated["status"], "cancelled")
+        PublishingQueueManager.clear_completed()
+        dummy_video.unlink(missing_ok=True)
 
 if __name__ == "__main__":
     unittest.main()

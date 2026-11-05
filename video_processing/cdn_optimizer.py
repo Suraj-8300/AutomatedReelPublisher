@@ -126,3 +126,4 @@ class CDNOptimizer:
         subprocess.run(thumb_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         return output_video
+

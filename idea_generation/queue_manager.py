@@ -140,3 +140,4 @@ class IdeaQueueManager:
             cls._save_queue(new_queue)
             return True
         return False
+

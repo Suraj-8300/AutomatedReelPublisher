@@ -131,3 +131,4 @@ class AudioMaster:
 
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return output_path
+

@@ -244,7 +244,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 auth_url = ""
                 if not is_auth:
                     try:
-                        auth_url, _ = YouTubeAuthenticator.get_authorization_url()
+                        auth_url = YouTubeAuthenticator.get_or_start_auth_url()
                     except Exception as e:
                         auth_url = ""
                 info = YouTubeAuthenticator.get_channel_info() if is_auth else {"authenticated": False}
@@ -283,6 +283,22 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self._set_cors_headers()
             self.end_headers()
             self.wfile.write(json.dumps({"success": True, "quota": status}).encode("utf-8"))
+
+        # 11e. API: Ready Videos Publishing Queue (Paced 50 Reels/Day Distribution)
+        elif url.path == "/api/publishing-queue":
+            from publishers.dispatch_queue import PublishingQueueManager
+            queue = PublishingQueueManager.get_queue()
+            scheduled_count = len([i for i in queue if i.get("status") in ["scheduled", "pending"]])
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "count": len(queue),
+                "scheduled_count": scheduled_count,
+                "queue": queue
+            }).encode("utf-8"))
 
         # 12. API: Animal Storytelling Studio Options
         elif url.path == "/api/animal-options":
@@ -413,6 +429,58 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         elif url.path == "/api/queue/replenish":
             from idea_generation import IdeaQueueManager
             res = IdeaQueueManager.replenish_if_needed()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3d. API: 1-Click Upload Now (Bypass Scheduled Release Time)
+        elif url.path == "/api/publishing-queue/upload-now":
+            from publishers.dispatch_queue import PublishingQueueManager
+            item_id = data.get("id")
+            dry_run = data.get("dry_run", False)
+            if item_id:
+                res = PublishingQueueManager.publish_now(item_id, dry_run=dry_run)
+            else:
+                res = PublishingQueueManager.publish_next(dry_run=dry_run)
+                if res is None:
+                    res = {"success": False, "error": "No pending videos in publishing queue"}
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3e. API: Cancel Scheduled Video in Publishing Queue
+        elif url.path == "/api/publishing-queue/cancel":
+            from publishers.dispatch_queue import PublishingQueueManager
+            item_id = data.get("id", "")
+            success = PublishingQueueManager.cancel_item(item_id)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": success}).encode("utf-8"))
+
+        # 3f. API: Enqueue Video to Publishing Queue
+        elif url.path == "/api/publishing-queue/enqueue":
+            from publishers.dispatch_queue import PublishingQueueManager
+            video_filename = data.get("video_filename", "")
+            src_video = OUTPUT_DIR / Path(video_filename).name
+            if not src_video.exists():
+                res = {"success": False, "error": f"Video file {video_filename} not found"}
+            else:
+                platforms = data.get("platforms", ["instagram", "youtube"])
+                title = data.get("title", src_video.stem.replace("_", " "))
+                entry = PublishingQueueManager.enqueue(
+                    video_path=src_video,
+                    title=title,
+                    platforms=platforms,
+                    instagram_meta={"caption": data.get("caption", title)},
+                    youtube_meta={"title": title, "description": data.get("description", ""), "tags": data.get("tags", [])}
+                )
+                res = {"success": True, "item": entry}
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self._set_cors_headers()
@@ -792,10 +860,27 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+def start_scheduler_thread():
+    """Background daemon thread to automatically release scheduled videos when their release time arrives."""
+    import threading
+    def _worker():
+        from publishers.dispatch_queue import PublishingQueueManager
+        while True:
+            try:
+                PublishingQueueManager.process_due_items()
+            except Exception as e:
+                print(f"⚠️ Scheduler ticker error: {e}")
+            time.sleep(30)
+    t = threading.Thread(target=_worker, daemon=True)
+    t.start()
+
 def start_server(port=PORT):
     # Auto-prune cache on launch
     prune_res = CacheManager.auto_prune()
     stats = CacheManager.get_cache_stats()
+
+    # Start background scheduled publishing dispatcher
+    start_scheduler_thread()
 
     server = QuietThreadingHTTPServer(("0.0.0.0", port), ReelServerHandler)
     print("=" * 65)

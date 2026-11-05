@@ -5,6 +5,7 @@ OAuth 2.0 Authenticator for YouTube Data API v3.
 import os
 import json
 import socket
+import threading
 from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -131,7 +132,7 @@ class YouTubeAuthenticator:
         return auth_url, state
 
     @classmethod
-    def run_local_auth_server(cls, timeout_secs: int = 120) -> Credentials:
+    def run_local_auth_server(cls, timeout_secs: int = 600) -> Credentials:
         """
         Starts a local HTTP server on port 8000 matching the registered redirect URI,
         prints the authorization link, waits for the user to complete Google OAuth,
@@ -183,6 +184,57 @@ class YouTubeAuthenticator:
 
         print("🎉 YouTube credentials successfully authorized and saved to youtube_token.json!")
         return creds
+
+    _bg_auth_thread = None
+    _bg_auth_url = None
+    _bg_lock = threading.Lock()
+
+    @classmethod
+    def get_or_start_auth_url(cls) -> str:
+        """
+        Ensures a background listener is active on port 8000 and returns
+        the exact matching authorization URL with identical PKCE verifier.
+        """
+        with cls._bg_lock:
+            if cls._bg_auth_url and cls._bg_auth_thread and cls._bg_auth_thread.is_alive():
+                return cls._bg_auth_url
+
+            flow = cls.create_flow()
+            OAuthCallbackHandler.flow = flow
+            OAuthCallbackHandler.auth_code = None
+            OAuthCallbackHandler.error = None
+
+            auth_url, _ = flow.authorization_url(
+                access_type="offline",
+                include_granted_scopes="true",
+                prompt="consent"
+            )
+            cls._bg_auth_url = auth_url
+
+            def _listener():
+                try:
+                    server = HTTPServer(("0.0.0.0", REDIRECT_PORT), OAuthCallbackHandler)
+                    server.timeout = 2.0
+                    import time
+                    start = time.time()
+                    while time.time() - start < 1800:  # 30 mins window
+                        server.handle_request()
+                        if OAuthCallbackHandler.auth_code or OAuthCallbackHandler.error:
+                            break
+                        if cls.is_authenticated():
+                            break
+                    server.server_close()
+                    if OAuthCallbackHandler.auth_code:
+                        flow.fetch_token(code=OAuthCallbackHandler.auth_code)
+                        with open(TOKEN_FILE, "w", encoding="utf-8") as f:
+                            f.write(flow.credentials.to_json())
+                        print("\n🎉 YouTube credentials successfully authorized in background listener!")
+                except Exception as e:
+                    print(f"⚠️ YouTube background auth server note: {e}")
+
+            cls._bg_auth_thread = threading.Thread(target=_listener, daemon=True)
+            cls._bg_auth_thread.start()
+            return auth_url
 
     @classmethod
     def get_authenticated_service(cls):

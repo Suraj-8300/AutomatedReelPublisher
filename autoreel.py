@@ -21,7 +21,13 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from idea_generation import IdeaQueueManager, IdeaResearchEngine, FeedbackLearner
 from video_generation import VideoGenerator, QuotaGovernor, DAILY_MAX_REELS
 from video_processing import CDNOptimizer, MetadataPackager
-from publishers import InstagramPublisher, InstagramQueueManager, YouTubePublisher, YouTubeAuthenticator
+from publishers import (
+    InstagramPublisher,
+    InstagramQueueManager,
+    YouTubePublisher,
+    YouTubeAuthenticator,
+    PublishingQueueManager
+)
 
 BANNER = r"""
    ___        __        ___          _ ___ _           _ _     
@@ -203,7 +209,28 @@ def cmd_auto(args):
         payoff=idea.get("payoff", "")
     )
 
-    dest = args.target.lower()
+    # Check if user requested immediate upload or scheduled queue pacing
+    if not getattr(args, "now", False):
+        print("\n📥 [AutoReelStudio] Enqueueing to Ready Videos Publishing Queue (Paced Distribution)...")
+        platforms = ["instagram", "youtube"] if dest in ["both", "all"] else [dest]
+        entry = PublishingQueueManager.enqueue(
+            video_path=cdn_video,
+            title=idea.get("title", cdn_video.stem),
+            platforms=platforms,
+            instagram_meta=ig_meta,
+            youtube_meta=yt_meta
+        )
+        print("=" * 65)
+        print(f"✅ VIDEO READY & ENQUEUED: {entry['title']}")
+        print(f"🔑 Queue ID:        {entry['id']}")
+        print(f"⏰ Scheduled Time:  {entry['scheduled_time']} (Paced 50 reels/day)")
+        print(f"🎯 Targets:         {', '.join(platforms).upper()}")
+        print(f"⚡ To upload right now: python3 autoreel.py upload-now {entry['id']}")
+        print("=" * 65)
+        return
+
+    # Instant live upload (when --now flag is passed)
+    print("\n⚡ [AutoReelStudio] Immediate Upload (--now requested)...")
 
     # Publish to Instagram
     if dest in ["instagram", "both", "all"]:
@@ -235,6 +262,64 @@ def cmd_auto(args):
                 privacy_status="public" if not args.dry_run else "private"
             )
             print(f"YouTube Result: {res_yt}")
+
+def cmd_pub_queue(args):
+    """Inspects the scheduled ready video publishing queue."""
+    if getattr(args, "action", None) == "due":
+        print("⏰ Checking and releasing any due scheduled videos...")
+        res = PublishingQueueManager.process_due_items(dry_run=args.dry_run)
+        print(f"Released {len(res)} due items.")
+        return
+    if getattr(args, "action", None) == "clear":
+        removed = PublishingQueueManager.clear_completed()
+        print(f"🧹 Purged {removed} completed/cancelled entries from queue.")
+        return
+
+    items = PublishingQueueManager.get_queue()
+    print("\n" + "=" * 65)
+    print(f"🚀 READY VIDEOS PUBLISHING QUEUE ({len(items)} items)")
+    print("   Pacing: 50 reels/day distribution (~28.8 min intervals)")
+    print("=" * 65)
+    if not items:
+        print("  (Publishing queue is empty. Generated videos queue here for scheduled pacing)")
+    for idx, item in enumerate(items, 1):
+        status = item.get("status", "unknown").upper()
+        platforms = "/".join(item.get("platforms", []))
+        sched = item.get("scheduled_time", "N/A")
+        print(f"  {idx:02d}. [{status:10s}] {item.get('title')}")
+        print(f"      ID: {item.get('id')} | Targets: {platforms} | Scheduled: {sched}")
+    print("=" * 65)
+
+def cmd_upload_now(args):
+    """1-Click Upload Now: Bypasses the schedule timer to publish immediately."""
+    item_id = args.id
+    dry_run = args.dry_run
+    if item_id and item_id != "next":
+        res = PublishingQueueManager.publish_now(item_id, dry_run=dry_run)
+    else:
+        res = PublishingQueueManager.publish_next(dry_run=dry_run)
+
+    if res:
+        print("\n" + "=" * 65)
+        print(f"⚡ 1-Click Upload Result: {res.get('status', '').upper()}")
+        print(f"🔑 ID:        {res.get('id')}")
+        print(f"🧾 Receipts:  {res.get('receipts')}")
+        if res.get("errors"):
+            print(f"⚠️ Errors:    {res.get('errors')}")
+        print("=" * 65)
+    else:
+        print("\n⚠️ No pending videos waiting in the publishing queue.")
+
+def cmd_scheduler(args):
+    """Runs continuous background scheduler loop checking every interval."""
+    print("⏰ [AutoReelStudio Scheduler Daemon] Starting paced release loop (checking every 30s)...")
+    print("Press Ctrl+C to stop.")
+    try:
+        while True:
+            PublishingQueueManager.process_due_items(dry_run=args.dry_run)
+            time.sleep(args.interval)
+    except KeyboardInterrupt:
+        print("\nScheduler daemon stopped.")
 
 def cmd_auth_youtube(args):
     """Starts local server to complete OAuth 2.0 authorization for YouTube."""
@@ -291,11 +376,27 @@ def main():
     p_auto.add_argument("-p", "--prompt", default=None, help="Custom prompt or leave empty to consume from 10-15 buffer queue")
     p_auto.add_argument("-d", "--duration", type=int, default=15, choices=[10, 15, 30, 60], help="Duration")
     p_auto.add_argument("--target", default="both", choices=["both", "instagram", "youtube", "all"], help="Publish destination")
+    p_auto.add_argument("--now", action="store_true", help="Immediately publish now instead of enqueueing for paced scheduling")
     p_auto.add_argument("--dry-run", action="store_true", help="Simulate publishing APIs")
+
+    # Command: pub-queue (Ready videos publishing queue)
+    p_pq = subparsers.add_parser("pub-queue", aliases=["ready-queue", "scheduled"], help="Inspect ready videos scheduled publishing queue")
+    p_pq.add_argument("action", nargs="?", default="list", choices=["list", "due", "clear"], help="Action to perform")
+    p_pq.add_argument("--dry-run", action="store_true", help="Simulate releases in dry-run mode")
+
+    # Command: upload-now (1-Click instant upload bypass)
+    p_un = subparsers.add_parser("upload-now", aliases=["publish-now"], help="1-Click Upload Now: Bypasses schedule timer to publish immediately")
+    p_un.add_argument("id", nargs="?", default="next", help="Queue item ID or 'next' for earliest")
+    p_un.add_argument("--dry-run", action="store_true", help="Simulate upload in dry-run mode")
+
+    # Command: daemon / scheduler
+    p_sched = subparsers.add_parser("daemon", aliases=["scheduler"], help="Start background scheduler daemon for paced releases")
+    p_sched.add_argument("--interval", type=int, default=30, help="Check interval in seconds")
+    p_sched.add_argument("--dry-run", action="store_true", help="Simulate releases in dry-run mode")
 
     # Command: auth-youtube
     p_auth = subparsers.add_parser("auth-youtube", help="Authorize YouTube channel via Google OAuth 2.0 (port 8000)")
-    p_auth.add_argument("--timeout", type=int, default=180, help="Timeout in seconds")
+    p_auth.add_argument("--timeout", type=int, default=600, help="Timeout in seconds")
 
     # Command: studio
     p_studio = subparsers.add_parser("studio", aliases=["web", "ui"], help="Start AutoReelStudio Web Dashboard")
@@ -320,6 +421,12 @@ def main():
         cmd_publish(args)
     elif args.command == "auto":
         cmd_auto(args)
+    elif args.command in ["pub-queue", "ready-queue", "scheduled"]:
+        cmd_pub_queue(args)
+    elif args.command in ["upload-now", "publish-now"]:
+        cmd_upload_now(args)
+    elif args.command in ["daemon", "scheduler"]:
+        cmd_scheduler(args)
     elif args.command == "auth-youtube":
         cmd_auth_youtube(args)
     elif args.command in ["studio", "web", "ui"]:

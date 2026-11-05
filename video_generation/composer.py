@@ -88,3 +88,4 @@ class VideoComposer:
             subprocess.run(fallback_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         return out_mp4
+

@@ -87,3 +87,4 @@ class QuotaGovernor:
             "percent_used": round((count / DAILY_MAX_REELS) * 100, 1),
             "allowed": count < DAILY_MAX_REELS
         }
+

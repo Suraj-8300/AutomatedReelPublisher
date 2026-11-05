@@ -104,3 +104,4 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         secs = int(seconds % 60)
         cs = int(round((seconds - int(seconds)) * 100))
         return f"{hours}:{minutes:02d}:{secs:02d}.{cs:02d}"
+

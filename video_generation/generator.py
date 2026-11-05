@@ -130,3 +130,4 @@ class VideoGenerator:
         print("=" * 65)
 
         return master_video_path, telemetry
+

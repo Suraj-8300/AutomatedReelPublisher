@@ -270,9 +270,12 @@ class VideoPreprocessor:
                 "-ac", str(AUDIO_CHANNELS)
             ])
         else:
-            # Map null audio track
+            # Explicitly map video from input 0 and null audio from input 1
+            if scaling_mode == "blur_pad":
+                cmd.extend(["-map", "[v]", "-map", "1:a"])
+            else:
+                cmd.extend(["-map", "0:v", "-map", "1:a"])
             cmd.extend([
-                "-map", "1:a",
                 "-c:a", "aac",
                 "-b:a", AUDIO_BITRATE,
                 "-ar", str(AUDIO_SAMPLE_RATE),

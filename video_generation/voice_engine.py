@@ -76,3 +76,4 @@ class NaturalVoiceEngine:
         total_duration = words_timing[-1]["end"] if words_timing else 15.0
 
         return audio_file, words_timing, total_duration
+

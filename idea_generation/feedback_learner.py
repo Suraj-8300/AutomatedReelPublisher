@@ -101,3 +101,4 @@ class FeedbackLearner:
             avg = sum(scores) / len(scores)
             weights[g] = round(avg / 70.0, 2)  # Normalized around 1.0
         return weights
+

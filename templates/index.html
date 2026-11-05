@@ -32,6 +32,12 @@
                         <span id="dailyQuotaText">Daily: 0/50</span>
                     </div>
 
+                    <!-- Ready Videos Publishing Queue Pill -->
+                    <div class="storage-pill" id="publishingQueuePill" onclick="togglePublishingQueue()" style="cursor: pointer;" title="Ready Videos Scheduled Queue (Click to view & 1-click upload)">
+                        <span class="storage-icon">🚀</span>
+                        <span id="publishingQueueText">Publish Queue: 0</span>
+                    </div>
+
                     <!-- Storage & Cache Monitor -->
                     <div class="storage-pill" id="storagePill" title="Temporary render clips & audio cache">
                         <span class="storage-icon">💾</span>
@@ -409,6 +415,30 @@
                 </div>
             </section>
         </div>
+
+        <!-- Section 2.5: Ready Videos Scheduled Publishing Queue -->
+        <section class="card queue-section" id="publishingQueueSection" style="margin-bottom: 24px;">
+            <div class="gallery-title-row">
+                <div class="section-title">
+                    <span>🚀 Ready Videos Publishing Queue</span>
+                    <span class="count-pill" id="publishingQueueCountBadge">0 Scheduled</span>
+                    <span style="font-size: 12px; color: #8ca2c4; margin-left: 10px;">Paced Distribution (~28.8m intervals) · 50 Reels/Day</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary" onclick="publishNextDueNow()" title="Immediately upload the earliest scheduled video right now">⚡ Upload Next Now</button>
+                    <button class="btn-secondary" onclick="loadPublishingQueue()">🔄 Refresh</button>
+                </div>
+            </div>
+
+            <div id="publishingQueueContainer">
+                <div class="empty-state" id="publishingQueueEmpty" style="padding: 24px; text-align: center; color: #536b8e;">
+                    <p style="margin: 0; font-size: 14px;">No videos waiting in queue. When you generate videos or run autonomous production, ready videos queue here for scheduled pacing, or you can click "Upload Now" at any moment.</p>
+                </div>
+                <div class="publishing-queue-list" id="publishingQueueList" style="display: grid; gap: 12px; margin-top: 12px;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
 
         <!-- Section 3: Generated Video Gallery -->
         <section class="card gallery-section">
