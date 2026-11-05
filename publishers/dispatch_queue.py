@@ -1,6 +1,6 @@
 """
 Publishing Dispatch Queue & Pacing Scheduler for AutoReelStudio.
-Manages ready-to-publish videos with scheduled pacing (10 reels/day pace ~144m / 2.4h intervals)
+Manages ready-to-publish videos with scheduled pacing (5 hours / 300m intervals)
 and supports instant 1-click "Upload Now" bypass.
 Coordinates publication across Instagram Reels and YouTube Shorts within platform safety quotas.
 """
@@ -25,7 +25,7 @@ from publishers.instagram.queue_manager import ReelQueueManager as InstagramQueu
 from publishers.youtube.auth import YouTubeAuthenticator
 from publishers.youtube.publisher import YouTubePublisher
 
-DEFAULT_INTERVAL_MINUTES = 144.0 # Paced release every 144 minutes / 2.4 hours (10 reels/day safe limit)
+DEFAULT_INTERVAL_MINUTES = 300.0 # Paced release every 300 minutes (5.0 hours)
 
 class PublishingQueueManager:
     """Manages the queue of ready-to-publish videos and scheduled distribution."""

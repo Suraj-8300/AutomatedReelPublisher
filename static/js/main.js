@@ -424,7 +424,7 @@ async function fetchQuota() {
         } else {
             if (heroBadge) heroBadge.className = 'md3-status-badge';
             if (heroPulse) heroPulse.className = 'pulse-indicator';
-            if (statusText) statusText.innerText = 'Autonomous Cadence Active · Paced at ~2.4 Hours';
+            if (statusText) statusText.innerText = '5-Hour Publishing Drops · Continuous Pre-Rendering Active';
             if (alertBanner) alertBanner.style.display = 'none';
         }
 
@@ -441,7 +441,7 @@ async function triggerResumeAuto() {
     const btn = document.getElementById('btnResumeAuto');
     if (btn) btn.disabled = true;
     try {
-        showSnackbar('▶️ Resuming background ~2.4-hour auto-publishing...', 'info');
+        showSnackbar('▶️ Resuming background 5-hour auto-publishing...', 'info');
         const res = await fetch(`${API_BASE}/api/action/resume-auto`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

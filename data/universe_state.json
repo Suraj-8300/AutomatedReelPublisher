@@ -3,7 +3,7 @@
   "universe_counters": {
     "mochi_and_friends": {
       "season": 1,
-      "episode": 22,
+      "episode": 23,
       "history": [
         {
           "code": "S01E01",
@@ -113,6 +113,11 @@
         {
           "code": "S01E22",
           "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E22)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E23",
+          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E23)",
           "category": "animal_universe"
         }
       ]

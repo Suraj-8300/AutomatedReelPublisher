@@ -112,9 +112,16 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
             temp_quota_file.unlink(missing_ok=True)
 
     def test_pacing_interval(self):
-        """Verifies the ~2.4-hour (144 min) queue pacing interval for 10 reels/day."""
+        """Verifies the 5-hour (300 min) queue pacing interval."""
         from publishers.dispatch_queue import DEFAULT_INTERVAL_MINUTES
-        self.assertEqual(DEFAULT_INTERVAL_MINUTES, 144.0)
+        self.assertEqual(DEFAULT_INTERVAL_MINUTES, 300.0)
+
+    def test_power_inhibitor_and_lid_policy(self):
+        """Verifies laptop lid-close sleep inhibitor status and policy."""
+        from core.power_inhibitor import PowerInhibitor
+        status = PowerInhibitor.get_status()
+        self.assertEqual(status["lid_policy"], "run_when_closed")
+        self.assertIn("5-Hour", status["reason"])
 
     def test_metadata_packager_platforms(self):
         """Verifies tailored metadata generation for Instagram and YouTube."""

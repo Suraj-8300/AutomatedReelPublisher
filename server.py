@@ -291,6 +291,16 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(info).encode("utf-8"))
 
+        # 11b-2. API: Laptop Lid & Power Inhibition Status
+        elif url.path == "/api/power/status":
+            from core.power_inhibitor import PowerInhibitor
+            status = PowerInhibitor.get_status()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "power": status}).encode("utf-8"))
+
         # 11c. API: 10-15 Creative Idea Queue Buffer
         elif url.path == "/api/queue":
             from idea_generation import IdeaQueueManager
@@ -1153,51 +1163,119 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         return {"success": False, "error": "Failed to stage reel for immediate upload"}
 
 def start_scheduler_thread():
-    """Background daemon thread to automatically release scheduled videos when their release time arrives."""
+    """Background daemon thread to automatically publish scheduled videos every 5 hours when their drop time arrives."""
     import threading
     def _worker():
         from publishers.dispatch_queue import PublishingQueueManager
-        from publishers.recent_manager import RecentlyPublishedManager
-        from video_processing import CDNOptimizer
         from video_generation import QuotaGovernor
 
         while True:
             try:
-                # 1. Process scheduled items only if auto-publishing is active today
+                # Process due items only if auto-publishing is active today
                 auto_allowed, _ = QuotaGovernor.is_auto_publish_allowed()
                 if auto_allowed:
                     PublishingQueueManager.process_due_items()
-
-                    # 2. Maintain at least 1 video queued ahead if daily quota allows
-                    allowed, remaining, _ = QuotaGovernor.can_generate()
-                    if allowed and remaining > 0:
-                        queue = PublishingQueueManager.get_queue()
-                        active = [i for i in queue if i.get("status") in ["scheduled", "pending"]]
-                        if len(active) == 0:
-                            # Auto-stage the next reel in the queue from ready output files
-                            available_mp4s = sorted(
-                                [f for f in OUTPUT_DIR.glob("*.mp4") if not f.name.startswith("test_") and not f.name.startswith("cdn_")],
-                                key=lambda f: f.stat().st_mtime,
-                                reverse=True
-                            )
-                            recent_filenames = {r.get("filename") for r in RecentlyPublishedManager.get_recent(20)}
-                            for candidate in available_mp4s:
-                                if candidate.name not in recent_filenames and f"cdn_{candidate.name}" not in recent_filenames:
-                                    cdn_file = CDNOptimizer.optimize_for_cdn(candidate)
-                                    title = candidate.stem.replace("_", " ")
-                                    entry = PublishingQueueManager.enqueue(
-                                        video_path=cdn_file,
-                                        title=title,
-                                        platforms=["instagram", "youtube"],
-                                        instagram_meta={"caption": f"{title}\n\n#Shorts #Reels #Viral"},
-                                        youtube_meta={"title": f"{title} #Shorts", "description": title, "tags": ["Shorts", "Trending"]}
-                                    )
-                                    print(f"🤖 [AutoScheduler] Auto-staged next reel: '{title}' for scheduled pacing.")
-                                    break
             except Exception as e:
-                print(f"⚠️ Scheduler ticker error: {e}")
+                print(f"⚠️ [5-Hour Scheduler] Dispatch ticker error: {e}")
             time.sleep(30)
-    t = threading.Thread(target=_worker, daemon=True)
+
+    t = threading.Thread(target=_worker, daemon=True, name="ScheduledDispatcher")
+    t.start()
+
+def start_continuous_producer_thread():
+    """
+    Dedicated background worker that continuously pre-renders reels one after another into
+    the publishing queue, ensuring a fresh backlog of finished master videos is always ready.
+    Decoupled from the 5-hour publishing schedule:
+      - Video Generation & Creation: Runs continuously one after another in background (even with laptop closed).
+      - Publishing Dispatcher: Releases exactly 1 reel every 5 hours to Instagram & YouTube.
+    """
+    import threading
+    TARGET_PRE_RENDERED_QUEUE = 6 # Maintains up to 6 pre-rendered master reels (30 hours of ready content)
+
+    def _producer_loop():
+        from idea_generation import IdeaQueueManager
+        from video_generation import VideoGenerator
+        from video_processing import CDNOptimizer, MetadataPackager
+        from publishers.dispatch_queue import PublishingQueueManager
+        from video_generation import QuotaGovernor
+
+        print("🚀 [ContinuousProducer] Video generation worker active. Pre-rendering reels continuously in background.")
+
+        while True:
+            try:
+                queue = PublishingQueueManager.get_queue()
+                pending = [i for i in queue if i.get("status") in ["scheduled", "pending"]]
+
+                if len(pending) < TARGET_PRE_RENDERED_QUEUE:
+                    # 1. Check daily safety quota
+                    allowed, remaining, _ = QuotaGovernor.can_generate()
+                    if not allowed:
+                        time.sleep(60)
+                        continue
+
+                    # 2. Ensure idea queue is stocked
+                    if IdeaQueueManager.get_count() < 10:
+                        IdeaQueueManager.replenish_if_needed()
+
+                    # 3. Pop next idea from the 2026 Character Universe
+                    idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+                    if not idea:
+                        time.sleep(10)
+                        continue
+
+                    print(f"\n🎬 [ContinuousProducer] Pre-rendering next reel in background ({len(pending)+1}/{TARGET_PRE_RENDERED_QUEUE}): '{idea.get('title')}'...")
+
+                    # 4. Synthesize full video (natural voiceover, 3-act scene images, motion clips, ducked soundtrack, subtitles)
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    try:
+                        video_path, telemetry = loop.run_until_complete(VideoGenerator.generate_reel(idea=idea))
+                    finally:
+                        loop.close()
+
+                    # 5. Faststart CDN optimization
+                    cdn_video = CDNOptimizer.optimize_for_cdn(video_path)
+
+                    # 6. Metadata packaging
+                    ig_meta = MetadataPackager.package_for_instagram(
+                        title=idea.get("title", ""),
+                        genre=idea.get("genre", "animal_universe"),
+                        hook=idea.get("hook", ""),
+                        facts=idea.get("facts", ""),
+                        payoff=idea.get("payoff", "")
+                    )
+                    yt_meta = MetadataPackager.package_for_youtube(
+                        title=idea.get("title", ""),
+                        genre=idea.get("genre", "animal_universe"),
+                        hook=idea.get("hook", ""),
+                        facts=idea.get("facts", ""),
+                        payoff=idea.get("payoff", "")
+                    )
+
+                    # 7. Enqueue into Publishing Queue (paced at +5 hours from previous video)
+                    entry = PublishingQueueManager.enqueue(
+                        video_path=cdn_video,
+                        title=idea.get("title", cdn_video.stem),
+                        platforms=["instagram", "youtube"],
+                        instagram_meta=ig_meta,
+                        youtube_meta=yt_meta
+                    )
+
+                    new_pending = len([i for i in PublishingQueueManager.get_queue() if i.get("status") in ["scheduled", "pending"]])
+                    print(f"✅ [ContinuousProducer] Reel ready & staged: '{entry['title']}' (+5h schedule). Pre-rendered buffer: {new_pending}/{TARGET_PRE_RENDERED_QUEUE}.")
+
+                    # Brief 8-second breathing pause between renders, then immediately proceed to next video
+                    time.sleep(8)
+                else:
+                    # Buffer comfortably full (30 hours of pre-rendered reels waiting)
+                    time.sleep(30)
+
+            except Exception as e:
+                print(f"⚠️ [ContinuousProducer] Error in generation loop: {e}")
+                time.sleep(20)
+
+    t = threading.Thread(target=_producer_loop, daemon=True, name="ContinuousProducer")
     t.start()
 
 def start_server(port=PORT):
@@ -1205,15 +1283,26 @@ def start_server(port=PORT):
     prune_res = CacheManager.auto_prune()
     stats = CacheManager.get_cache_stats()
 
-    # Start background scheduled publishing dispatcher
+    # Activate Sleep & Laptop Lid-Close Protection (KDE PowerDevil + DBus inhibitor)
+    try:
+        from core.power_inhibitor import PowerInhibitor
+        PowerInhibitor.activate()
+    except Exception as e:
+        print(f"⚠️ Power inhibitor notice: {e}")
+
+    # Start 5-Hour Publishing Dispatcher
     start_scheduler_thread()
+
+    # Start Continuous Background Video Generation Worker (runs one after another)
+    start_continuous_producer_thread()
 
     server = QuietThreadingHTTPServer(("0.0.0.0", port), ReelServerHandler)
     print("=" * 65)
     print(f"🚀 AUTOREELSTUDIO RUNNING AT: http://localhost:{port}")
-    print(f"🎬 Subsystems:         ReelMakerAI (Generator) + ReelPublisher (Meta Reels API)")
+    print(f"🎬 Video Generation:   Continuous Background Producer Active (Pre-rendering one after another)")
+    print(f"⏰ Social Publishing:  5-Hour Cadence Worker Active (Instagram & YouTube every 5h)")
+    print(f"💻 Lid-Close Policy:   Protected (Laptop keeps running when lid closed)")
     print(f"📱 Instagram Account:  @{os.environ.get('INSTAGRAM_USERNAME', 'sun_27417')}")
-    print(f"📦 Active Ingestion Bridge: Meta Native Direct Resumable Upload (100% Free, Zero Tunnels)")
     print(f"💾 Storage Cache:      {stats['total_mb']} MB ({stats['file_count']} files, auto-pruned {prune_res['freed_mb']} MB)")
     print("=" * 65)
     try:

@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
-    <link rel="stylesheet" href="/static/css/style.css?v=2.6">
+    <link rel="stylesheet" href="/static/css/style.css?v=2.7">
 </head>
 <body class="md3-body">
     <div class="md3-container">
@@ -24,12 +24,18 @@
                 </div>
                 <div class="md3-brand-text">
                     <span class="md3-brand-title">AutoReelStudio</span>
-                    <span class="md3-brand-badge">Autonomous 10/Day</span>
+                    <span class="md3-brand-badge">5-Hour Drops · Continuous Producer</span>
                 </div>
             </div>
 
-            <!-- Connected Platform Status Chips -->
+            <!-- Connected Platform & System Status Chips -->
             <div class="md3-channel-chips">
+                <div class="md3-chip md3-chip-power" id="chipLidProtection" title="Continuous video creation even when laptop closed (Lid-close sleep inhibited)">
+                    <span class="material-symbols-outlined chip-icon">laptop_chromebook</span>
+                    <span class="chip-text">Lid-Close Protected</span>
+                    <span class="chip-status-dot online"></span>
+                </div>
+
                 <div class="md3-chip md3-chip-ig" id="chipInstagram" title="Meta Instagram Graph API">
                     <span class="material-symbols-outlined chip-icon">photo_camera</span>
                     <span class="chip-text" id="igHandle">@sun_27417</span>
@@ -51,11 +57,11 @@
                 <div class="md3-hero-meta">
                     <div class="md3-status-badge" id="heroStatusBadge">
                         <span class="pulse-indicator" id="heroPulseIndicator"></span>
-                        <span id="autonomousStatusText">Autonomous Cadence Active · Paced at ~2.4 Hours</span>
+                        <span id="autonomousStatusText">5-Hour Publishing Drops · Continuous Pre-Rendering</span>
                     </div>
                     <h1 class="md3-hero-headline">Autonomous Reel Publishing</h1>
                     <p class="md3-hero-description">
-                        High-quality AI reels are generated, optimized, and published automatically to Instagram Reels and YouTube Shorts every ~2.4 hours (capped at 10/day safe limit).
+                        High-quality AI reels are pre-rendered continuously in the background (running one after another even when your laptop lid is closed), while publishing releases exactly one reel every 5 hours.
                     </p>
                     
                     <!-- Dynamic Manual Override Alert Banner (Shown when 1-Click Publish was triggered) -->
@@ -64,25 +70,25 @@
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #f59e0b;">pause_circle</span>
                             <span id="overrideAlertText">Auto-publish stopped for today. Manual override active: 5 pushes remaining.</span>
                         </div>
-                        <button class="md3-btn-text-sm" id="btnResumeAuto" onclick="triggerResumeAuto()" title="Re-enable background ~2.4-hour auto-publishing for today">
+                        <button class="md3-btn-text-sm" id="btnResumeAuto" onclick="triggerResumeAuto()" title="Re-enable background 5-hour auto-publishing for today">
                             Resume Auto-Publish
                         </button>
                     </div>
 
                     <div class="md3-hero-timer-box">
                         <span class="material-symbols-outlined timer-icon">schedule</span>
-                        <span class="timer-label">Next Scheduled Drop:</span>
+                        <span class="timer-label">Next 5-Hour Scheduled Drop:</span>
                         <span class="timer-value" id="nextDropCountdown">Calculating...</span>
                     </div>
                 </div>
 
                 <!-- 1-Click Action Buttons -->
                 <div class="md3-hero-actions">
-                    <button class="md3-btn-hero" id="btnPublishNowHero" onclick="triggerPublishNow()" title="Instantly publish the next reel to Instagram and YouTube right now (within safe 10/day ceiling)">
+                    <button class="md3-btn-hero" id="btnPublishNowHero" onclick="triggerPublishNow()" title="Instantly publish the next reel to Instagram and YouTube right now (from pre-rendered buffer)">
                         <span class="material-symbols-outlined btn-icon">bolt</span>
                         <div>
                             <span class="btn-label" id="btnPublishLabel">Publish Next Reel Now</span>
-                            <span class="btn-sublabel" id="btnPublishQuota">Safe 10/Day Ceiling</span>
+                            <span class="btn-sublabel" id="btnPublishQuota">Instant 1-Click Drop</span>
                         </div>
                     </button>
 
@@ -96,7 +102,7 @@
 
         <!-- MD3 Stats Metrics Cards Grid -->
         <section class="md3-stats-grid">
-            <!-- Metric 1: Daily 10-Reels Quota -->
+            <!-- Metric 1: Daily Target -->
             <div class="md3-card md3-stat-card">
                 <div class="stat-header">
                     <span class="stat-title">Daily Distribution Target</span>
@@ -104,7 +110,7 @@
                 </div>
                 <div class="stat-number-row">
                     <span class="stat-big-number" id="quotaPublishedNumber">0</span>
-                    <span class="stat-total-number">/ 10 Daily Reels</span>
+                    <span class="stat-total-number">/ 10 Daily Ceiling</span>
                 </div>
                 <div class="md3-progress-track">
                     <div class="md3-progress-bar" id="quotaProgressBar" style="width: 0%;"></div>
@@ -112,7 +118,7 @@
                 <div class="stat-badge-row">
                     <span class="md3-tonal-badge badge-manual" id="manualOverrideBadge">Manual Override: 0 / 5 Pushed</span>
                 </div>
-                <span class="stat-caption" id="quotaCaption">10 reels remaining for today's quota</span>
+                <span class="stat-caption" id="quotaCaption">Paced at 5h intervals (~4–5 reels/day)</span>
             </div>
 
             <!-- Metric 2: Ready Scheduled Queue -->
@@ -123,12 +129,12 @@
                 </div>
                 <div class="stat-number-row">
                     <span class="stat-big-number" id="queueScheduledNumber">0</span>
-                    <span class="stat-total-number">Reels Waiting</span>
+                    <span class="stat-total-number">Reels Pre-Rendered</span>
                 </div>
                 <div class="stat-badge-row">
-                    <span class="md3-tonal-badge" id="queuePacingBadge">~2.4 hr pacing (Safe 10/day)</span>
+                    <span class="md3-tonal-badge" id="queuePacingBadge">5.0 hr pacing</span>
                 </div>
-                <span class="stat-caption" id="queueNextCaption">No delay when using 1-Click Publish</span>
+                <span class="stat-caption" id="queueNextCaption">Continuous producer keeps buffer stocked</span>
             </div>
 
             <!-- Metric 3: AI Creative Idea Buffer -->
@@ -313,6 +319,6 @@
     <!-- MD3 Floating Snackbar / Toast Container -->
     <div class="md3-snackbar-container" id="snackbarContainer"></div>
 
-    <script src="/static/js/main.js?v=2.6"></script>
+    <script src="/static/js/main.js?v=2.7"></script>
 </body>
 </html>
