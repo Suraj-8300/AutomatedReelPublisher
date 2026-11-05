@@ -378,13 +378,14 @@ async function fetchQuota() {
 
         const autoPublished = q.auto_published_today !== undefined ? q.auto_published_today : (q.generated_today || 0);
         const manualPublished = q.manual_published_today || 0;
-        const autoLimit = q.daily_limit || 50;
+        const autoLimit = q.daily_limit || 10;
+        const manualLimit = q.manual_limit || 5;
         const remainingAuto = q.remaining_today !== undefined ? q.remaining_today : (autoLimit - autoPublished);
-        const remainingManual = q.remaining_manual !== undefined ? q.remaining_manual : 20;
+        const remainingManual = q.remaining_manual !== undefined ? q.remaining_manual : 5;
         const isStopped = !!q.auto_publish_stopped;
         const percent = Math.min(100, Math.round((autoPublished / autoLimit) * 100));
 
-        // Metric 1: 50 Auto Reels Target
+        // Metric 1: 10 Daily Reels Target
         const numElem = document.getElementById('quotaPublishedNumber');
         const barElem = document.getElementById('quotaProgressBar');
         const capElem = document.getElementById('quotaCaption');
@@ -393,10 +394,10 @@ async function fetchQuota() {
         if (numElem) numElem.innerText = autoPublished;
         if (barElem) barElem.style.width = `${percent}%`;
         if (capElem) {
-            capElem.innerText = `${remainingAuto} auto reels remaining for today`;
+            capElem.innerText = `${remainingAuto} daily reels remaining for today`;
         }
         if (manualBadge) {
-            manualBadge.innerText = `Manual Override: ${manualPublished} / 20 Pushed`;
+            manualBadge.innerText = `Manual Override: ${manualPublished} / ${manualLimit} Pushed`;
         }
 
         // Hero Button Sublabel (Remaining manual pushes)
@@ -418,12 +419,12 @@ async function fetchQuota() {
             if (statusText) statusText.innerText = 'Auto-Publish Paused for Today · 1-Click Override Active';
             if (alertBanner) alertBanner.style.display = 'flex';
             if (alertText) {
-                alertText.innerText = `Auto-publish stopped for today. Manual override: ${remainingManual} of 20 reels left.`;
+                alertText.innerText = `Auto-publish stopped for today. Manual override: ${remainingManual} of ${manualLimit} reels left.`;
             }
         } else {
             if (heroBadge) heroBadge.className = 'md3-status-badge';
             if (heroPulse) heroPulse.className = 'pulse-indicator';
-            if (statusText) statusText.innerText = 'Autonomous Cadence Active · Paced at 10 Mins';
+            if (statusText) statusText.innerText = 'Autonomous Cadence Active · Paced at ~2.4 Hours';
             if (alertBanner) alertBanner.style.display = 'none';
         }
 
@@ -440,7 +441,7 @@ async function triggerResumeAuto() {
     const btn = document.getElementById('btnResumeAuto');
     if (btn) btn.disabled = true;
     try {
-        showSnackbar('▶️ Resuming background 10-minute auto-publishing...', 'info');
+        showSnackbar('▶️ Resuming background ~2.4-hour auto-publishing...', 'info');
         const res = await fetch(`${API_BASE}/api/action/resume-auto`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

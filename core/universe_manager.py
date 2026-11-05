@@ -521,3 +521,4 @@ class UniverseManager:
                 "act3_payoff": act3
             }
         }
+

@@ -1,8 +1,9 @@
 """
 Daily Quota Governor for AutoReelStudio.
-Enforces the 50 reels/day auto-publishing ceiling and 10-minute cadence.
-Supports pushing the limit by up to 20 additional reels via 1-Click "Publish Now"
-while stopping automated background publishing for the remainder of that day.
+Enforces the 10 reels/day safe publishing ceiling and ~2.4-hour cadence.
+Protects Instagram Graph API and YouTube Data API channels against rate-limits and uploadLimitExceeded errors.
+Supports 1-Click "Publish Now" manual overrides within the strict 10 reels/day ceiling,
+automatically halting background auto-publishing when manual override is triggered.
 """
 
 import json
@@ -14,10 +15,10 @@ from typing import Dict, Any, Tuple
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 QUOTA_FILE = DATA_DIR / "daily_quota.json"
 
-DAILY_AUTO_MAX = 50       # Baseline automated reels per day
-DAILY_MANUAL_MAX = 20     # Maximum extra reels pushable via 1-Click "Publish Now"
-DAILY_MAX_REELS = 50      # Preserved for backward compatibility (auto daily target)
-TOTAL_MAX_CEILING = DAILY_AUTO_MAX + DAILY_MANUAL_MAX # Absolute combined ceiling (70)
+DAILY_AUTO_MAX = 10       # Safe automated reels per day (avoids YouTube & IG daily upload limit)
+DAILY_MANUAL_MAX = 5      # Maximum manual pushes when auto-publishing is stopped
+DAILY_MAX_REELS = 10      # Preserved for backward compatibility (daily target)
+TOTAL_MAX_CEILING = 10    # Hard maximum limit per 24 hours across all uploads (YouTube/Meta safe boundary)
 
 class QuotaGovernor:
     """
@@ -159,9 +160,9 @@ class QuotaGovernor:
             return True, remaining_manual, f"⚠️ Auto-publish stopped. Manual override active: {remaining_manual} remaining."
 
         if auto_count >= DAILY_AUTO_MAX:
-            if manual_count < DAILY_MANUAL_MAX:
-                return True, remaining_manual, f"✅ Auto target reached (50/50). {remaining_manual} manual override reels available."
-            return False, 0, f"⛔ Daily cap reached ({DAILY_AUTO_MAX} auto + {DAILY_MANUAL_MAX} manual)."
+            if manual_count < DAILY_MANUAL_MAX and total_count < TOTAL_MAX_CEILING:
+                return True, remaining_manual, f"✅ Auto target reached (10/10). {remaining_manual} manual override reels available."
+            return False, 0, f"⛔ Daily cap reached ({TOTAL_MAX_CEILING}/{TOTAL_MAX_CEILING} reels limit for YouTube & Instagram)."
 
         return True, remaining_auto, f"✅ Quota OK: {auto_count}/{DAILY_AUTO_MAX} generated today ({remaining_auto} remaining)."
 
@@ -191,7 +192,7 @@ class QuotaGovernor:
                 data["auto_publish_stopped_reason"] = (
                     f"Daily auto-publish target reached: {data['auto_count']}/{DAILY_AUTO_MAX} reels published today."
                 )
-                print(f"🎯 [QuotaGovernor] Daily auto-publish target (50) completed for today.")
+                print(f"🎯 [QuotaGovernor] Daily auto-publish target (10) completed for today.")
 
         data["count"] = data.get("auto_count", 0) + data.get("manual_count", 0)
         cls._save_data(data)
@@ -216,7 +217,7 @@ class QuotaGovernor:
 
     @classmethod
     def resume_auto_publish(cls) -> Dict[str, Any]:
-        """Re-enables auto-publishing for today if auto_count < 50."""
+        """Re-enables auto-publishing for today if auto_count < 10."""
         data = cls._load_data()
         if data.get("auto_count", 0) >= DAILY_AUTO_MAX:
             return cls.get_status()

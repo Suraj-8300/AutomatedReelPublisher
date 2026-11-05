@@ -3,7 +3,7 @@
 AutoReelStudio — Unified Autonomous AI Video Generation & Social Publishing Platform
 Modular Architecture:
   1. idea_generation/  -> Research, Ideation, 10-15 Buffer Queue, Feedback Learner
-  2. video_generation/ -> AI Visuals, Natural Voice, Ducked Audio, 50/day Quota Gate, Composer
+  2. video_generation/ -> AI Visuals, Natural Voice, Ducked Audio, 10/day Quota Gate, Composer
   3. video_processing/ -> CDN Video Optimization (faststart), Metadata Packager (IG + YT)
   4. publishers/       -> Dedicated Platform Publishers (Instagram Meta Graph API + YouTube Data API v3)
 """
@@ -84,7 +84,7 @@ def cmd_queue(args):
         print("=" * 65)
 
 def cmd_quota(args):
-    """Displays today's 50-reels generation quota telemetry."""
+    """Displays today's 10-reels generation quota telemetry."""
     status = QuotaGovernor.get_status()
     print("\n" + "=" * 65)
     print("📊 DAILY REEL GENERATION QUOTA TELEMETRY")
@@ -262,7 +262,7 @@ def cmd_auto(args):
         print("=" * 65)
         print(f"✅ VIDEO READY & ENQUEUED: {entry['title']}")
         print(f"🔑 Queue ID:        {entry['id']}")
-        print(f"⏰ Scheduled Time:  {entry['scheduled_time']} (Paced 50 reels/day)")
+        print(f"⏰ Scheduled Time:  {entry['scheduled_time']} (Paced 10 reels/day)")
         print(f"🎯 Targets:         {', '.join(platforms).upper()}")
         print(f"⚡ To upload right now: python3 autoreel.py upload-now {entry['id']}")
         print("=" * 65)
@@ -337,7 +337,7 @@ def cmd_pub_queue(args):
     items = PublishingQueueManager.get_queue()
     print("\n" + "=" * 65)
     print(f"🚀 READY VIDEOS PUBLISHING QUEUE ({len(items)} items)")
-    print("   Pacing: 50 reels/day distribution (10 min intervals)")
+    print("   Pacing: 10 reels/day distribution (~2.4 hr intervals)")
     print("=" * 65)
     if not items:
         print("  (Publishing queue is empty. Generated videos queue here for scheduled pacing)")
@@ -480,7 +480,7 @@ def main():
     p_queue.add_argument("action", nargs="?", default="list", choices=["list", "replenish", "pop"], help="Queue action")
 
     # Command: quota
-    subparsers.add_parser("quota", help="Check today's 50-reels generation quota telemetry")
+    subparsers.add_parser("quota", help="Check today's 10-reels generation quota telemetry")
 
     # Command: make
     p_make = subparsers.add_parser("make", aliases=["generate"], help="Synthesize video from idea queue or custom prompt with AI visuals")

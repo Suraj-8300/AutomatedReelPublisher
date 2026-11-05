@@ -1,7 +1,7 @@
 """
 Video Generation Orchestrator for AutoReelStudio.
 Executes the full AI synthesis pipeline:
-Quota Check (50/day limit) -> Voiceover -> AI Visuals & Camera Motion -> Ducked Soundtrack -> Dynamic Typography -> Master Composition.
+Quota Check (10/day limit) -> Voiceover -> AI Visuals & Camera Motion -> Ducked Soundtrack -> Dynamic Typography -> Master Composition.
 """
 
 import os
@@ -33,7 +33,7 @@ class VideoGenerator:
         Synthesizes a complete high-retention 9:16 vertical Reel.
         Checks and records against the 50 reels/day quota.
         """
-        # 1. Enforce Daily 50-Reel Safety Quota
+        # 1. Enforce Daily 10-Reel Safety Quota
         allowed, remaining, msg = QuotaGovernor.can_generate()
         if not allowed:
             raise PermissionError(msg)
@@ -120,13 +120,13 @@ class VideoGenerator:
             "voice": voice,
             "caption_style": caption_style,
             "daily_quota_used": new_count,
-            "daily_quota_limit": 50,
+            "daily_quota_limit": 10,
             "elapsed_seconds": round(elapsed, 2)
         }
 
         print("=" * 65)
         print(f"🎉 MASTER VIDEO GENERATED: {master_video_path.name}")
-        print(f"⚡ Time Elapsed: {elapsed:.2f}s | Daily Count: {new_count}/50")
+        print(f"⚡ Time Elapsed: {elapsed:.2f}s | Daily Count: {new_count}/10")
         print("=" * 65)
 
         return master_video_path, telemetry

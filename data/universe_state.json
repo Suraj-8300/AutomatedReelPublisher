@@ -3,7 +3,7 @@
   "universe_counters": {
     "mochi_and_friends": {
       "season": 1,
-      "episode": 17,
+      "episode": 22,
       "history": [
         {
           "code": "S01E01",
@@ -89,12 +89,37 @@
           "code": "S01E17",
           "title": "Mochi & Co.: The Pancake Catastrophe (S01E17)",
           "category": "animal_universe"
+        },
+        {
+          "code": "S01E18",
+          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E18)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E19",
+          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E19)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E20",
+          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E20)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E21",
+          "title": "Mochi & Co.: The Pancake Catastrophe (S01E21)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E22",
+          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E22)",
+          "category": "animal_universe"
         }
       ]
     },
     "baby_boss_ventures": {
       "season": 1,
-      "episode": 4,
+      "episode": 5,
       "history": [
         {
           "code": "S01E01",
@@ -115,12 +140,17 @@
           "code": "S01E04",
           "title": "Baby Boss Syndicate: Baby Street Food Mogul: The Pani Puri Empire (S01E04)",
           "category": "baby_comedy"
+        },
+        {
+          "code": "S01E05",
+          "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E05)",
+          "category": "baby_comedy"
         }
       ]
     },
     "emotional_animal_sagas": {
       "season": 1,
-      "episode": 2,
+      "episode": 3,
       "history": [
         {
           "code": "S01E01",
@@ -130,6 +160,11 @@
         {
           "code": "S01E02",
           "title": "Paws of Hope: The Storm Under the Red Bridge (S01E02)",
+          "category": "emotional_animal"
+        },
+        {
+          "code": "S01E03",
+          "title": "Paws of Hope: The Storm Under the Red Bridge (S01E03)",
           "category": "emotional_animal"
         }
       ]

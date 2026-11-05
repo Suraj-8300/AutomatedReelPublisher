@@ -47,19 +47,19 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
         self.assertGreaterEqual(len(idea["scenes"]), 2)
 
     def test_daily_quota_governor(self):
-        """Verifies the 50 reels/day safety limit and telemetry."""
+        """Verifies the 10 reels/day safety limit and telemetry."""
         status = QuotaGovernor.get_status()
-        self.assertEqual(status["daily_limit"], 50)
+        self.assertEqual(status["daily_limit"], 10)
         self.assertIn("generated_today", status)
         self.assertIn("remaining_today", status)
-        self.assertEqual(status["remaining_today"], 50 - status["generated_today"])
+        self.assertEqual(status["remaining_today"], 10 - status["generated_today"])
 
         allowed, remaining, msg = QuotaGovernor.can_generate()
         self.assertTrue(allowed)
         self.assertGreater(remaining, 0)
 
     def test_manual_override_and_auto_publish_cutoff(self):
-        """Verifies 1-Click Publish Now override (+20 reels) and auto-publish cutoff rule."""
+        """Verifies 1-Click Publish Now override and auto-publish cutoff rule within safe 10/day ceiling."""
         import tempfile
         from unittest.mock import patch
 
@@ -71,9 +71,9 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
             with patch("video_generation.quota_governor.QUOTA_FILE", temp_quota_file):
                 # 1. Baseline status
                 status = QuotaGovernor.get_status()
-                self.assertEqual(status["daily_limit"], 50)
-                self.assertEqual(status["manual_limit"], 20)
-                self.assertEqual(status["total_limit"], 70)
+                self.assertEqual(status["daily_limit"], 10)
+                self.assertEqual(status["manual_limit"], 5)
+                self.assertEqual(status["total_limit"], 10)
                 self.assertFalse(status["auto_publish_stopped"])
 
                 # Auto publish should initially be allowed
@@ -91,19 +91,18 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
                 self.assertFalse(auto_allowed_now)
                 self.assertIn("stopped", stop_reason.lower())
 
-                # Manual override should still have 19 remaining
+                # Manual override should still have 4 remaining
                 can_manual, remaining_m, _ = QuotaGovernor.can_manual_publish()
                 self.assertTrue(can_manual)
-                self.assertEqual(remaining_m, 19)
+                self.assertEqual(remaining_m, 4)
 
-                # 3. Test reaching 20 manual limit
-                for _ in range(19):
+                # 3. Test reaching manual limit
+                for _ in range(4):
                     QuotaGovernor.record_publish(is_manual=True)
 
-                can_manual_20, remaining_m20, cap_msg = QuotaGovernor.can_manual_publish()
-                self.assertFalse(can_manual_20)
-                self.assertEqual(remaining_m20, 0)
-                self.assertIn("ceiling reached", cap_msg.lower())
+                can_manual_5, remaining_m5, cap_msg = QuotaGovernor.can_manual_publish()
+                self.assertFalse(can_manual_5)
+                self.assertEqual(remaining_m5, 0)
 
                 # 4. Resume auto-publish manually
                 QuotaGovernor.resume_auto_publish()
@@ -112,10 +111,10 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
         finally:
             temp_quota_file.unlink(missing_ok=True)
 
-    def test_ten_minute_interval_pacing(self):
-        """Verifies the 10-minute queue pacing interval."""
+    def test_pacing_interval(self):
+        """Verifies the ~2.4-hour (144 min) queue pacing interval for 10 reels/day."""
         from publishers.dispatch_queue import DEFAULT_INTERVAL_MINUTES
-        self.assertEqual(DEFAULT_INTERVAL_MINUTES, 10.0)
+        self.assertEqual(DEFAULT_INTERVAL_MINUTES, 144.0)
 
     def test_metadata_packager_platforms(self):
         """Verifies tailored metadata generation for Instagram and YouTube."""

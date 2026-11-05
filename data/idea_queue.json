@@ -1,54 +1,5 @@
 [
   {
-    "id": "emotional_animal_sagas_s01e01_2082",
-    "universe_id": "emotional_animal_sagas",
-    "season": 1,
-    "episode": 1,
-    "episode_code": "S01E01",
-    "title": "Paws of Hope: The Storm Under the Red Bridge (S01E01)",
-    "genre": "emotional_animal",
-    "hook": "For three days, this gentle stray dog guarded an abandoned cardboard box in torrential rain.",
-    "script": "For three days, this gentle stray dog guarded an abandoned cardboard box in torrential rain. Passersby hurried past in their raincoats, never looking down. Under the iron bridge, Scout curled his wet golden body around a soggy shoebox, refusing to leave. When a railway mechanic finally knelt down with a flashlight, Scout didn't growl. He gently nudged the lid open with his wet nose, revealing a shivering 4-week-old calico kitten. The mechanic carried them both home inside his warm jacket. Today, they sleep together by the fireplace — and Scout still checks on her every two hours.",
-    "scenes": [
-      {
-        "text": "For three days, this gentle stray dog guarded an abandoned cardboard box in torrential rain.",
-        "visual_prompt": "Cinematic rainy evening under an ancient iron bridge, a large gentle golden retriever lying in the puddles shielding a small cardboard box with his body, neon street reflections, emotional lighting, 9:16 vertical",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "When a mechanic approached, the dog gently nudged the lid open to reveal a tiny shivering kitten.",
-        "visual_prompt": "Warm flashlight beam cutting through the rain, revealing the gentle dog nudging a tiny wet calico kitten with huge amber eyes, emotional masterpiece photography, 8k, 9:16 vertical",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "Today, they sleep together by the fireplace, and he still checks on her every single night.",
-        "visual_prompt": "Cozy living room hearth with crackling golden fire, the golden dog resting his chin peacefully over the sleeping kitten curled on his front paws, soft volumetric fire glow, 8k photorealistic, 9:16 vertical",
-        "motion": "zoom_out"
-      }
-    ],
-    "suggested_voice": "en-US-EricNeural",
-    "suggested_music": "ambient_glow",
-    "cast": [
-      {
-        "id": "stray_scout",
-        "name": "Scout & Little Nova",
-        "species": "Golden Retriever & Calico Kitten",
-        "traits": "Weathered gentle golden dog and tiny shivering calico kitten with striking amber eyes",
-        "visual_token": "a gentle weathered golden retriever with kind soulful eyes protecting a tiny shivering calico kitten in a warm sheltered alcove, cinematic rain"
-      }
-    ],
-    "visual_style": "photorealistic",
-    "narrative_structure": {
-      "act1_hook": "Passersby hurried past in their raincoats, never looking down. Under the iron bridge, Scout curled his wet golden body around a soggy shoebox, refusing to leave.",
-      "act2_escalation": "When a railway mechanic finally knelt down with a flashlight, Scout didn't growl. He gently nudged the lid open with his wet nose, revealing a shivering 4-week-old calico kitten.",
-      "act3_payoff": "The mechanic carried them both home inside his warm jacket. Today, they sleep together by the fireplace — and Scout still checks on her every two hours."
-    },
-    "duration": 15,
-    "created_at": 1793913961.7498217,
-    "status": "ready",
-    "caption_style": "karaoke"
-  },
-  {
     "id": "mochi_and_friends_s01e15_4481",
     "universe_id": "mochi_and_friends",
     "season": 1,
@@ -485,5 +436,400 @@
     "created_at": 1793913961.7512093,
     "status": "ready",
     "caption_style": "high_impact"
+  },
+  {
+    "id": "mochi_and_friends_s01e18_1405",
+    "universe_id": "mochi_and_friends",
+    "season": 1,
+    "episode": 18,
+    "episode_code": "S01E18",
+    "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E18)",
+    "genre": "animal_universe",
+    "hook": "What happens when three cats drink a triple-shot espresso during Monday morning rush?",
+    "script": "What happens when three cats drink a triple-shot espresso during Monday morning rush? At 7:01 AM, the ticket machine started printing orders like a runaway lottery ticker. 142 oat-milk lattes in six minutes. Mochi was operating three steam wands simultaneously with both paws and his tail. Pip was carrying five cups balanced on his head like a circus seal, dodging flying milk foam. By 7:15 AM, the entire cafe was covered in milk foam art of Barnaby's grumpy face. The customers tipped 50 percent just for the spectacle.",
+    "scenes": [
+      {
+        "text": "At 7:01 AM, the ticket machine started spitting orders like a runaway lottery ticker.",
+        "visual_prompt": "Close-up of a vintage brass espresso machine steaming furiously in an artisanal cafe, endless paper orders fluttering down around an orange tabby kitten barista in apron, cinematic lighting, 9:16 vertical",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Mochi operated three steam wands with both paws while Pip balanced five latte cups on his golden head.",
+        "visual_prompt": "Action shot in cozy sunlit cafe, adorable golden retriever puppy balancing miniature porcelain cups on his head while orange kitten steams milk with laser focus, cinematic depth of field, 8k, 9:16 vertical",
+        "motion": "pan_right"
+      },
+      {
+        "text": "The entire room was covered in latte art of Barnaby's face, and the line outside cheered.",
+        "visual_prompt": "Overhead cinematic view of five artisanal lattes with intricate milk foam art depicting a grumpy bulldog face, warm rustic wooden cafe table, photorealistic 8k, 9:16 vertical",
+        "motion": "zoom_out"
+      }
+    ],
+    "suggested_voice": "en-US-ChristopherNeural",
+    "suggested_music": "lofi_chill",
+    "cast": [
+      {
+        "id": "mochi",
+        "name": "Mochi",
+        "species": "Orange Tabby Cat",
+        "traits": "Mischievous, ambitious, emerald eyes, folded ears, tiny white paws, wears a miniature red chef apron",
+        "personality": "Chaotic genius, experiments with insane recipes, never admits defeat",
+        "visual_token": "a charming photorealistic orange tabby kitten with vibrant emerald green eyes, folded ears, tiny white paws, wearing a crisp red chef apron"
+      },
+      {
+        "id": "barnaby",
+        "name": "Barnaby",
+        "species": "Old English Bulldog",
+        "traits": "Wrinkly face, tiny brass reading glasses perched on nose, tweed vest, holding a mini wooden clipboard",
+        "personality": "Strict father figure, sighs constantly, obsessed with hygiene codes, secretly loves Mochi's cooking",
+        "visual_token": "a lovable wrinkled old english bulldog wearing round brass reading glasses and a vintage tweed vest, holding a miniature clipboard"
+      },
+      {
+        "id": "pip",
+        "name": "Pip",
+        "species": "Golden Retriever Puppy",
+        "traits": "Oversized clumsy paws, floppy golden ears, teal polka-dot bowtie, wide expressive glossy eyes",
+        "personality": "Nervous assistant, easily startled, chief taste-tester, panics when orders stack up",
+        "visual_token": "an adorable fluffy golden retriever puppy with giant expressive brown eyes and floppy ears, wearing a teal polka-dot bowtie"
+      },
+      {
+        "id": "luna",
+        "name": "Luna",
+        "species": "White Lop Bunny",
+        "traits": "Velvety snow-white fur, long drooping ears, miniature toolbelt, quick twitching pink nose",
+        "personality": "Engineering mastermind, level-headed voice of reason, fixes Mochi's kitchen explosions",
+        "visual_token": "a graceful pure-white lop-eared rabbit with soft velvet fur and bright blue eyes, wearing a tiny leather utility toolbelt"
+      }
+    ],
+    "visual_style": "photorealistic",
+    "narrative_structure": {
+      "act1_hook": "At 7:01 AM, the ticket machine started printing orders like a runaway lottery ticker. 142 oat-milk lattes in six minutes.",
+      "act2_escalation": "Mochi was operating three steam wands simultaneously with both paws and his tail. Pip was carrying five cups balanced on his head like a circus seal, dodging flying milk foam.",
+      "act3_payoff": "By 7:15 AM, the entire cafe was covered in milk foam art of Barnaby's grumpy face. The customers tipped 50 percent just for the spectacle."
+    },
+    "duration": 15,
+    "created_at": 1793914557.1548073,
+    "status": "ready",
+    "caption_style": "high_impact"
+  },
+  {
+    "id": "baby_boss_ventures_s01e05_5001",
+    "universe_id": "baby_boss_ventures",
+    "season": 1,
+    "episode": 5,
+    "episode_code": "S01E05",
+    "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E05)",
+    "genre": "baby_comedy",
+    "hook": "POV: Your 10-month-old calls an emergency 6 AM meeting to renegotiate nap times.",
+    "script": "POV: Your 10-month-old calls an emergency 6 AM meeting to renegotiate nap times. Leo adjusted his miniature silk tie, cleared his throat into the studio microphone, and slid the financial charts across the high chair. 'Look team, 2 PM tummy time produces negative ROI. If we swap milk bottles for cold brew and outsource diaper changes to junior analysts, our sleep-adjusted margins double.' He slammed his tiny sippy cup on the desk, stared straight into the lens, and said: 'Sign the pacifier agreement or I cry during your Zoom call with the investors.'",
+    "scenes": [
+      {
+        "text": "POV: Your 10-month-old calls an emergency 6 AM boardroom meeting to renegotiate nap times.",
+        "visual_prompt": "Cinematic shot of a chubby baby in tailored navy pinstripe suit sitting at massive mahogany boardroom table with Shure SM7B studio microphone, serious executive expression, 8k, 9:16 vertical",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "'Tummy time yields zero shareholder value. We need to restructure formula allocations immediately.'",
+        "visual_prompt": "Baby executive holding a tiny golden pointer toward a financial graph on a wall projector showing milk bottle vs nap projections, Wall Street aesthetic, photorealistic 8k, 9:16 vertical",
+        "motion": "pan_left"
+      },
+      {
+        "text": "He slammed his sippy cup and gave his final ultimatum before his morning teething break.",
+        "visual_prompt": "Dramatic close-up of baby boss with a fierce deadpan CEO stare, gold baby watch reflecting rim lighting, cinematic depth of field, award-winning lighting, 9:16 vertical",
+        "motion": "zoom_out"
+      }
+    ],
+    "suggested_voice": "en-US-GuyNeural",
+    "suggested_music": "cyber_pulse",
+    "cast": [
+      {
+        "id": "boss_leo",
+        "name": "Leo (The Boss)",
+        "species": "Human Infant (10 Months)",
+        "traits": "Chubby cheeks, razor-sharp slicked back hair, Italian pinstripe suit, gold baby Rolex, sippy cup labeled 'Q3 REVENUE'",
+        "personality": "Deadpan, hyper-articulate boardroom titan, treats teething rings like multi-million dollar asset portfolios",
+        "visual_token": "a photorealistic chubby 10-month-old baby with slicked hair wearing a tailored navy pinstripe suit and silk tie, sitting behind a massive mahogany boardroom desk with a studio podcast microphone"
+      }
+    ],
+    "visual_style": "photorealistic",
+    "narrative_structure": {
+      "act1_hook": "Leo adjusted his miniature silk tie, cleared his throat into the studio microphone, and slid the financial charts across the high chair.",
+      "act2_escalation": "'Look team, 2 PM tummy time produces negative ROI. If we swap milk bottles for cold brew and outsource diaper changes to junior analysts, our sleep-adjusted margins double.'",
+      "act3_payoff": "He slammed his tiny sippy cup on the desk, stared straight into the lens, and said: 'Sign the pacifier agreement or I cry during your Zoom call with the investors.'"
+    },
+    "duration": 15,
+    "created_at": 1793914557.155059,
+    "status": "ready",
+    "caption_style": "clean_minimal"
+  },
+  {
+    "id": "emotional_animal_sagas_s01e03_9334",
+    "universe_id": "emotional_animal_sagas",
+    "season": 1,
+    "episode": 3,
+    "episode_code": "S01E03",
+    "title": "Paws of Hope: The Storm Under the Red Bridge (S01E03)",
+    "genre": "emotional_animal",
+    "hook": "For three days, this gentle stray dog guarded an abandoned cardboard box in torrential rain.",
+    "script": "For three days, this gentle stray dog guarded an abandoned cardboard box in torrential rain. Passersby hurried past in their raincoats, never looking down. Under the iron bridge, Scout curled his wet golden body around a soggy shoebox, refusing to leave. When a railway mechanic finally knelt down with a flashlight, Scout didn't growl. He gently nudged the lid open with his wet nose, revealing a shivering 4-week-old calico kitten. The mechanic carried them both home inside his warm jacket. Today, they sleep together by the fireplace — and Scout still checks on her every two hours.",
+    "scenes": [
+      {
+        "text": "For three days, this gentle stray dog guarded an abandoned cardboard box in torrential rain.",
+        "visual_prompt": "Cinematic rainy evening under an ancient iron bridge, a large gentle golden retriever lying in the puddles shielding a small cardboard box with his body, neon street reflections, emotional lighting, 9:16 vertical",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "When a mechanic approached, the dog gently nudged the lid open to reveal a tiny shivering kitten.",
+        "visual_prompt": "Warm flashlight beam cutting through the rain, revealing the gentle dog nudging a tiny wet calico kitten with huge amber eyes, emotional masterpiece photography, 8k, 9:16 vertical",
+        "motion": "parallax_dolly"
+      },
+      {
+        "text": "Today, they sleep together by the fireplace, and he still checks on her every single night.",
+        "visual_prompt": "Cozy living room hearth with crackling golden fire, the golden dog resting his chin peacefully over the sleeping kitten curled on his front paws, soft volumetric fire glow, 8k photorealistic, 9:16 vertical",
+        "motion": "zoom_out"
+      }
+    ],
+    "suggested_voice": "en-US-EricNeural",
+    "suggested_music": "ambient_glow",
+    "cast": [
+      {
+        "id": "stray_scout",
+        "name": "Scout & Little Nova",
+        "species": "Golden Retriever & Calico Kitten",
+        "traits": "Weathered gentle golden dog and tiny shivering calico kitten with striking amber eyes",
+        "visual_token": "a gentle weathered golden retriever with kind soulful eyes protecting a tiny shivering calico kitten in a warm sheltered alcove, cinematic rain"
+      }
+    ],
+    "visual_style": "photorealistic",
+    "narrative_structure": {
+      "act1_hook": "Passersby hurried past in their raincoats, never looking down. Under the iron bridge, Scout curled his wet golden body around a soggy shoebox, refusing to leave.",
+      "act2_escalation": "When a railway mechanic finally knelt down with a flashlight, Scout didn't growl. He gently nudged the lid open with his wet nose, revealing a shivering 4-week-old calico kitten.",
+      "act3_payoff": "The mechanic carried them both home inside his warm jacket. Today, they sleep together by the fireplace — and Scout still checks on her every two hours."
+    },
+    "duration": 15,
+    "created_at": 1793914557.1552548,
+    "status": "ready",
+    "caption_style": "high_impact"
+  },
+  {
+    "id": "mochi_and_friends_s01e19_6243",
+    "universe_id": "mochi_and_friends",
+    "season": 1,
+    "episode": 19,
+    "episode_code": "S01E19",
+    "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E19)",
+    "genre": "animal_universe",
+    "hook": "Barnaby announced a surprise health inspection, and Mochi had 30 seconds to hide the evidence.",
+    "script": "Barnaby announced a surprise health inspection, and Mochi had 30 seconds to hide the evidence. The brass bell chimed. Barnaby stepped in with his white glove and clipboard, clicking his pen with terrifying precision. Mochi shoved three stolen salmon fillets into Luna's toolbelt, while Pip stood at attention saluting so hard his floppy ears vibrated. Barnaby wiped the top shelf. Barnaby inspected his white glove. Clean. Then Mochi accidentally sneezed a cloud of powdered sugar directly onto Barnaby's shiny black shoes.",
+    "scenes": [
+      {
+        "text": "Barnaby announced a surprise health inspection, clicking his pen with terrifying precision.",
+        "visual_prompt": "Dramatic low-angle cinematic shot of a stern wrinkled bulldog inspector in a tweed vest holding a clipboard and clicking a brass pen, ominous lighting, photorealistic 8k, 9:16 vertical",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Mochi shoved secret snacks into rabbit toolbelts while Pip stood at military attention saluting with his paw.",
+        "visual_prompt": "Hilarious contrast shot of an orange tabby kitten frantically hiding a fish behind a flour sack while a golden retriever puppy salutes nervously, warm detailed kitchen, 9:16 vertical",
+        "motion": "pan_left"
+      },
+      {
+        "text": "The kitchen was spotless until Mochi sneezed a cloud of powdered sugar over Barnaby's polished boots.",
+        "visual_prompt": "Slow-motion capture of a fluffy orange kitten mid-sneeze surrounded by a glittering cloud of white powdered sugar settling on black shoes, funny expressive facial details, 8k, 9:16 vertical",
+        "motion": "zoom_out"
+      }
+    ],
+    "suggested_voice": "en-US-ChristopherNeural",
+    "suggested_music": "cyber_pulse",
+    "cast": [
+      {
+        "id": "mochi",
+        "name": "Mochi",
+        "species": "Orange Tabby Cat",
+        "traits": "Mischievous, ambitious, emerald eyes, folded ears, tiny white paws, wears a miniature red chef apron",
+        "personality": "Chaotic genius, experiments with insane recipes, never admits defeat",
+        "visual_token": "a charming photorealistic orange tabby kitten with vibrant emerald green eyes, folded ears, tiny white paws, wearing a crisp red chef apron"
+      },
+      {
+        "id": "barnaby",
+        "name": "Barnaby",
+        "species": "Old English Bulldog",
+        "traits": "Wrinkly face, tiny brass reading glasses perched on nose, tweed vest, holding a mini wooden clipboard",
+        "personality": "Strict father figure, sighs constantly, obsessed with hygiene codes, secretly loves Mochi's cooking",
+        "visual_token": "a lovable wrinkled old english bulldog wearing round brass reading glasses and a vintage tweed vest, holding a miniature clipboard"
+      },
+      {
+        "id": "pip",
+        "name": "Pip",
+        "species": "Golden Retriever Puppy",
+        "traits": "Oversized clumsy paws, floppy golden ears, teal polka-dot bowtie, wide expressive glossy eyes",
+        "personality": "Nervous assistant, easily startled, chief taste-tester, panics when orders stack up",
+        "visual_token": "an adorable fluffy golden retriever puppy with giant expressive brown eyes and floppy ears, wearing a teal polka-dot bowtie"
+      },
+      {
+        "id": "luna",
+        "name": "Luna",
+        "species": "White Lop Bunny",
+        "traits": "Velvety snow-white fur, long drooping ears, miniature toolbelt, quick twitching pink nose",
+        "personality": "Engineering mastermind, level-headed voice of reason, fixes Mochi's kitchen explosions",
+        "visual_token": "a graceful pure-white lop-eared rabbit with soft velvet fur and bright blue eyes, wearing a tiny leather utility toolbelt"
+      }
+    ],
+    "visual_style": "photorealistic",
+    "narrative_structure": {
+      "act1_hook": "The brass bell chimed. Barnaby stepped in with his white glove and clipboard, clicking his pen with terrifying precision.",
+      "act2_escalation": "Mochi shoved three stolen salmon fillets into Luna's toolbelt, while Pip stood at attention saluting so hard his floppy ears vibrated. Barnaby wiped the top shelf.",
+      "act3_payoff": "Barnaby inspected his white glove. Clean. Then Mochi accidentally sneezed a cloud of powdered sugar directly onto Barnaby's shiny black shoes."
+    },
+    "duration": 15,
+    "created_at": 1793914557.1554496,
+    "status": "ready",
+    "caption_style": "karaoke"
+  },
+  {
+    "id": "mochi_and_friends_s01e20_8916",
+    "universe_id": "mochi_and_friends",
+    "season": 1,
+    "episode": 20,
+    "episode_code": "S01E20",
+    "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E20)",
+    "genre": "animal_universe",
+    "hook": "POV: You catch your pets running an illegal underground pizzeria at 2 AM.",
+    "script": "POV: You catch your pets running an illegal underground pizzeria at 2 AM. At 2:15 AM, the scent of fresh basil and bubbling mozzarella began wafting from the locked pantry door. Behind the flour bags, Mochi had built a miniature brick woodfire oven. Luna was calculating dough hydration on a tiny blackboard while Pip rolled pizza dough with a wine bottle. When the human opened the pantry door, all three froze. Mochi slowly slid a 3-inch truffle pizza across the floor with a note: 'Five stars or we tell the neighbors.'",
+    "scenes": [
+      {
+        "text": "POV: You catch your pets running an underground pizzeria at 2 AM.",
+        "visual_prompt": "Cinematic dark room, ray of light cutting through a cracked wooden pantry door revealing a miniature glowing woodfire pizza oven inside, warm embers glowing, photorealistic 8k, 9:16 vertical",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Mochi was stretching Neapolitan dough while Luna engineered the brick oven chimney with copper pipes.",
+        "visual_prompt": "Intricate miniature pizza workshop, orange tabby kitten tossing tiny pizza dough into the air, white bunny with toolbelt checking heat gauge, glowing firelight, 8k, 9:16 vertical",
+        "motion": "pan_right"
+      },
+      {
+        "text": "They got caught red-pawed and offered a slice as hush money.",
+        "visual_prompt": "Three animal culprits staring wide-eyed up at the camera, tiny kitten paw sliding a perfect miniature steaming pepperoni pizza forward, hilarious expressive eyes, photorealistic 8k, 9:16 vertical",
+        "motion": "zoom_out"
+      }
+    ],
+    "suggested_voice": "en-US-ChristopherNeural",
+    "suggested_music": "ambient_glow",
+    "cast": [
+      {
+        "id": "mochi",
+        "name": "Mochi",
+        "species": "Orange Tabby Cat",
+        "traits": "Mischievous, ambitious, emerald eyes, folded ears, tiny white paws, wears a miniature red chef apron",
+        "personality": "Chaotic genius, experiments with insane recipes, never admits defeat",
+        "visual_token": "a charming photorealistic orange tabby kitten with vibrant emerald green eyes, folded ears, tiny white paws, wearing a crisp red chef apron"
+      },
+      {
+        "id": "barnaby",
+        "name": "Barnaby",
+        "species": "Old English Bulldog",
+        "traits": "Wrinkly face, tiny brass reading glasses perched on nose, tweed vest, holding a mini wooden clipboard",
+        "personality": "Strict father figure, sighs constantly, obsessed with hygiene codes, secretly loves Mochi's cooking",
+        "visual_token": "a lovable wrinkled old english bulldog wearing round brass reading glasses and a vintage tweed vest, holding a miniature clipboard"
+      },
+      {
+        "id": "pip",
+        "name": "Pip",
+        "species": "Golden Retriever Puppy",
+        "traits": "Oversized clumsy paws, floppy golden ears, teal polka-dot bowtie, wide expressive glossy eyes",
+        "personality": "Nervous assistant, easily startled, chief taste-tester, panics when orders stack up",
+        "visual_token": "an adorable fluffy golden retriever puppy with giant expressive brown eyes and floppy ears, wearing a teal polka-dot bowtie"
+      },
+      {
+        "id": "luna",
+        "name": "Luna",
+        "species": "White Lop Bunny",
+        "traits": "Velvety snow-white fur, long drooping ears, miniature toolbelt, quick twitching pink nose",
+        "personality": "Engineering mastermind, level-headed voice of reason, fixes Mochi's kitchen explosions",
+        "visual_token": "a graceful pure-white lop-eared rabbit with soft velvet fur and bright blue eyes, wearing a tiny leather utility toolbelt"
+      }
+    ],
+    "visual_style": "photorealistic",
+    "narrative_structure": {
+      "act1_hook": "At 2:15 AM, the scent of fresh basil and bubbling mozzarella began wafting from the locked pantry door.",
+      "act2_escalation": "Behind the flour bags, Mochi had built a miniature brick woodfire oven. Luna was calculating dough hydration on a tiny blackboard while Pip rolled pizza dough with a wine bottle.",
+      "act3_payoff": "When the human opened the pantry door, all three froze. Mochi slowly slid a 3-inch truffle pizza across the floor with a note: 'Five stars or we tell the neighbors.'"
+    },
+    "duration": 15,
+    "created_at": 1793914557.1556435,
+    "status": "ready",
+    "caption_style": "clean_minimal"
+  },
+  {
+    "id": "mochi_and_friends_s01e21_7295",
+    "universe_id": "mochi_and_friends",
+    "season": 1,
+    "episode": 21,
+    "episode_code": "S01E21",
+    "title": "Mochi & Co.: The Pancake Catastrophe (S01E21)",
+    "genre": "animal_universe",
+    "hook": "POV: You let a ginger kitten run Sunday breakfast rush at a Michelin-star cafe.",
+    "script": "POV: You let a ginger kitten run Sunday breakfast rush at a Michelin-star cafe. Mochi tied his apron tight and cranked the gas stove to maximum. Three hundred hungry woodland critters were banging on the door for pancakes. Pip was whisking batter so fast flour covered the ceiling. Mochi attempted a triple-backflip pancake toss — the pancake hit the ceiling fan, spun like a helicopter, and plastered straight across Barnaby's reading glasses. Barnaby took off his glasses, took one bite of the pancake stuck to his face, and mumbled: 'Needs more blueberry syrup. Four stars.'",
+    "scenes": [
+      {
+        "text": "POV: You let a ginger kitten run Sunday breakfast rush at a Michelin-star cafe.",
+        "visual_prompt": "Cinematic shot of a charming photorealistic orange tabby kitten with emerald green eyes wearing a crisp red chef apron, standing on stool behind miniature cafe counter, morning sunlight streaming through cafe windows, 8k ultra-detailed, 9:16 vertical",
+        "motion": "zoom_in"
+      },
+      {
+        "text": "Mochi cranked the stove to max while Pip scrambled with thirty pancake orders, flour flying everywhere as a giant pancake hits the ceiling fan.",
+        "visual_prompt": "Chaotic cute miniature kitchen, fluffy golden retriever puppy covered in white flour looking shocked, while a golden pancake spins off a ceiling fan above, warm cinematic lighting, photorealistic fur, 9:16 vertical",
+        "motion": "pan_left"
+      },
+      {
+        "text": "The pancake landed right on Barnaby's glasses. He took one bite and gave it four stars anyway.",
+        "visual_prompt": "Close-up of a dignified wrinkled old english bulldog with a golden pancake draped over his brass reading glasses, licking sweet maple syrup off his nose with a deadpan expression, 8k cinematic photography, 9:16 vertical",
+        "motion": "zoom_out"
+      }
+    ],
+    "suggested_voice": "en-US-ChristopherNeural",
+    "suggested_music": "acoustic_breeze",
+    "cast": [
+      {
+        "id": "mochi",
+        "name": "Mochi",
+        "species": "Orange Tabby Cat",
+        "traits": "Mischievous, ambitious, emerald eyes, folded ears, tiny white paws, wears a miniature red chef apron",
+        "personality": "Chaotic genius, experiments with insane recipes, never admits defeat",
+        "visual_token": "a charming photorealistic orange tabby kitten with vibrant emerald green eyes, folded ears, tiny white paws, wearing a crisp red chef apron"
+      },
+      {
+        "id": "barnaby",
+        "name": "Barnaby",
+        "species": "Old English Bulldog",
+        "traits": "Wrinkly face, tiny brass reading glasses perched on nose, tweed vest, holding a mini wooden clipboard",
+        "personality": "Strict father figure, sighs constantly, obsessed with hygiene codes, secretly loves Mochi's cooking",
+        "visual_token": "a lovable wrinkled old english bulldog wearing round brass reading glasses and a vintage tweed vest, holding a miniature clipboard"
+      },
+      {
+        "id": "pip",
+        "name": "Pip",
+        "species": "Golden Retriever Puppy",
+        "traits": "Oversized clumsy paws, floppy golden ears, teal polka-dot bowtie, wide expressive glossy eyes",
+        "personality": "Nervous assistant, easily startled, chief taste-tester, panics when orders stack up",
+        "visual_token": "an adorable fluffy golden retriever puppy with giant expressive brown eyes and floppy ears, wearing a teal polka-dot bowtie"
+      },
+      {
+        "id": "luna",
+        "name": "Luna",
+        "species": "White Lop Bunny",
+        "traits": "Velvety snow-white fur, long drooping ears, miniature toolbelt, quick twitching pink nose",
+        "personality": "Engineering mastermind, level-headed voice of reason, fixes Mochi's kitchen explosions",
+        "visual_token": "a graceful pure-white lop-eared rabbit with soft velvet fur and bright blue eyes, wearing a tiny leather utility toolbelt"
+      }
+    ],
+    "visual_style": "photorealistic",
+    "narrative_structure": {
+      "act1_hook": "Mochi tied his apron tight and cranked the gas stove to maximum. Three hundred hungry woodland critters were banging on the door for pancakes.",
+      "act2_escalation": "Pip was whisking batter so fast flour covered the ceiling. Mochi attempted a triple-backflip pancake toss — the pancake hit the ceiling fan, spun like a helicopter, and plastered straight across Barnaby's reading glasses.",
+      "act3_payoff": "Barnaby took off his glasses, took one bite of the pancake stuck to his face, and mumbled: 'Needs more blueberry syrup. Four stars.'"
+    },
+    "duration": 15,
+    "created_at": 1793914557.1558223,
+    "status": "ready",
+    "caption_style": "clean_minimal"
   }
 ]

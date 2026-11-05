@@ -307,7 +307,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 "queue": queue
             }).encode("utf-8"))
 
-        # 11d. API: 50 Reels/Day Quota Telemetry
+        # 11d. API: 10 Reels/Day Quota Telemetry
         elif url.path == "/api/quota":
             from video_generation import QuotaGovernor
             status = QuotaGovernor.get_status()
@@ -317,7 +317,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"success": True, "quota": status}).encode("utf-8"))
 
-        # 11e. API: Ready Videos Publishing Queue (Paced 50 Reels/Day Distribution)
+        # 11e. API: Ready Videos Publishing Queue (Paced 10 Reels/Day Distribution)
         elif url.path == "/api/publishing-queue":
             from publishers.dispatch_queue import PublishingQueueManager
             queue = PublishingQueueManager.get_queue()
