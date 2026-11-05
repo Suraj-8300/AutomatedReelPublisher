@@ -236,6 +236,28 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"success": True, "stats": stats}).encode("utf-8"))
 
+        # 11b. API: YouTube Channel Status & Auth URL
+        elif url.path == "/api/youtube/status":
+            try:
+                from youtube_pipeline.auth import YouTubeAuthenticator
+                is_auth = YouTubeAuthenticator.is_authenticated()
+                auth_url = ""
+                if not is_auth:
+                    try:
+                        auth_url, _ = YouTubeAuthenticator.get_authorization_url()
+                    except Exception as e:
+                        auth_url = ""
+                info = YouTubeAuthenticator.get_channel_info() if is_auth else {"authenticated": False}
+                info["auth_url"] = auth_url
+            except Exception as e:
+                info = {"authenticated": False, "error": str(e), "auth_url": ""}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(info).encode("utf-8"))
+
         # 12. API: Animal Storytelling Studio Options
         elif url.path == "/api/animal-options":
             species_list = [
@@ -332,6 +354,29 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         # 3. API: Publish an Existing Video File to Instagram
         elif url.path == "/api/publish-reel":
             res = self._handle_publish_reel(data)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3b. API: Publish an Existing Video File to YouTube Shorts
+        elif url.path == "/api/youtube/publish":
+            try:
+                from youtube_pipeline.publisher import YouTubePublisher
+                video_filename = data.get("video_filename", "")
+                src_video = OUTPUT_DIR / Path(video_filename).name
+                if not src_video.exists():
+                    res = {"success": False, "error": f"Video file {video_filename} not found"}
+                else:
+                    title = data.get("title") or src_video.stem.replace("_", " ")
+                    desc = data.get("description", "")
+                    privacy = data.get("privacy", "public")
+                    pub = YouTubePublisher()
+                    res = pub.upload_short(src_video, title=title, description=desc, privacy_status=privacy)
+            except Exception as e:
+                res = {"success": False, "error": str(e)}
+
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self._set_cors_headers()
@@ -622,6 +667,29 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             result = manager.process_video_file(target, dry_run=dry_run)
             elapsed = time.time() - start
 
+            # Optional YouTube Shorts Publishing
+            destinations = data.get("destinations", ["instagram"])
+            if isinstance(destinations, str):
+                destinations = [destinations]
+
+            yt_receipt = None
+            if "youtube" in destinations or "both" in destinations:
+                try:
+                    from youtube_pipeline.auth import YouTubeAuthenticator
+                    from youtube_pipeline.publisher import YouTubePublisher
+                    if YouTubeAuthenticator.is_authenticated():
+                        pub = YouTubePublisher()
+                        yt_receipt = pub.upload_short(
+                            src_path,
+                            title=storyboard.get("title", src_path.stem),
+                            description=storyboard.get("script", ""),
+                            privacy_status="public" if not dry_run else "private"
+                        )
+                    else:
+                        yt_receipt = {"success": False, "error": "YouTube not authenticated"}
+                except Exception as ex:
+                    yt_receipt = {"success": False, "error": str(ex)}
+
             if result.get("success"):
                 receipt = result.get("receipt", {})
                 return {
@@ -632,6 +700,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                     "qc": qc_result,
                     "permalink": receipt.get("instagram_permalink"),
                     "media_id": receipt.get("instagram_media_id"),
+                    "youtube": yt_receipt,
                     "elapsed": elapsed
                 }
             else:

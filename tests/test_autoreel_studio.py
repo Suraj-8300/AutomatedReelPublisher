@@ -21,21 +21,16 @@ from instagram_pipeline.preprocessor import VideoPreprocessor
 
 class TestAutoReelStudio(unittest.TestCase):
 
-    def test_backwards_compatibility_symlinks(self):
-        """Verifies that ReelMakerAI and ReelPublisher symlinks exist and resolve to AutoReelStudio."""
+    def test_standalone_project_isolation(self):
+        """Verifies that AutoReelStudio is the sole standalone project and former projects are deleted."""
         projects_dir = PROJECT_ROOT.parent
         reel_maker = projects_dir / "ReelMakerAI"
         reel_publisher = projects_dir / "ReelPublisher"
         auto_reel_studio = projects_dir / "AutoReelStudio"
 
-        self.assertTrue(reel_maker.exists(), "ReelMakerAI symlink must exist")
-        self.assertTrue(reel_publisher.exists(), "ReelPublisher symlink must exist")
-        self.assertTrue(auto_reel_studio.is_dir(), "AutoReelStudio must be a valid directory")
-
-        self.assertEqual(reel_maker.resolve(), auto_reel_studio.resolve(),
-                         "ReelMakerAI must resolve to AutoReelStudio")
-        self.assertEqual(reel_publisher.resolve(), auto_reel_studio.resolve(),
-                         "ReelPublisher must resolve to AutoReelStudio")
+        self.assertFalse(reel_maker.exists(), "ReelMakerAI must be deleted")
+        self.assertFalse(reel_publisher.exists(), "ReelPublisher must be deleted")
+        self.assertTrue(auto_reel_studio.is_dir(), "AutoReelStudio must be the active directory")
 
     def test_unified_cli_parser(self):
         """Verifies that autoreel.py can parse subcommands correctly."""
@@ -109,6 +104,18 @@ class TestAutoReelStudio(unittest.TestCase):
         bad_res = VideoPreprocessor.validate_compliance(bad_meta)
         self.assertFalse(bad_res["is_compliant"])
         self.assertGreaterEqual(len(bad_res["issues"]), 3)
+
+    def test_youtube_oauth_configuration(self):
+        """Verifies YouTube OAuth client flow and authorization URL generation."""
+        from youtube_pipeline.auth import YouTubeAuthenticator
+        from youtube_pipeline.config import CLIENT_SECRET_FILE, REDIRECT_URI
+
+        self.assertTrue(CLIENT_SECRET_FILE.exists(), "client_secret.json must exist")
+        auth_url, state = YouTubeAuthenticator.get_authorization_url()
+        self.assertIn("accounts.google.com", auth_url)
+        self.assertIn("198990477835-2s5o6ggf09a3d0uqmdlhvs9f0aa5nc4l", auth_url)
+        self.assertIn("redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauth%2Fyoutube%2Fcallback", auth_url)
+        self.assertIn("youtube.upload", auth_url)
 
 if __name__ == "__main__":
     unittest.main()

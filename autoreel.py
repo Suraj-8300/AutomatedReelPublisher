@@ -75,10 +75,10 @@ def cmd_studio(args):
     start_server(port=port)
 
 def cmd_auto(args):
-    """1-Click Autonomous generation and immediate live Instagram publication."""
+    """Autonomous generation and publication to Instagram Reels and/or YouTube Shorts."""
     from generate import run_pipeline, send_to_instagram_inbox
 
-    print("🚀 [AutoReelStudio] Initiating 1-Click Autonomous Generate & Publish Pipeline...")
+    print("🚀 [AutoReelStudio] Initiating Autonomous Generate & Publish Pipeline...")
     output_video, storyboard, qc_result = asyncio.run(run_pipeline(
         prompt=args.prompt,
         duration=args.duration,
@@ -92,12 +92,51 @@ def cmd_auto(args):
         run_qc=True
     ))
 
-    print(f"\n📤 [AutoReelStudio] Dispatching rendered video to Instagram Reels...")
-    send_to_instagram_inbox(
-        output_mp4=output_video,
-        storyboard=storyboard,
-        auto_publish=True,
-        dry_run=args.dry_run
+    dest = getattr(args, "target", "instagram")
+
+    # 1. Instagram Reels Publishing
+    if dest in ["instagram", "both", "all"]:
+        print(f"\n📤 [AutoReelStudio] Dispatching rendered video to Instagram Reels...")
+        send_to_instagram_inbox(
+            output_mp4=output_video,
+            storyboard=storyboard,
+            auto_publish=True,
+            dry_run=args.dry_run
+        )
+
+    # 2. YouTube Shorts Publishing
+    if dest in ["youtube", "both", "all"]:
+        from youtube_pipeline.auth import YouTubeAuthenticator
+        from youtube_pipeline.publisher import YouTubePublisher
+        if not YouTubeAuthenticator.is_authenticated():
+            print("⚠️ [YouTube] YouTube channel not authorized. Run 'python3 autoreel.py auth-youtube' first.")
+        else:
+            print(f"\n📤 [AutoReelStudio] Uploading rendered video to YouTube Shorts...")
+            pub = YouTubePublisher()
+            title = storyboard.get("title", "Autonomous AI Reel")
+            script = storyboard.get("script", "")
+            pub.upload_short(
+                video_path=Path(output_video),
+                title=title,
+                description=script,
+                privacy_status="public" if not args.dry_run else "private"
+            )
+
+def cmd_auth_youtube(args):
+    """Starts local server to complete OAuth 2.0 authorization for YouTube."""
+    from youtube_pipeline.auth import YouTubeAuthenticator
+    YouTubeAuthenticator.run_local_auth_server(timeout_secs=args.timeout)
+
+def cmd_publish_youtube(args):
+    """Publishes a video file directly to YouTube Shorts."""
+    from youtube_pipeline.publisher import YouTubePublisher
+    title = args.title or Path(args.video).stem.replace("_", " ")
+    pub = YouTubePublisher()
+    pub.upload_short(
+        video_path=Path(args.video),
+        title=title,
+        description=args.desc or "",
+        privacy_status=args.privacy
     )
 
 def cmd_check(args):
@@ -166,7 +205,7 @@ def main():
     p_studio.add_argument("--port", type=int, default=8080, help="Port to run web server on (default: 8080)")
 
     # Command: auto (1-Click Generate + Live Publish)
-    p_auto = subparsers.add_parser("auto", help="1-Click autonomous generation and direct Meta publication")
+    p_auto = subparsers.add_parser("auto", help="1-Click autonomous generation and direct publishing")
     p_auto.add_argument("-p", "--prompt", default=None, help="Custom prompt or leave empty for creative engine")
     p_auto.add_argument("-d", "--duration", type=int, choices=[10, 15, 30, 60], default=15, help="Video duration in seconds")
     p_auto.add_argument("-g", "--genre", default=None, choices=list(GENRE_TAXONOMY.keys()), help="Creative genre")
@@ -176,7 +215,19 @@ def main():
     p_auto.add_argument("--style", default=None, choices=["photorealistic", "pixar_3d", "cartoon_2d", "anime", "stop_motion", "fantasy_world"], help="Visual style")
     p_auto.add_argument("--activity", default=None, help="Human-like animal activity")
     p_auto.add_argument("--duo", action="store_true", help="Generate animal duo story")
-    p_auto.add_argument("--dry-run", action="store_true", help="Simulate Meta Graph API publishing in dry-run mode")
+    p_auto.add_argument("--target", default="instagram", choices=["instagram", "youtube", "both", "all"], help="Destination platform: instagram, youtube, or both")
+    p_auto.add_argument("--dry-run", action="store_true", help="Simulate publishing in dry-run mode")
+
+    # Command: auth-youtube (OAuth 2.0 Flow)
+    p_auth_yt = subparsers.add_parser("auth-youtube", help="Authorize YouTube channel via Google OAuth 2.0 (port 8000)")
+    p_auth_yt.add_argument("--timeout", type=int, default=180, help="Authorization timeout in seconds (default: 180)")
+
+    # Command: publish-youtube (Direct Shorts Upload)
+    p_pub_yt = subparsers.add_parser("publish-youtube", help="Publish a video file to YouTube Shorts")
+    p_pub_yt.add_argument("video", help="Path to input MP4 video file")
+    p_pub_yt.add_argument("--title", default=None, help="Shorts title")
+    p_pub_yt.add_argument("--desc", default=None, help="Shorts description")
+    p_pub_yt.add_argument("--privacy", default="public", choices=["public", "private", "unlisted"], help="Video privacy")
 
     # Command: check (QC / Compliance)
     p_check = subparsers.add_parser("check", aliases=["audit", "inspect"], help="Check video compliance against Instagram Reels specifications")
@@ -209,6 +260,10 @@ def main():
         cmd_studio(args)
     elif args.command == "auto":
         cmd_auto(args)
+    elif args.command == "auth-youtube":
+        cmd_auth_youtube(args)
+    elif args.command == "publish-youtube":
+        cmd_publish_youtube(args)
     elif args.command in ["check", "audit", "inspect"]:
         cmd_check(args)
     elif args.command == "watch":

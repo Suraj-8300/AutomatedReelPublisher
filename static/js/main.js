@@ -12,6 +12,7 @@ let isSafeZoneVisible = false;
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     checkAccountStatus();
+    checkYouTubeStatus();
     updateCacheStats();
     loadGallery();
 
@@ -77,6 +78,38 @@ async function checkAccountStatus() {
         }
     } catch (e) {
         console.warn('Could not connect to /api/status:', e);
+    }
+}
+
+/**
+ * 1b. Fetch live YouTube Shorts Account Status & OAuth State
+ */
+async function checkYouTubeStatus() {
+    try {
+        const res = await fetch(`${API_BASE}/api/youtube/status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const dot = document.getElementById('ytStatusDot');
+        const handle = document.getElementById('ytHandle');
+        const text = document.getElementById('ytStatusText');
+
+        if (data.authenticated) {
+            if (dot) dot.className = 'status-dot online';
+            if (handle) handle.innerText = data.title || 'YouTube Channel';
+            if (text) text.innerText = `${data.subscribers || 0} subs · Connected`;
+        } else {
+            if (dot) dot.className = 'status-dot offline';
+            if (handle) handle.innerText = 'YouTube Shorts';
+            if (text) {
+                if (data.auth_url) {
+                    text.innerHTML = `<a href="${data.auth_url}" target="_blank" style="color:#00f0ff;text-decoration:underline;font-weight:700;">Connect Channel</a>`;
+                } else {
+                    text.innerText = 'OAuth Pending';
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('Could not connect to /api/youtube/status:', e);
     }
 }
 
@@ -282,6 +315,7 @@ function getFormPayload() {
         const activityType = document.getElementById('animalActivitySelect')?.value || null;
         const isDuo = Boolean(document.getElementById('animalDuoCheckbox')?.checked);
         const prompt = document.getElementById('animalPromptInput')?.value.trim() || '';
+        const targetPlatform = document.getElementById('targetPlatformSelect')?.value || 'both';
 
         return {
             mode: 'animal_story',
@@ -296,6 +330,7 @@ function getFormPayload() {
             voice: voice,
             music: music,
             seed: seed,
+            destinations: targetPlatform,
             dry_run: dryRun
         };
     }
@@ -304,6 +339,7 @@ function getFormPayload() {
     const genreVal = document.getElementById('genreSelect').value;
     const genre = (genreVal === 'RANDOM') ? null : genreVal;
     const mode = document.getElementById('modeSelect').value;
+    const targetPlatform = document.getElementById('targetPlatformSelect')?.value || 'both';
 
     return {
         prompt,
@@ -314,18 +350,19 @@ function getFormPayload() {
         voice,
         music,
         seed,
+        destinations: targetPlatform,
         dry_run: dryRun
     };
 }
 
 /**
- * 3. ⚡ 1-Click Generate & Auto-Publish to Instagram Reels
+ * 3. ⚡ 1-Click Generate & Auto-Publish to Instagram Reels & YouTube Shorts
  */
 async function triggerOneClickPublish() {
     const payload = getFormPayload();
 
     setControlsDisabled(true);
-    showStatus('⚡ 1-Click Creation & Publish', 'Synthesizing voiceover, assembling full-screen 9:16 footage, rendering captions & publishing live...', 25);
+    showStatus('⚡ 1-Click Multi-Platform Publish', 'Synthesizing voiceover, assembling full-screen 9:16 footage, rendering captions & publishing live...', 25);
 
     try {
         const res = await fetch(`${API_BASE}/api/generate-and-publish`, {
@@ -338,20 +375,39 @@ async function triggerOneClickPublish() {
         if (data.success) {
             updateProgress(100);
             const permalink = data.permalink || (payload.dry_run ? 'https://www.instagram.com/reel/dryrun_simulation/' : '#');
+            let linksHtml = '';
+
+            if (payload.destinations === 'instagram' || payload.destinations === 'both' || payload.destinations === 'all') {
+                linksHtml += `
+                    <a href="${permalink}" target="_blank" class="btn-publish-direct" style="display: inline-block; width: auto; padding: 8px 18px; margin-right: 8px; margin-bottom: 8px; text-decoration: none;">
+                        📸 View on Instagram (@sun_27417)
+                    </a>
+                `;
+            }
+
+            if (data.youtube && data.youtube.shorts_url) {
+                linksHtml += `
+                    <a href="${data.youtube.shorts_url}" target="_blank" class="btn-publish-direct" style="display: inline-block; width: auto; padding: 8px 18px; margin-bottom: 8px; background: #ff0000; text-decoration: none;">
+                        ▶️ View on YouTube Shorts
+                    </a>
+                `;
+            }
+
             const receiptHtml = `
                 <div style="margin-top: 8px;">
-                    <p style="color: #00FFA3; font-weight: bold; font-size: 0.95rem;">🎉 Reel Published Successfully to Instagram!</p>
+                    <p style="color: #00FFA3; font-weight: bold; font-size: 0.95rem;">🎉 Multi-Platform Publication Complete!</p>
                     <p style="margin: 4px 0 10px 0; font-size: 0.84rem;">Total pipeline time: ${data.elapsed ? data.elapsed.toFixed(1) + 's' : 'done'}</p>
-                    <a href="${permalink}" target="_blank" class="btn-publish-direct" style="display: inline-block; width: auto; padding: 8px 18px; text-decoration: none;">
-                        🔗 View Reel on Instagram (@sun_27417)
-                    </a>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${linksHtml}
+                    </div>
                 </div>
             `;
-            showSuccess('✅ Live Publication Complete!', receiptHtml);
+            showSuccess('✅ Live Multi-Publication Complete!', receiptHtml);
 
             loadVideoIntoPreview(data.video_url, data.filename || 'reel.mp4', true);
             loadGallery();
             checkAccountStatus();
+            checkYouTubeStatus();
             updateCacheStats();
         } else {
             showError('Publication Failed', data.error || 'Unknown error occurred in pipeline');

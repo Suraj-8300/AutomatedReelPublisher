@@ -157,6 +157,19 @@ body {
     box-shadow: 0 0 10px var(--success);
 }
 
+.status-dot.offline {
+    background: var(--danger);
+    box-shadow: 0 0 10px var(--danger);
+}
+
+.youtube-pill {
+    border-color: rgba(255, 68, 68, 0.35);
+}
+
+.youtube-pill:hover {
+    border-color: #ff3333;
+}
+
 .account-details {
     display: flex;
     flex-direction: column;

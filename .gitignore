@@ -2,6 +2,9 @@
 .env
 .env.local
 .env.*.local
+client_secret*.json
+*token*.json
+*.pickle
 
 # Virtual Environment & Python Cache
 venv/
