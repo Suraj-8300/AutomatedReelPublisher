@@ -1,17 +1,29 @@
 #!/usr/bin/env python3
 import os
 import sys
+from pathlib import Path
+
+# Auto-switch into project virtual environment if executed with system python
+PROJECT_ROOT = Path(__file__).resolve().parent
+_venv_dir = PROJECT_ROOT / "venv"
+_venv_python = _venv_dir / "bin" / "python3"
+if _venv_python.exists() and sys.prefix != str(_venv_dir):
+    if os.environ.get("_AUTOREEL_VENV_ACTIVE") != "1":
+        os.environ["_AUTOREEL_VENV_ACTIVE"] = "1"
+        try:
+            os.execv(str(_venv_python), [str(_venv_python)] + sys.argv)
+        except Exception:
+            pass
+
 import json
 import random
 import shutil
 import time
 import asyncio
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
-from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 # Ensure project root is in sys.path
-PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.config import OUTPUT_DIR, CACHE_DIR, VOICES

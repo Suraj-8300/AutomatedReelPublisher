@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
 import sys
+import os
+from pathlib import Path
+
+# Auto-switch into project virtual environment if executed with system python
+PROJECT_ROOT = Path(__file__).resolve().parent
+_venv_dir = PROJECT_ROOT / "venv"
+_venv_python = _venv_dir / "bin" / "python3"
+if _venv_python.exists() and sys.prefix != str(_venv_dir):
+    if os.environ.get("_AUTOREEL_VENV_ACTIVE") != "1":
+        os.environ["_AUTOREEL_VENV_ACTIVE"] = "1"
+        try:
+            os.execv(str(_venv_python), [str(_venv_python)] + sys.argv)
+        except Exception:
+            pass
+
 import argparse
 import asyncio
 import time
-from pathlib import Path
 from typing import Optional, Dict, Any, Tuple
 
 # Add project root to sys.path
-PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.config import VOICES, DEFAULT_VOICE, OUTPUT_DIR

@@ -10,12 +10,24 @@ Modular Architecture:
 
 import sys
 import os
-import argparse
-import asyncio
 from pathlib import Path
 
-# Add project root to sys.path
+# Auto-switch into project virtual environment if executed with system python
 PROJECT_ROOT = Path(__file__).resolve().parent
+_venv_dir = PROJECT_ROOT / "venv"
+_venv_python = _venv_dir / "bin" / "python3"
+if _venv_python.exists() and sys.prefix != str(_venv_dir):
+    if os.environ.get("_AUTOREEL_VENV_ACTIVE") != "1":
+        os.environ["_AUTOREEL_VENV_ACTIVE"] = "1"
+        try:
+            os.execv(str(_venv_python), [str(_venv_python)] + sys.argv)
+        except Exception:
+            pass
+
+import argparse
+import asyncio
+
+# Add project root to sys.path
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from idea_generation import IdeaQueueManager, IdeaResearchEngine, FeedbackLearner

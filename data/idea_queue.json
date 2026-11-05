@@ -1,38 +1,5 @@
 [
   {
-    "id": "c2496a508246",
-    "title": "The Unbreakable Roman Concrete That Heals Itself",
-    "genre": "ancient_mysteries",
-    "hook": "Roman concrete structures have stood in corrosive sea water for 2,000 years — and get STRONGER over time.",
-    "script": "Roman concrete structures have stood in corrosive ocean water for two thousand years and get stronger over time. Scientists discovered white lime clasts inside the mortar that dissolve in rainwater and chemically seal microcracks shut. Ancient engineers created an indestructible material that modern builders are still scrambling to duplicate.",
-    "scenes": [
-      {
-        "text": "Roman concrete structures have stood in corrosive ocean water for two thousand years and get stronger over time.",
-        "visual_prompt": "Majestic ancient Roman sea harbor and aqueduct battling crashing ocean waves under sunset skies, standing completely intact, cinematic 8k photography, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Scientists discovered white lime clasts inside the mortar that dissolve in rainwater and chemically seal microcracks shut.",
-        "visual_prompt": "Macro 3D visual of concrete crack naturally sealing itself with glowing crystalline calcium carbonate minerals in real-time, high scientific detail, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "Ancient engineers created an indestructible material that modern builders are still scrambling to duplicate.",
-        "visual_prompt": "The magnificent Roman Pantheon dome with sunbeam shining through oculus onto ancient self-healing marble concrete floor, awe-inspiring architectural masterpiece, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "Modern concrete decays in 50 years. MIT researchers found Romans mixed quicklime at high temperatures, creating lime clasts. When cracks form and rainwater enters, the lime clasts dissolve and recrystallize as calcium carbonate, self-healing the fracture.",
-    "payoff": "Ancient Roman engineering literally invented self-healing nanostructured construction.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-GuyNeural",
-    "suggested_music": "curiosity_lofi",
-    "caption_style": "cinematic",
-    "duration": 15,
-    "created_at": 1793906956.9959056,
-    "status": "ready"
-  },
-  {
     "id": "9f31a1f3f978",
     "title": "The Cold Plasma Fire That Doesn't Burn Skin",
     "genre": "science_paradoxes",
