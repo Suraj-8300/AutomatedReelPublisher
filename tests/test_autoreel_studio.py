@@ -265,19 +265,19 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
             test_old_file.unlink(missing_ok=True)
 
     def test_universe_manager_episodic_continuity(self):
-        """Verifies the 2026 Persistent Character Universe & 3-Act Narrative Architecture."""
+        """Verifies the Technical & Scientific Knowledge Hub & 3-Act Narrative Architecture."""
         from core.universe_manager import UniverseManager, UNIVERSES
 
-        # 1. Universes existence
+        # 1. Domains existence
         universes = UniverseManager.get_all_universes()
-        self.assertIn("mochi_and_friends", universes)
-        self.assertIn("baby_boss_ventures", universes)
-        self.assertIn("emotional_animal_sagas", universes)
-        self.assertIn("fictional_pov", universes)
-        self.assertIn("visual_asmr_satisfaction", universes)
+        self.assertIn("system_design", universes)
+        self.assertIn("computer_engineering", universes)
+        self.assertIn("study_shorts", universes)
+        self.assertIn("science_paradoxes", universes)
+        self.assertIn("ancient_mysteries", universes)
 
         # 2. Generate episode and verify 3-act structure
-        ep = UniverseManager.generate_next_episode(universe_id="mochi_and_friends")
+        ep = UniverseManager.generate_next_episode(universe_id="system_design")
         self.assertIn("title", ep)
         self.assertIn("hook", ep)
         self.assertIn("script", ep)
@@ -288,11 +288,11 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
         self.assertIn("act2_escalation", ep["narrative_structure"])
         self.assertIn("act3_payoff", ep["narrative_structure"])
 
-        # 3. Switching active universe
-        success = UniverseManager.set_active_universe("baby_boss_ventures")
+        # 3. Switching active domain
+        success = UniverseManager.set_active_universe("computer_engineering")
         self.assertTrue(success)
         active_info = UniverseManager.get_active_universe_info()
-        self.assertEqual(active_info["universe_id"], "baby_boss_ventures")
+        self.assertEqual(active_info["universe_id"], "computer_engineering")
 
         # Revert back
         UniverseManager.set_active_universe("mochi_and_friends")

@@ -1,46 +1,49 @@
 [
   {
-    "id": "pub_5d84d40284",
-    "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E01)",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Through_Alternate_Eyes_POV_fictio.mp4",
-    "filename": "cdn_Through_Alternate_Eyes_POV_fictio.mp4",
+    "id": "pub_c79ea0c7fd",
+    "title": "Stack vs Heap Memory: The Real Cause of StackOverflow",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Stack_vs_Heap_Memory_The_R_ffbd21.mp4",
+    "filename": "cdn_Stack_vs_Heap_Memory_The_R_ffbd21.mp4",
     "platforms": [
       "instagram",
       "youtube"
     ],
     "status": "scheduled",
-    "created_at": "2026-11-05T21:30:32.311206+00:00",
-    "scheduled_time": "2026-11-05T21:40:32.311206+00:00",
+    "created_at": "2026-11-05T22:33:22.569556+00:00",
+    "scheduled_time": "2026-11-06T03:33:22.569556+00:00",
     "published_at": null,
     "instagram_meta": {
-      "caption": "POV: It is midnight in 2099, and your radio antenna just picked up a broadcast from 1944.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n.\n.\n#pov #cinematic #scifi #timetravel #alternatehistory #cyberpunk #reels #explore #trending #instareels #fyp",
+      "caption": "Why does infinite recursion cause a StackOverflow, but memory leaks happen on the Heap?\n\nThe Stack is ultra-fast, contiguous LIFO memory managed automatically by the CPU stack pointer for local variables and return addresses. The Heap is dynamic, fragmented memory allocated at runtime via malloc. When deep recursion exceeds stack bounds, the stack pointer collides with protected memory.\n\nUse tail-call optimization or iterative loops with heap data structures to process deep recursive trees safely.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#viral #trending #characteruniverse #reels #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
       "hashtags": [
-        "#pov",
-        "#cinematic",
-        "#scifi",
-        "#timetravel",
-        "#alternatehistory",
-        "#cyberpunk",
+        "#viral",
+        "#trending",
+        "#characteruniverse",
+        "#reels",
         "#reels",
         "#explore",
         "#trending",
         "#instareels",
-        "#fyp"
+        "#fyp",
+        "#aigenerated",
+        "#alteredcontent",
+        "#syntheticmedia"
       ],
-      "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E01)"
+      "title": "Stack vs Heap Memory: The Real Cause of StackOverflow"
     },
     "youtube_meta": {
-      "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E01) #Shorts",
-      "description": "POV: It is midnight in 2099, and your radio antenna just picked up a broadcast from 1944.\n\n\n\n\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n#Shorts #Viral #Facts #Fictionalpov #Curiosity #Trending",
+      "title": "Stack vs Heap Memory: The Real Cause of StackOverflow #Shorts",
+      "description": "Why does infinite recursion cause a StackOverflow, but memory leaks happen on the Heap?\n\nThe Stack is ultra-fast, contiguous LIFO memory managed automatically by the CPU stack pointer for local variables and return addresses. The Heap is dynamic, fragmented memory allocated at runtime via malloc. When deep recursion exceeds stack bounds, the stack pointer collides with protected memory.\n\nUse tail-call optimization or iterative loops with heap data structures to process deep recursive trees safely.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Studyshorts #Curiosity #Trending #AlteredContent #SyntheticMedia",
       "tags": [
         "Shorts",
         "YouTubeShorts",
-        "POV",
-        "AlternateHistory",
-        "Cyberpunk",
-        "SciFi",
+        "Viral",
+        "Trending",
+        "Storytelling",
         "Cinematic",
-        "TimeTravel"
+        "AlteredContent",
+        "SyntheticMedia",
+        "AIGenerated",
+        "AICharacter"
       ],
       "category_id": "24",
       "privacy_status": "public"
@@ -49,49 +52,278 @@
     "errors": {}
   },
   {
-    "id": "pub_d08ca80ff1",
-    "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E02)",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Through_Alternate_Eyes_POV_fictio.mp4",
-    "filename": "cdn_Through_Alternate_Eyes_POV_fictio.mp4",
+    "id": "pub_f0617397e3",
+    "title": "The Quantum Eraser That Rewrites The Past",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Quantum_Eraser_That_Re_990705.mp4",
+    "filename": "cdn_The_Quantum_Eraser_That_Re_990705.mp4",
     "platforms": [
       "instagram",
       "youtube"
     ],
     "status": "scheduled",
-    "created_at": "2026-11-05T21:44:24.105437+00:00",
-    "scheduled_time": "2026-11-06T02:44:24.105437+00:00",
+    "created_at": "2026-11-05T22:33:52.987948+00:00",
+    "scheduled_time": "2026-11-06T08:33:22.569556+00:00",
     "published_at": null,
     "instagram_meta": {
-      "caption": "POV: It is midnight in 2099, and your radio antenna just picked up a broadcast from 1944.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n.\n.\n#pov #cinematic #scifi #timetravel #alternatehistory #cyberpunk #reels #explore #trending #instareels #fyp",
+      "caption": "Physicists built an experiment that proves a photon's past can be changed after it already landed.\n\nIn the Delayed Choice Quantum Eraser experiment, particles act as waves when paths are unknown, but collapse into solid particles if measurement info is preserved — even if that measurement happens AFTER the particle hits the sensor.\n\nAt the quantum scale, time is not a one-way street — the future literally decides what the past did.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#science #physics #mindblown #didyouknow #cosmos #scientificfacts #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
       "hashtags": [
-        "#pov",
-        "#cinematic",
-        "#scifi",
-        "#timetravel",
-        "#alternatehistory",
-        "#cyberpunk",
+        "#science",
+        "#physics",
+        "#mindblown",
+        "#didyouknow",
+        "#cosmos",
+        "#scientificfacts",
         "#reels",
         "#explore",
         "#trending",
         "#instareels",
-        "#fyp"
+        "#fyp",
+        "#aigenerated",
+        "#alteredcontent",
+        "#syntheticmedia"
       ],
-      "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E02)"
+      "title": "The Quantum Eraser That Rewrites The Past"
     },
     "youtube_meta": {
-      "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E02) #Shorts",
-      "description": "POV: It is midnight in 2099, and your radio antenna just picked up a broadcast from 1944.\n\n\n\n\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n#Shorts #Viral #Facts #Fictionalpov #Curiosity #Trending",
+      "title": "The Quantum Eraser That Rewrites The Past #Shorts",
+      "description": "Physicists built an experiment that proves a photon's past can be changed after it already landed.\n\nIn the Delayed Choice Quantum Eraser experiment, particles act as waves when paths are unknown, but collapse into solid particles if measurement info is preserved — even if that measurement happens AFTER the particle hits the sensor.\n\nAt the quantum scale, time is not a one-way street — the future literally decides what the past did.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Scienceparadoxes #Curiosity #Trending #AlteredContent #SyntheticMedia",
       "tags": [
         "Shorts",
         "YouTubeShorts",
-        "POV",
-        "AlternateHistory",
-        "Cyberpunk",
-        "SciFi",
-        "Cinematic",
-        "TimeTravel"
+        "ScienceFacts",
+        "Physics",
+        "Cosmos",
+        "MindBlowing",
+        "ScientificFacts",
+        "AlteredContent",
+        "SyntheticMedia",
+        "AIGenerated",
+        "AICharacter"
       ],
-      "category_id": "24",
+      "category_id": "28",
+      "privacy_status": "public"
+    },
+    "receipts": {},
+    "errors": {}
+  },
+  {
+    "id": "pub_1b02583f9a",
+    "title": "The Boötes Void: The 330 Million Light-Year Abyss",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Botes_Void_The_330_Mil_b37fde.mp4",
+    "filename": "cdn_The_Botes_Void_The_330_Mil_b37fde.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "status": "scheduled",
+    "created_at": "2026-11-05T22:34:17.305962+00:00",
+    "scheduled_time": "2026-11-06T13:33:22.569556+00:00",
+    "published_at": null,
+    "instagram_meta": {
+      "caption": "There is an empty sphere in the cosmos 330 million light-years across that should contain 10,000 galaxies — but contains almost nothing.\n\nDiscovered in 1981, the Boötes Supervoid is so massive that if the Milky Way were at its center, humanity wouldn't have discovered other galaxies until the 1960s with radio telescopes. Astronomers believe smaller cosmic voids merged like soap bubbles.\n\nIt remains the largest supervoid in the observable universe, a silent reminder of how vast and empty reality truly is.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#science #physics #mindblown #didyouknow #cosmos #scientificfacts #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "hashtags": [
+        "#science",
+        "#physics",
+        "#mindblown",
+        "#didyouknow",
+        "#cosmos",
+        "#scientificfacts",
+        "#reels",
+        "#explore",
+        "#trending",
+        "#instareels",
+        "#fyp",
+        "#aigenerated",
+        "#alteredcontent",
+        "#syntheticmedia"
+      ],
+      "title": "The Boötes Void: The 330 Million Light-Year Abyss"
+    },
+    "youtube_meta": {
+      "title": "The Boötes Void: The 330 Million Light-Year Abyss #Shorts",
+      "description": "There is an empty sphere in the cosmos 330 million light-years across that should contain 10,000 galaxies — but contains almost nothing.\n\nDiscovered in 1981, the Boötes Supervoid is so massive that if the Milky Way were at its center, humanity wouldn't have discovered other galaxies until the 1960s with radio telescopes. Astronomers believe smaller cosmic voids merged like soap bubbles.\n\nIt remains the largest supervoid in the observable universe, a silent reminder of how vast and empty reality truly is.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Scienceparadoxes #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "tags": [
+        "Shorts",
+        "YouTubeShorts",
+        "ScienceFacts",
+        "Physics",
+        "Cosmos",
+        "MindBlowing",
+        "ScientificFacts",
+        "AlteredContent",
+        "SyntheticMedia",
+        "AIGenerated",
+        "AICharacter"
+      ],
+      "category_id": "28",
+      "privacy_status": "public"
+    },
+    "receipts": {},
+    "errors": {}
+  },
+  {
+    "id": "pub_f625dbff9c",
+    "title": "The Ocean Floating 400 Miles Under Earth's Crust",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Ocean_Floating_400_Mil_ec4e24.mp4",
+    "filename": "cdn_The_Ocean_Floating_400_Mil_ec4e24.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "status": "scheduled",
+    "created_at": "2026-11-05T22:34:39.806225+00:00",
+    "scheduled_time": "2026-11-06T18:33:22.569556+00:00",
+    "published_at": null,
+    "instagram_meta": {
+      "caption": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined.\n\n400 miles beneath North America, seismic data revealed water trapped inside a rare blue mineral called ringwoodite. It doesn't slosh around as liquid; it exists as hydroxide ions locked within the crystal lattice under 1,000 degrees heat and 200,000 atmospheres of pressure.\n\nThis discovery proves Earth's surface oceans didn't arrive via comets — they literally seeped out from inside our own mantle.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#science #physics #mindblown #didyouknow #cosmos #scientificfacts #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "hashtags": [
+        "#science",
+        "#physics",
+        "#mindblown",
+        "#didyouknow",
+        "#cosmos",
+        "#scientificfacts",
+        "#reels",
+        "#explore",
+        "#trending",
+        "#instareels",
+        "#fyp",
+        "#aigenerated",
+        "#alteredcontent",
+        "#syntheticmedia"
+      ],
+      "title": "The Ocean Floating 400 Miles Under Earth's Crust"
+    },
+    "youtube_meta": {
+      "title": "The Ocean Floating 400 Miles Under Earth's Crust #Shorts",
+      "description": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined.\n\n400 miles beneath North America, seismic data revealed water trapped inside a rare blue mineral called ringwoodite. It doesn't slosh around as liquid; it exists as hydroxide ions locked within the crystal lattice under 1,000 degrees heat and 200,000 atmospheres of pressure.\n\nThis discovery proves Earth's surface oceans didn't arrive via comets — they literally seeped out from inside our own mantle.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Scienceparadoxes #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "tags": [
+        "Shorts",
+        "YouTubeShorts",
+        "ScienceFacts",
+        "Physics",
+        "Cosmos",
+        "MindBlowing",
+        "ScientificFacts",
+        "AlteredContent",
+        "SyntheticMedia",
+        "AIGenerated",
+        "AICharacter"
+      ],
+      "category_id": "28",
+      "privacy_status": "public"
+    },
+    "receipts": {},
+    "errors": {}
+  },
+  {
+    "id": "pub_ff9e167f0f",
+    "title": "CPU Branch Prediction: Why Sorted Data Runs 6x Faster",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_CPU_Branch_Prediction_Why__fdff0f.mp4",
+    "filename": "cdn_CPU_Branch_Prediction_Why__fdff0f.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "status": "scheduled",
+    "created_at": "2026-11-05T22:35:08.290113+00:00",
+    "scheduled_time": "2026-11-06T23:33:22.569556+00:00",
+    "published_at": null,
+    "instagram_meta": {
+      "caption": "Your CPU runs faster when your data is sorted — and the reason is an invisible crystal ball inside the silicon.\n\nModern CPU pipelines are 15 to 20 stages deep. When code reaches an if statement, waiting for the memory lookup wastes 20 clock cycles. The Branch Predictor uses history tables to guess the outcome. If correct, execution flows seamlessly at 4 billion instructions per second.\n\nSorting an array makes an unsorted loop run six times faster, purely by feeding the CPU predictor clean patterns.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#computerengineering #hardware #silicon #cpu #microprocessor #lowlevel #assembly #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "hashtags": [
+        "#computerengineering",
+        "#hardware",
+        "#silicon",
+        "#cpu",
+        "#microprocessor",
+        "#lowlevel",
+        "#assembly",
+        "#reels",
+        "#explore",
+        "#trending",
+        "#instareels",
+        "#fyp",
+        "#aigenerated",
+        "#alteredcontent",
+        "#syntheticmedia"
+      ],
+      "title": "CPU Branch Prediction: Why Sorted Data Runs 6x Faster"
+    },
+    "youtube_meta": {
+      "title": "CPU Branch Prediction: Why Sorted Data Runs 6x Faster #Shorts",
+      "description": "Your CPU runs faster when your data is sorted — and the reason is an invisible crystal ball inside the silicon.\n\nModern CPU pipelines are 15 to 20 stages deep. When code reaches an if statement, waiting for the memory lookup wastes 20 clock cycles. The Branch Predictor uses history tables to guess the outcome. If correct, execution flows seamlessly at 4 billion instructions per second.\n\nSorting an array makes an unsorted loop run six times faster, purely by feeding the CPU predictor clean patterns.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Computerengineering #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "tags": [
+        "Shorts",
+        "YouTubeShorts",
+        "ComputerEngineering",
+        "Hardware",
+        "CPU",
+        "Microprocessor",
+        "Assembly",
+        "LowLevel",
+        "Silicon",
+        "AlteredContent",
+        "SyntheticMedia",
+        "AIGenerated",
+        "AICharacter"
+      ],
+      "category_id": "28",
+      "privacy_status": "public"
+    },
+    "receipts": {},
+    "errors": {}
+  },
+  {
+    "id": "pub_39d5f2413d",
+    "title": "Why Roman Concrete Gets Stronger Over 2,000 Years",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Why_Roman_Concrete_Gets_St_018143.mp4",
+    "filename": "cdn_Why_Roman_Concrete_Gets_St_018143.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "status": "scheduled",
+    "created_at": "2026-11-05T22:35:55.152030+00:00",
+    "scheduled_time": "2026-11-07T04:33:22.569556+00:00",
+    "published_at": null,
+    "instagram_meta": {
+      "caption": "Ancient Roman harbors have been battered by ocean waves for 2,000 years — and they are harder today than when they were built.\n\nMIT geologists discovered Romans mixed quicklime at extreme temperatures, leaving microscopic lime clasts. When seawater cracks the concrete, it dissolves the lime, precipitating calcium carbonate that literally heals the cracks in real time.\n\nModern concrete crumbles in 50 years, but ancient Roman chemistry engineered self-healing stone that outlives empires.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#ancienthistory #archaeology #mysteries #ancientcivilization #historyfacts #engineering #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "hashtags": [
+        "#ancienthistory",
+        "#archaeology",
+        "#mysteries",
+        "#ancientcivilization",
+        "#historyfacts",
+        "#engineering",
+        "#reels",
+        "#explore",
+        "#trending",
+        "#instareels",
+        "#fyp",
+        "#aigenerated",
+        "#alteredcontent",
+        "#syntheticmedia"
+      ],
+      "title": "Why Roman Concrete Gets Stronger Over 2,000 Years"
+    },
+    "youtube_meta": {
+      "title": "Why Roman Concrete Gets Stronger Over 2,000 Years #Shorts",
+      "description": "Ancient Roman harbors have been battered by ocean waves for 2,000 years — and they are harder today than when they were built.\n\nMIT geologists discovered Romans mixed quicklime at extreme temperatures, leaving microscopic lime clasts. When seawater cracks the concrete, it dissolves the lime, precipitating calcium carbonate that literally heals the cracks in real time.\n\nModern concrete crumbles in 50 years, but ancient Roman chemistry engineered self-healing stone that outlives empires.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Ancientmysteries #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "tags": [
+        "Shorts",
+        "YouTubeShorts",
+        "AncientTech",
+        "History",
+        "Archaeology",
+        "EngineeringMarvels",
+        "Antikythera",
+        "AlteredContent",
+        "SyntheticMedia",
+        "AIGenerated",
+        "AICharacter"
+      ],
+      "category_id": "27",
       "privacy_status": "public"
     },
     "receipts": {},

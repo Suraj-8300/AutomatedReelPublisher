@@ -1337,14 +1337,14 @@ def start_continuous_producer_thread():
                     # 6. Metadata packaging
                     ig_meta = MetadataPackager.package_for_instagram(
                         title=idea.get("title", ""),
-                        genre=idea.get("genre", "animal_universe"),
+                        genre=idea.get("genre", "system_design"),
                         hook=idea.get("hook", ""),
                         facts=idea.get("facts", ""),
                         payoff=idea.get("payoff", "")
                     )
                     yt_meta = MetadataPackager.package_for_youtube(
                         title=idea.get("title", ""),
-                        genre=idea.get("genre", "animal_universe"),
+                        genre=idea.get("genre", "system_design"),
                         hook=idea.get("hook", ""),
                         facts=idea.get("facts", ""),
                         payoff=idea.get("payoff", "")

@@ -22,15 +22,11 @@ class MetadataPackager:
         Creates an Instagram-optimized caption with narrative spacing, emojis, and hashtags.
         """
         genre_tags = {
-            "animal_universe": ["#cuteanimals", "#catlover", "#funnyanimals", "#mochiandco", "#animalcomedy", "#petlife"],
-            "baby_comedy": ["#babycomedy", "#corporatehumor", "#relatable", "#babiesoftiktok", "#satire", "#funnypodcast"],
-            "emotional_animal": ["#animalrescue", "#doglovers", "#heartwarming", "#kindness", "#loyalty", "#rescuedog"],
-            "fictional_pov": ["#pov", "#cinematic", "#scifi", "#timetravel", "#alternatehistory", "#cyberpunk"],
-            "asmr_satisfying": ["#asmr", "#satisfying", "#satisfyingvideos", "#loop", "#relaxing", "#kineticart"],
-            "science_paradoxes": ["#science", "#physics", "#mindblown", "#didyouknow", "#cosmos"],
-            "dark_psychology": ["#psychology", "#humanmind", "#brainfacts", "#psychologyfacts", "#mindset"],
-            "ancient_mysteries": ["#ancienthistory", "#archaeology", "#mysteries", "#ancientcivilization", "#historyfacts"],
-            "nature_and_animals": ["#wildlife", "#naturelovers", "#animals", "#oceanlife", "#earth"],
+            "system_design": ["#systemdesign", "#softwareengineering", "#distributedsystems", "#coding", "#backend", "#kafka", "#redis", "#softwaredevelopment"],
+            "computer_engineering": ["#computerengineering", "#hardware", "#silicon", "#cpu", "#microprocessor", "#lowlevel", "#assembly"],
+            "study_shorts": ["#computerscience", "#algorithms", "#codinginterview", "#bigo", "#programming", "#softwaredeveloper", "#csstudents"],
+            "science_paradoxes": ["#science", "#physics", "#mindblown", "#didyouknow", "#cosmos", "#scientificfacts"],
+            "ancient_mysteries": ["#ancienthistory", "#archaeology", "#mysteries", "#ancientcivilization", "#historyfacts", "#engineering"],
             "deep_tech": ["#technology", "#futuretech", "#ai", "#innovation", "#quantum"],
             "ocean_and_cosmos": ["#space", "#universe", "#astronomy", "#deepsea", "#ocean"]
         }
@@ -82,26 +78,23 @@ class MetadataPackager:
             yt_title = clean_title[:100]
 
         category_map = {
-            "animal_universe": "15",    # Pets & Animals
-            "baby_comedy": "23",        # Comedy
-            "emotional_animal": "15",   # Pets & Animals
-            "fictional_pov": "24",      # Entertainment
-            "asmr_satisfying": "24",    # Entertainment
-            "science_paradoxes": "28",  # Science & Tech
+            "system_design": "28",        # Science & Technology
+            "computer_engineering": "28", # Science & Technology
+            "study_shorts": "27",         # Education
+            "science_paradoxes": "28",    # Science & Tech
+            "ancient_mysteries": "27",    # Education / History
             "deep_tech": "28",
-            "dark_psychology": "27",    # Education
-            "ancient_mysteries": "24",  # Entertainment
-            "nature_and_animals": "15", # Pets & Animals
+            "dark_psychology": "27",
             "ocean_and_cosmos": "28"
         }
-        category_id = category_map.get(genre, "24")
+        category_id = category_map.get(genre, "28")
 
         tags_map = {
-            "animal_universe": ["Shorts", "YouTubeShorts", "CuteAnimals", "CatLover", "FunnyCats", "MochiAndCo", "AnimalMemes", "DogLover", "Trending"],
-            "baby_comedy": ["Shorts", "YouTubeShorts", "BabyComedy", "BoardroomBaby", "FunnyBabies", "WorkplaceHumor", "Satire", "Relatable", "Trending"],
-            "emotional_animal": ["Shorts", "YouTubeShorts", "AnimalRescue", "DogLoyalty", "Heartwarming", "HeroDog", "PetStories", "EmotionalShorts"],
-            "fictional_pov": ["Shorts", "YouTubeShorts", "POV", "AlternateHistory", "Cyberpunk", "SciFi", "Cinematic", "TimeTravel"],
-            "asmr_satisfying": ["Shorts", "YouTubeShorts", "ASMR", "OddlySatisfying", "Satisfying", "KineticSand", "GlassArt", "RelaxingShorts"]
+            "system_design": ["Shorts", "YouTubeShorts", "SystemDesign", "SoftwareEngineering", "DistributedSystems", "Kafka", "Backend", "Coding", "CloudArchitecture"],
+            "computer_engineering": ["Shorts", "YouTubeShorts", "ComputerEngineering", "Hardware", "CPU", "Microprocessor", "Assembly", "LowLevel", "Silicon"],
+            "study_shorts": ["Shorts", "YouTubeShorts", "ComputerScience", "BigO", "Algorithms", "CodingInterview", "DataStructures", "SoftwareEngineer"],
+            "science_paradoxes": ["Shorts", "YouTubeShorts", "ScienceFacts", "Physics", "Cosmos", "MindBlowing", "ScientificFacts"],
+            "ancient_mysteries": ["Shorts", "YouTubeShorts", "AncientTech", "History", "Archaeology", "EngineeringMarvels", "Antikythera"]
         }
         yt_tags = list(dict.fromkeys(tags_map.get(genre, [
             "Shorts",

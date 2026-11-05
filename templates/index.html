@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
-    <link rel="stylesheet" href="/static/css/style.css?v=2.9">
+    <link rel="stylesheet" href="/static/css/style.css?v=3.0">
 </head>
 <body class="md3-body">
     <div class="md3-container">
@@ -20,7 +20,7 @@
         <header class="md3-top-app-bar">
             <div class="md3-brand">
                 <div class="md3-brand-icon">
-                    <span class="material-symbols-outlined">auto_videocam</span>
+                    <span style="font-size: 22px;">🎬</span>
                 </div>
                 <div class="md3-brand-text">
                     <span class="md3-brand-title">AutoReelStudio</span>
@@ -31,25 +31,25 @@
             <!-- Connected Platform & System Status Chips -->
             <div class="md3-channel-chips">
                 <div class="md3-chip md3-chip-power" id="chipLidProtection" title="Continuous video creation even when laptop closed (Lid-close sleep inhibited)">
-                    <span class="material-symbols-outlined chip-icon">laptop_chromebook</span>
+                    <span style="font-size: 14px;">💻</span>
                     <span class="chip-text">Lid-Close Protected</span>
                     <span class="chip-status-dot online"></span>
                 </div>
 
                 <div class="md3-chip md3-chip-compliance" id="chipAlteredContent" title="YouTube Altered/Synthetic Content Label declared on all uploads. Complies with YPP reused content & safety policies.">
-                    <span class="material-symbols-outlined chip-icon">verified_user</span>
+                    <span style="font-size: 14px;">🛡️</span>
                     <span class="chip-text">AI Altered Labeled</span>
                     <span class="chip-status-dot online"></span>
                 </div>
 
                 <div class="md3-chip md3-chip-ig" id="chipInstagram" title="Meta Instagram Graph API">
-                    <span class="material-symbols-outlined chip-icon">photo_camera</span>
+                    <span style="font-size: 14px;">📸</span>
                     <span class="chip-text" id="igHandle">@sun_27417</span>
                     <span class="chip-status-dot offline" id="igStatusDot"></span>
                 </div>
 
                 <div class="md3-chip md3-chip-yt" id="chipYouTube" title="YouTube Data API v3 Channel">
-                    <span class="material-symbols-outlined chip-icon">smart_display</span>
+                    <span style="font-size: 14px;">▶️</span>
                     <span class="chip-text" id="ytHandle">EGO X</span>
                     <span class="chip-status-dot online" id="ytStatusDot"></span>
                 </div>
@@ -73,7 +73,7 @@
                     <!-- Dynamic Manual Override Alert Banner (Shown when 1-Click Publish was triggered) -->
                     <div class="md3-hero-alert" id="overrideAlertBanner" style="display: none;">
                         <div class="md3-hero-alert-left">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: #f59e0b;">pause_circle</span>
+                            <span style="font-size: 18px; color: #f59e0b;">⏸️</span>
                             <span id="overrideAlertText">Auto-publish stopped for today. Manual override active: 5 pushes remaining.</span>
                         </div>
                         <button class="md3-btn-text-sm" id="btnResumeAuto" onclick="triggerResumeAuto()" title="Re-enable background 5-hour auto-publishing for today">
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="md3-hero-timer-box">
-                        <span class="material-symbols-outlined timer-icon">schedule</span>
+                        <span style="font-size: 16px;">⏰</span>
                         <span class="timer-label">Next 5-Hour Scheduled Drop:</span>
                         <span class="timer-value" id="nextDropCountdown">Calculating...</span>
                     </div>
@@ -91,7 +91,7 @@
                 <!-- 1-Click Action Buttons -->
                 <div class="md3-hero-actions">
                     <button class="md3-btn-hero" id="btnPublishNowHero" onclick="triggerPublishNow()" title="Instantly publish the next reel to Instagram and YouTube right now (from pre-rendered buffer)">
-                        <span class="material-symbols-outlined btn-icon">bolt</span>
+                        <span style="font-size: 18px;">⚡</span>
                         <div>
                             <span class="btn-label" id="btnPublishLabel">Publish Next Reel Now</span>
                             <span class="btn-sublabel" id="btnPublishQuota">Instant 1-Click Drop</span>
@@ -99,7 +99,7 @@
                     </button>
 
                     <button class="md3-btn-tonal" id="btnStageNextHero" onclick="triggerStageNext()" title="Queue an upcoming reel into the schedule">
-                        <span class="material-symbols-outlined btn-icon">add_circle</span>
+                        <span style="font-size: 18px;">➕</span>
                         <span class="btn-label">Stage Next Reel</span>
                     </button>
                 </div>
@@ -112,7 +112,7 @@
             <div class="md3-card md3-stat-card">
                 <div class="stat-header">
                     <span class="stat-title">Daily Distribution Target</span>
-                    <span class="material-symbols-outlined stat-icon">track_changes</span>
+                    <span style="font-size: 16px;">🎯</span>
                 </div>
                 <div class="stat-number-row">
                     <span class="stat-big-number" id="quotaPublishedNumber">0</span>
@@ -131,7 +131,7 @@
             <div class="md3-card md3-stat-card">
                 <div class="stat-header">
                     <span class="stat-title">Ready In Queue</span>
-                    <span class="material-symbols-outlined stat-icon">pending_actions</span>
+                    <span style="font-size: 16px;">⏳</span>
                 </div>
                 <div class="stat-number-row">
                     <span class="stat-big-number" id="queueScheduledNumber">0</span>
@@ -147,7 +147,7 @@
             <div class="md3-card md3-stat-card">
                 <div class="stat-header">
                     <span class="stat-title">AI Creative Buffer</span>
-                    <span class="material-symbols-outlined stat-icon">lightbulb</span>
+                    <span style="font-size: 16px;">💡</span>
                 </div>
                 <div class="stat-number-row">
                     <span class="stat-big-number" id="ideaBufferNumber">13</span>
@@ -163,64 +163,64 @@
         <!-- Main Workspace Flow -->
         <main class="md3-main-flow">
 
-            <!-- 2026 Persistent Character Universe & Recurring Cast Engine -->
+            <!-- Technical & Scientific Knowledge Hub Engine -->
             <section class="md3-card md3-universe-card">
                 <div class="universe-header">
                     <div class="universe-title-group">
                         <div class="section-icon-container accent-purple">
-                            <span class="material-symbols-outlined">movie</span>
+                            <span class="material-symbols-outlined">terminal</span>
                         </div>
                         <div>
                             <div class="universe-badge-row">
-                                <span class="md3-tonal-badge badge-universe" id="universeCategoryBadge">Recurring Character Universe</span>
-                                <span class="universe-episode-pill" id="universeEpisodePill">Season 1 · Episode 1</span>
-                                <span class="universe-act-pill">3-Act Viral Arc: Hook ➔ Escalation ➔ Payoff</span>
+                                <span class="md3-tonal-badge badge-universe" id="universeCategoryBadge">Distributed Systems</span>
+                                <span class="universe-episode-pill" id="universeEpisodePill">Module 1 · Topic 1</span>
+                                <span class="universe-act-pill">3-Act Viral Arc: Hook ➔ Schematic Breakdown ➔ Engineering Payoff</span>
                             </div>
-                            <h2 class="universe-title" id="universeTitle">Mochi & Co. (The Bistro Universe)</h2>
-                            <p class="universe-description" id="universeDescription">A bustling miniature cafe run by a mischievous orange cat and his unlikely animal crew.</p>
+                            <h2 class="universe-title" id="universeTitle">System Design & Distributed Systems</h2>
+                            <p class="universe-description" id="universeDescription">High-throughput architecture breakdowns: Kafka Zero-Copy, Consistent Hashing, Redis epoll event loop, Bloom filters, and Sharding.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Universe Switcher Pills -->
+                <!-- Domain Switcher Pills -->
                 <div class="universe-selector-tabs" id="universeTabs">
-                    <button class="universe-tab active" onclick="selectUniverse('mochi_and_friends')">🐾 Mochi & Co. (Animal Comedy)</button>
-                    <button class="universe-tab" onclick="selectUniverse('baby_boss_ventures')">💼 Baby Boss (Satire)</button>
-                    <button class="universe-tab" onclick="selectUniverse('emotional_animal_sagas')">❤️ Paws of Hope (Rescue)</button>
-                    <button class="universe-tab" onclick="selectUniverse('fictional_pov')">🌌 Fictional POV (Alternate Reality)</button>
-                    <button class="universe-tab" onclick="selectUniverse('visual_asmr_satisfaction')">✨ Impossible Textures (ASMR)</button>
+                    <button class="universe-tab active" onclick="selectUniverse('system_design')">⚡ System Design & Distributed</button>
+                    <button class="universe-tab" onclick="selectUniverse('computer_engineering')">💻 Computer Engineering & Silicon</button>
+                    <button class="universe-tab" onclick="selectUniverse('study_shorts')">📚 CS Study Shorts & Algorithms</button>
+                    <button class="universe-tab" onclick="selectUniverse('science_paradoxes')">🔬 Science & Cosmos Paradoxes</button>
+                    <button class="universe-tab" onclick="selectUniverse('ancient_mysteries')">🏛️ Ancient Tech & Engineering</button>
                 </div>
 
-                <!-- Recurring Cast Grid -->
+                <!-- Technical Architecture & Principle Telemetry -->
                 <div class="universe-cast-container">
-                    <div class="cast-label">Recurring Cast & Consistent Character Models:</div>
+                    <div class="cast-label">Core Architecture & Principles Telemetry:</div>
                     <div class="universe-cast-chips" id="universeCastChips">
                         <div class="cast-chip">
-                            <span class="cast-emoji">🐱</span>
+                            <span class="cast-emoji">⚡</span>
                             <div class="cast-details">
-                                <span class="cast-name">Mochi</span>
-                                <span class="cast-role">Master Baker / Chaos</span>
+                                <span class="cast-name">OS PageCache</span>
+                                <span class="cast-role">Kernel Architecture</span>
                             </div>
                         </div>
                         <div class="cast-chip">
-                            <span class="cast-emoji">🐶</span>
+                            <span class="cast-emoji">🔄</span>
                             <div class="cast-details">
-                                <span class="cast-name">Barnaby</span>
-                                <span class="cast-role">Bulldog Inspector</span>
+                                <span class="cast-name">Consistent Ring</span>
+                                <span class="cast-role">Virtual Topology</span>
                             </div>
                         </div>
                         <div class="cast-chip">
-                            <span class="cast-emoji">🐾</span>
+                            <span class="cast-emoji">🚀</span>
                             <div class="cast-details">
-                                <span class="cast-name">Pip</span>
-                                <span class="cast-role">Nervous Assistant</span>
+                                <span class="cast-name">epoll Event Loop</span>
+                                <span class="cast-role">I/O Multiplexing</span>
                             </div>
                         </div>
                         <div class="cast-chip">
-                            <span class="cast-emoji">🐰</span>
+                            <span class="cast-emoji">🛡️</span>
                             <div class="cast-details">
-                                <span class="cast-name">Luna</span>
-                                <span class="cast-role">Bunny Engineer</span>
+                                <span class="cast-name">Bloom Filter</span>
+                                <span class="cast-role">Probabilistic Sets</span>
                             </div>
                         </div>
                     </div>
@@ -232,7 +232,7 @@
                 <div class="section-card-header">
                     <div class="section-card-title-group">
                         <div class="section-icon-container">
-                            <span class="material-symbols-outlined">hourglass_top</span>
+                            <span style="font-size: 20px;">⏳</span>
                         </div>
                         <div>
                             <h2 class="section-title">Ready Videos Publishing Queue</h2>
@@ -246,7 +246,7 @@
 
                 <!-- Queue Empty State -->
                 <div class="md3-empty-state" id="queueEmptyState">
-                    <span class="material-symbols-outlined empty-icon">check_circle</span>
+                    <span style="font-size: 32px;">✅</span>
                     <p class="empty-title">Queue is clear</p>
                     <p class="empty-desc">The next reel will be automatically staged by the background scheduler, or click <strong>Publish Next Reel Now</strong> above to dispatch immediately.</p>
                 </div>
@@ -260,7 +260,7 @@
                 <div class="section-card-header">
                     <div class="section-card-title-group">
                         <div class="section-icon-container accent-amber">
-                            <span class="material-symbols-outlined">stars</span>
+                            <span style="font-size: 20px;">✨</span>
                         </div>
                         <div>
                             <h2 class="section-title">Recently Published Reels</h2>
@@ -274,7 +274,7 @@
 
                 <!-- Recently Published Empty State -->
                 <div class="md3-empty-state" id="recentEmptyState" style="display: none;">
-                    <span class="material-symbols-outlined empty-icon">video_library</span>
+                    <span style="font-size: 32px;">🎬</span>
                     <p class="empty-title">No reels published yet today</p>
                     <p class="empty-desc">Reels published automatically or via 1-Click will appear here with live links.</p>
                 </div>
@@ -288,10 +288,10 @@
                 <details class="md3-details" id="manualCreatorDetails">
                     <summary class="md3-summary">
                         <div class="summary-left">
-                            <span class="material-symbols-outlined summary-icon">tune</span>
-                            <span class="summary-title">Manual Custom Reel Synthesizer (Optional)</span>
+                            <span style="font-size: 18px;">🎛️</span>
+                            <span class="summary-title" style="margin-left: 8px;">Manual Custom Reel Synthesizer (Optional)</span>
                         </div>
-                        <span class="material-symbols-outlined summary-arrow">expand_more</span>
+                        <span class="summary-arrow">▼</span>
                     </summary>
                     <div class="md3-accordion-body">
                         <p class="accordion-hint">Leave blank to let the autonomous AI research engine pick the highest-converting topic, or specify a custom theme:</p>
@@ -300,7 +300,7 @@
                                 <input type="text" id="customPromptInput" placeholder="e.g. Why deep sea creatures glow in total darkness" autocomplete="off">
                             </div>
                             <button class="md3-btn-primary" id="btnCustomGenerate" onclick="triggerCustomReel()">
-                                <span class="material-symbols-outlined">auto_fix_high</span>
+                                <span style="font-size: 16px;">🪄</span>
                                 <span>Generate & Stage</span>
                             </button>
                         </div>
@@ -328,14 +328,14 @@
             <!-- Modal Header -->
             <div class="md3-modal-header">
                 <div class="md3-modal-title-group">
-                    <span class="material-symbols-outlined modal-header-icon">smart_display</span>
+                    <span style="font-size: 20px;">🎬</span>
                     <div>
                         <h3 class="md3-modal-title" id="modalVideoTitle">Reel Video Preview</h3>
                         <div class="md3-modal-subtitle" id="modalVideoSubtitle">1080x1920 (9:16 Vertical Reel) · Paced 5-Hour Drops</div>
                     </div>
                 </div>
                 <button class="md3-btn-icon-close" onclick="closeVideoModal()" title="Close Preview (Esc)">
-                    <span class="material-symbols-outlined">close</span>
+                    <span style="font-size: 16px; font-weight: bold;">✕</span>
                 </button>
             </div>
 
@@ -349,7 +349,7 @@
                             Your browser does not support HTML5 video preview.
                         </video>
                         <div class="phone-overlay-badge" id="modalOverlayBadge">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">verified_user</span>
+                            <span style="font-size: 12px;">🛡️</span>
                             <span>AI Altered Labeled</span>
                         </div>
                     </div>
@@ -360,7 +360,7 @@
                     <div class="details-section">
                         <span class="details-label">Distribution Status & Timing</span>
                         <div class="details-value-pill" id="modalStatusPill">
-                            <span class="material-symbols-outlined" style="font-size: 16px; color: #8570ff;">schedule</span>
+                            <span style="font-size: 14px;">⏱️</span>
                             <span id="modalScheduleTime">Scheduled for next 5h drop</span>
                         </div>
                     </div>
@@ -369,15 +369,15 @@
                         <span class="details-label">Target Social Platforms</span>
                         <div class="details-chips-row">
                             <span class="md3-chip md3-chip-ig" id="modalChipIg">
-                                <span class="material-symbols-outlined chip-icon">photo_camera</span>
+                                <span style="font-size: 14px;">📸</span>
                                 <span>Instagram Reels</span>
                             </span>
                             <span class="md3-chip md3-chip-yt" id="modalChipYt">
-                                <span class="material-symbols-outlined chip-icon">smart_display</span>
+                                <span style="font-size: 14px;">▶️</span>
                                 <span>YouTube Shorts</span>
                             </span>
                             <span class="md3-chip md3-chip-compliance">
-                                <span class="material-symbols-outlined chip-icon">verified_user</span>
+                                <span style="font-size: 14px;">🛡️</span>
                                 <span>YPP & Reused Content Safe</span>
                             </span>
                         </div>
@@ -397,11 +397,11 @@
 
                     <div class="details-actions">
                         <button class="md3-btn-hero btn-modal-publish" id="modalBtnPublishNow" onclick="modalPublishCurrentReel()" title="Publish this exact reel right now to Instagram & YouTube">
-                            <span class="material-symbols-outlined">bolt</span>
+                            <span style="font-size: 16px;">⚡</span>
                             <span id="modalBtnPublishLabel">Publish Reel Now</span>
                         </button>
                         <a id="modalBtnDownload" href="#" download class="md3-btn-tonal btn-modal-download" title="Download master MP4 file">
-                            <span class="material-symbols-outlined">download</span>
+                            <span style="font-size: 16px;">⬇️</span>
                             <span>Download MP4</span>
                         </a>
                         <button class="md3-btn-text-sm" onclick="closeVideoModal()" style="color: var(--md-sys-color-on-surface-variant); cursor: pointer; border: none; background: transparent; padding: 8px 12px;">
@@ -416,6 +416,6 @@
     <!-- MD3 Floating Snackbar / Toast Container -->
     <div class="md3-snackbar-container" id="snackbarContainer"></div>
 
-    <script src="/static/js/main.js?v=2.9"></script>
+    <script src="/static/js/main.js?v=3.0"></script>
 </body>
 </html>

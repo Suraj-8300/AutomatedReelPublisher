@@ -1,196 +1,33 @@
 {
-  "active_universe": "mochi_and_friends",
+  "active_universe": "computer_engineering",
   "universe_counters": {
-    "mochi_and_friends": {
+    "system_design": {
       "season": 1,
-      "episode": 23,
+      "episode": 1,
       "history": [
         {
           "code": "S01E01",
-          "title": "Mochi & Co.: The Pancake Catastrophe (S01E01)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E02",
-          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E02)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E03",
-          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E03)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E04",
-          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E04)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E05",
-          "title": "Mochi & Co.: The Pancake Catastrophe (S01E05)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E06",
-          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E06)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E07",
-          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E07)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E08",
-          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E08)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E09",
-          "title": "Mochi & Co.: The Pancake Catastrophe (S01E09)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E10",
-          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E10)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E11",
-          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E11)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E12",
-          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E12)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E13",
-          "title": "Mochi & Co.: The Pancake Catastrophe (S01E13)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E14",
-          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E14)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E15",
-          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E15)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E16",
-          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E16)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E17",
-          "title": "Mochi & Co.: The Pancake Catastrophe (S01E17)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E18",
-          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E18)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E19",
-          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E19)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E20",
-          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E20)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E21",
-          "title": "Mochi & Co.: The Pancake Catastrophe (S01E21)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E22",
-          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E22)",
-          "category": "animal_universe"
-        },
-        {
-          "code": "S01E23",
-          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E23)",
-          "category": "animal_universe"
+          "title": "Kafka Zero-Copy: 10 Million Writes/Sec",
+          "hook": "How does Apache Kafka write 10 million messages a second without melting your CPU?"
         }
       ]
     },
-    "baby_boss_ventures": {
+    "computer_engineering": {
       "season": 1,
-      "episode": 5,
-      "history": [
-        {
-          "code": "S01E01",
-          "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E01)",
-          "category": "baby_comedy"
-        },
-        {
-          "code": "S01E02",
-          "title": "Baby Boss Syndicate: Baby Street Food Mogul: The Pani Puri Empire (S01E02)",
-          "category": "baby_comedy"
-        },
-        {
-          "code": "S01E03",
-          "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E03)",
-          "category": "baby_comedy"
-        },
-        {
-          "code": "S01E04",
-          "title": "Baby Boss Syndicate: Baby Street Food Mogul: The Pani Puri Empire (S01E04)",
-          "category": "baby_comedy"
-        },
-        {
-          "code": "S01E05",
-          "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E05)",
-          "category": "baby_comedy"
-        }
-      ]
+      "episode": 0,
+      "history": []
     },
-    "emotional_animal_sagas": {
+    "study_shorts": {
       "season": 1,
-      "episode": 3,
-      "history": [
-        {
-          "code": "S01E01",
-          "title": "Paws of Hope: The Storm Under the Red Bridge (S01E01)",
-          "category": "emotional_animal"
-        },
-        {
-          "code": "S01E02",
-          "title": "Paws of Hope: The Storm Under the Red Bridge (S01E02)",
-          "category": "emotional_animal"
-        },
-        {
-          "code": "S01E03",
-          "title": "Paws of Hope: The Storm Under the Red Bridge (S01E03)",
-          "category": "emotional_animal"
-        }
-      ]
+      "episode": 0,
+      "history": []
     },
-    "fictional_pov": {
+    "science_paradoxes": {
       "season": 1,
-      "episode": 2,
-      "history": [
-        {
-          "code": "S01E01",
-          "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E01)",
-          "category": "fictional_pov"
-        },
-        {
-          "code": "S01E02",
-          "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E02)",
-          "category": "fictional_pov"
-        }
-      ]
+      "episode": 0,
+      "history": []
     },
-    "visual_asmr_satisfaction": {
+    "ancient_mysteries": {
       "season": 1,
       "episode": 0,
       "history": []

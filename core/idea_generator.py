@@ -298,39 +298,33 @@ class IdeaGenerator:
 
     @staticmethod
     def generate_autonomous_idea(
-        genre: str = "animal_universe",
+        genre: str = "system_design",
         subgenre: Optional[str] = None,
         duration: int = 15,
         seed: Optional[int] = None
     ) -> Dict[str, Any]:
-        """Synthesizes a high-retention, fully coherent Reel from the character universe or curated knowledge catalog."""
-        clean_genre = genre.lower() if genre else "animal_universe"
+        """Synthesizes a high-retention, fully coherent Reel from the technical & scientific knowledge hub or curated catalog."""
+        clean_genre = genre.lower() if genre else "system_design"
 
-        # Check for 2026 Character Universe & Viral Categories
-        universe_keys = {"animal_universe", "baby_comedy", "emotional_animal", "fictional_pov", "asmr_satisfying", "universe", "mochi_and_friends", "baby_boss_ventures", "emotional_animal_sagas"}
-        if clean_genre in universe_keys:
-            try:
-                from .universe_manager import UniverseManager, UNIVERSES
+        # Check for Technical & Scientific Knowledge Hub domains
+        try:
+            from .universe_manager import UniverseManager, UNIVERSES
+            if clean_genre in UNIVERSES or clean_genre in ["universe", "tech", "engineering"]:
                 target_uid = clean_genre if clean_genre in UNIVERSES else None
-                if not target_uid and clean_genre != "universe":
-                    for uid, udata in UNIVERSES.items():
-                        if udata.get("category") == clean_genre:
-                            target_uid = uid
-                            break
                 ep = UniverseManager.generate_next_episode(universe_id=target_uid)
                 return {
                     "title": ep["title"],
                     "genre": ep["genre"],
-                    "subgenre": "episodic_universe",
+                    "subgenre": "technical_breakdown",
                     "hook": ep["hook"],
                     "script": ep["script"],
-                    "keywords": [ep["genre"], "universe", "viral", "2026"],
-                    "source": "AutoReel Character Universe",
-                    "badge": "🎬 UNIVERSE",
-                    "theme": "neon_purple"
+                    "keywords": [ep["genre"], "engineering", "tech", "systemdesign"],
+                    "source": "AutoReel Knowledge Hub",
+                    "badge": "⚡ ENGINEERING",
+                    "theme": "neon_cyan"
                 }
-            except Exception:
-                pass
+        except Exception:
+            pass
 
         rng = random.Random(seed) if seed is not None else random.Random()
         if clean_genre not in AUTONOMOUS_GENRE_KEYS:

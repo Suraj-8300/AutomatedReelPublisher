@@ -269,7 +269,7 @@ function renderQueueList(items) {
             <div class="md3-item-row" onclick="openVideoPreview('${item.id}')" title="Click to watch '${escapeHtml(item.title)}' preview in player">
                 <div class="item-left">
                     <div class="item-play-thumbnail" title="Click to watch preview">
-                        <span class="material-symbols-outlined play-icon">play_arrow</span>
+                        <span class="play-icon" style="font-size: 14px;">▶</span>
                         <span class="item-badge-index">${index + 1}</span>
                     </div>
                     <div class="item-info">
@@ -278,7 +278,7 @@ function renderQueueList(items) {
                             <span>⏱️ Scheduled: ${timeFormatted}</span>
                             <span>•</span>
                             <span class="meta-preview-hint">
-                                <span class="material-symbols-outlined" style="font-size: 13px;">smart_display</span> Watch Preview
+                                <span style="font-size: 13px;">📺</span> Watch Preview
                             </span>
                             <span>•</span>
                             ${hasIg ? '<span class="meta-chip ig">📸 Instagram</span>' : ''}
@@ -288,15 +288,15 @@ function renderQueueList(items) {
                 </div>
                 <div class="item-actions" onclick="event.stopPropagation()">
                     <button class="btn-item-action btn-preview-watch" onclick="openVideoPreview('${item.id}')" title="Preview video in web player">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
+                        <span style="font-size: 14px;">▶</span>
                         <span>Watch</span>
                     </button>
                     <button class="btn-item-action btn-upload-now" onclick="uploadQueueItemNow('${item.id}')" title="Publish this reel immediately">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">bolt</span>
+                        <span style="font-size: 14px;">⚡</span>
                         <span>Publish Now</span>
                     </button>
                     <button class="btn-icon-only" onclick="cancelQueueItem('${item.id}')" title="Cancel this queued reel">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                        <span style="font-size: 14px; font-weight: bold;">✕</span>
                     </button>
                 </div>
             </div>
@@ -911,9 +911,9 @@ async function fetchUniverseStatus() {
         const descElem = document.getElementById('universeDescription');
         const castContainer = document.getElementById('universeCastChips');
 
-        if (catBadge) catBadge.innerText = (active.category || 'Character Universe').replace('_', ' ').toUpperCase();
-        if (epPill) epPill.innerText = `Season ${active.current_season || 1} · Episode ${active.current_episode || 1}`;
-        if (titleElem) titleElem.innerText = active.title || 'Character Universe';
+        if (catBadge) catBadge.innerText = (active.category || 'Knowledge Domain').replace('_', ' ').toUpperCase();
+        if (epPill) epPill.innerText = `Module ${active.current_season || 1} · Topic ${active.current_episode || 1}`;
+        if (titleElem) titleElem.innerText = active.title || 'Knowledge Domain';
         if (descElem) descElem.innerText = active.description || '';
 
         // Update active tab button
@@ -928,15 +928,28 @@ async function fetchUniverseStatus() {
         // Render cast chips
         if (castContainer && active.cast && active.cast.length > 0) {
             const emojiMap = {
-                'Orange Tabby Cat': '🐱',
-                'Old English Bulldog': '🐶',
-                'Golden Retriever Puppy': '🐾',
-                'White Lop Bunny': '🐰',
-                'Human Infant (10 Months)': '👶',
-                'Golden Retriever & Calico Kitten': '🐾'
+                'Kernel Architecture': '⚡',
+                'Virtual Topology': '🔄',
+                'I/O Multiplexing': '🚀',
+                'Probabilistic Sets': '🛡️',
+                'Silicon Logic': '💻',
+                'Memory Hierarchy': '🧱',
+                'MMU Silicon': '🗺️',
+                'CPU Micro-Op Scheduler': '⚙️',
+                'Complexity Analysis': '📈',
+                'LIFO Architecture': '📚',
+                'Memory Management': '💾',
+                'Compiler Passes': '🛠️',
+                'Mantle Mineral': '💎',
+                'Ionized Gas': '⚡',
+                'Quantum Optics': '🔬',
+                'Cosmic Structure': '🌌',
+                'Volcanic Material': '🌋',
+                'Self-Healing Chemical Matrix': '🧪',
+                'Precision Mechanics': '⚙️'
             };
             castContainer.innerHTML = active.cast.map(c => {
-                const emoji = emojiMap[c.species] || '✨';
+                const emoji = emojiMap[c.species] || '⚡';
                 return `
                     <div class="cast-chip" title="${escapeHtml(c.traits || '')}">
                         <span class="cast-emoji">${emoji}</span>
@@ -955,7 +968,7 @@ async function fetchUniverseStatus() {
 
 async function selectUniverse(universeId) {
     try {
-        showSnackbar(`Switching universe...`, 'info');
+        showSnackbar(`Switching domain...`, 'info');
         const res = await fetch(`${API_BASE}/api/universe/set-active`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -963,12 +976,12 @@ async function selectUniverse(universeId) {
         });
         const data = await res.json();
         if (data.success) {
-            showSnackbar(`Universe updated to: ${data.active.title}`, 'success');
+            showSnackbar(`Domain active: ${data.active.title}`, 'success');
             await fetchUniverseStatus();
             await fetchIdeaBuffer();
         }
     } catch (err) {
-        showSnackbar('Failed to switch universe: ' + err.message, 'error');
+        showSnackbar('Failed to switch domain: ' + err.message, 'error');
     }
 }
 

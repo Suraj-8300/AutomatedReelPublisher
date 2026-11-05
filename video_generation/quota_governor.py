@@ -30,7 +30,7 @@ class QuotaGovernor:
 
     @staticmethod
     def _today_str() -> str:
-        return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        return datetime.now().strftime("%Y-%m-%d")
 
     @classmethod
     def _load_data(cls) -> Dict[str, Any]:
@@ -142,29 +142,11 @@ class QuotaGovernor:
     @classmethod
     def can_generate(cls) -> Tuple[bool, int, str]:
         """
-        Checks if Reel generation is allowed today under safety caps.
-        Returns: (allowed: bool, remaining_today: int, message: str)
+        Local master video creation runs continuously in the background to keep
+        the staging queue buffer populated (running one after another even when lid is closed).
+        Decoupled from the 5-hour social publishing schedule.
         """
-        data = cls._load_data()
-        auto_count = data.get("auto_count", 0)
-        manual_count = data.get("manual_count", 0)
-        total_count = data.get("count", 0)
-        auto_stopped = data.get("auto_publish_stopped", False)
-
-        remaining_auto = max(0, DAILY_AUTO_MAX - auto_count)
-        remaining_manual = max(0, DAILY_MANUAL_MAX - manual_count)
-
-        if auto_stopped:
-            if manual_count >= DAILY_MANUAL_MAX:
-                return False, 0, f"⛔ Daily limit reached: {manual_count}/{DAILY_MANUAL_MAX} manual override reels used today."
-            return True, remaining_manual, f"⚠️ Auto-publish stopped. Manual override active: {remaining_manual} remaining."
-
-        if auto_count >= DAILY_AUTO_MAX:
-            if manual_count < DAILY_MANUAL_MAX and total_count < TOTAL_MAX_CEILING:
-                return True, remaining_manual, f"✅ Auto target reached (10/10). {remaining_manual} manual override reels available."
-            return False, 0, f"⛔ Daily cap reached ({TOTAL_MAX_CEILING}/{TOTAL_MAX_CEILING} reels limit for YouTube & Instagram)."
-
-        return True, remaining_auto, f"✅ Quota OK: {auto_count}/{DAILY_AUTO_MAX} generated today ({remaining_auto} remaining)."
+        return True, 10, "✅ Video generator active: pre-rendering master reels continuously into buffer."
 
     @classmethod
     def record_publish(cls, is_manual: bool = False) -> Dict[str, Any]:
@@ -200,11 +182,11 @@ class QuotaGovernor:
 
     @classmethod
     def record_generation(cls) -> int:
-        """Increments today's generated count (backward compatibility)."""
+        """Increments today's generated count (tracks pre-rendered buffer creations without affecting social publishing ceiling)."""
         data = cls._load_data()
-        data["count"] = data.get("count", 0) + 1
+        data["generated_buffer_count"] = data.get("generated_buffer_count", 0) + 1
         cls._save_data(data)
-        return data["count"]
+        return data["generated_buffer_count"]
 
     @classmethod
     def stop_auto_publish(cls, reason: str = "Manual override activated") -> Dict[str, Any]:
