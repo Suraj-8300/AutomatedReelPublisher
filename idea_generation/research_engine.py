@@ -231,6 +231,33 @@ class IdeaResearchEngine:
         if custom_prompt and custom_prompt.strip():
             return cls._synthesize_from_custom_prompt(custom_prompt.strip(), duration)
 
+        # 2026 Viral Universe Engine (Recurring Character Universes, Episodic 3-Act Storytelling)
+        try:
+            from core.universe_manager import UniverseManager, UNIVERSES
+            # If no genre specified or a 2026 format/universe requested, use the Universe Engine
+            universe_categories = {"animal_universe", "baby_comedy", "emotional_animal", "fictional_pov", "asmr_satisfying"}
+            if not genre or genre in UNIVERSES or genre in universe_categories:
+                target_uid = genre if genre in UNIVERSES else None
+                if not target_uid and genre in universe_categories:
+                    for uid, udata in UNIVERSES.items():
+                        if udata.get("category") == genre:
+                            target_uid = uid
+                            break
+                if not target_uid:
+                    # Balanced rotation across all 5 late-2026 viral formats (weighted: animal comedy 40%, baby comedy 20%, emotional 15%, pov 15%, asmr 10%)
+                    universe_keys = list(UNIVERSES.keys())
+                    weights = [0.4, 0.2, 0.15, 0.15, 0.1]
+                    target_uid = random.choices(universe_keys, weights=weights, k=1)[0]
+                episode = UniverseManager.generate_next_episode(universe_id=target_uid)
+                episode["duration"] = duration
+                episode["created_at"] = time.time()
+                episode["status"] = "ready"
+                episode["caption_style"] = random.choice(["karaoke", "high_impact", "clean_minimal"])
+                return episode
+        except Exception as e:
+            # Fallback to research domains if universe engine encounters an error
+            pass
+
         # Select domain based on weights or preference
         available_domains = list(RESEARCH_DOMAINS.keys())
         if genre and genre in RESEARCH_DOMAINS:

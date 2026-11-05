@@ -42,9 +42,12 @@ class AudioMaster:
             "cyber_pulse": {"bass": 65.4, "sub": 32.7, "lead": 130.8, "tempo": 120},
             "deep_mystery": {"bass": 55.0, "sub": 27.5, "lead": 110.0, "tempo": 90},
             "curiosity_lofi": {"bass": 73.4, "sub": 36.7, "lead": 146.8, "tempo": 100},
+            "lofi_chill": {"bass": 73.4, "sub": 36.7, "lead": 146.8, "tempo": 95},
             "action_hybrid": {"bass": 82.4, "sub": 41.2, "lead": 164.8, "tempo": 130},
             "comedy_bounce": {"bass": 98.0, "sub": 49.0, "lead": 196.0, "tempo": 140},
-            "emotional_piano": {"bass": 58.2, "sub": 29.1, "lead": 116.5, "tempo": 80}
+            "acoustic_breeze": {"bass": 88.0, "sub": 44.0, "lead": 176.0, "tempo": 115},
+            "emotional_piano": {"bass": 58.2, "sub": 29.1, "lead": 116.5, "tempo": 80},
+            "ambient_glow": {"bass": 55.0, "sub": 27.5, "lead": 110.0, "tempo": 75}
         }
         profile = style_profiles.get(style, style_profiles["cyber_pulse"])
 

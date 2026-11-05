@@ -2,7 +2,7 @@
 Video Generation Module for AutoReelStudio.
 """
 
-from .quota_governor import QuotaGovernor, DAILY_MAX_REELS
+from .quota_governor import QuotaGovernor, DAILY_MAX_REELS, DAILY_AUTO_MAX, DAILY_MANUAL_MAX
 from .ai_visual_engine import AIVisualEngine
 from .voice_engine import NaturalVoiceEngine
 from .audio_master import AudioMaster
@@ -13,6 +13,8 @@ from .generator import VideoGenerator
 __all__ = [
     "QuotaGovernor",
     "DAILY_MAX_REELS",
+    "DAILY_AUTO_MAX",
+    "DAILY_MANUAL_MAX",
     "AIVisualEngine",
     "NaturalVoiceEngine",
     "AudioMaster",

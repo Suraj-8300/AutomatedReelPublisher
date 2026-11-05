@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=2.5">
 </head>
 <body class="md3-body">
     <div class="md3-container">
@@ -33,7 +33,7 @@
                 <div class="md3-chip md3-chip-ig" id="chipInstagram" title="Meta Instagram Graph API">
                     <span class="material-symbols-outlined chip-icon">photo_camera</span>
                     <span class="chip-text" id="igHandle">@sun_27417</span>
-                    <span class="chip-status-dot online"></span>
+                    <span class="chip-status-dot offline" id="igStatusDot"></span>
                 </div>
 
                 <div class="md3-chip md3-chip-yt" id="chipYouTube" title="YouTube Data API v3 Channel">
@@ -49,15 +49,26 @@
             <div class="md3-hero-glow"></div>
             <div class="md3-hero-content">
                 <div class="md3-hero-meta">
-                    <div class="md3-status-badge">
-                        <span class="pulse-indicator"></span>
-                        <span id="autonomousStatusText">Autonomous Cadence Active · Paced at ~28.8 Mins</span>
+                    <div class="md3-status-badge" id="heroStatusBadge">
+                        <span class="pulse-indicator" id="heroPulseIndicator"></span>
+                        <span id="autonomousStatusText">Autonomous Cadence Active · Paced at 10 Mins</span>
                     </div>
                     <h1 class="md3-hero-headline">Autonomous Reel Publishing</h1>
                     <p class="md3-hero-description">
-                        High-quality AI reels are generated, optimized, and published automatically to Instagram Reels and YouTube Shorts at a steady pace of 50 reels per day.
+                        High-quality AI reels are generated, optimized, and published automatically to Instagram Reels and YouTube Shorts every 10 minutes (capped at 50/day).
                     </p>
                     
+                    <!-- Dynamic Manual Override Alert Banner (Shown when 1-Click Publish was triggered) -->
+                    <div class="md3-hero-alert" id="overrideAlertBanner" style="display: none;">
+                        <div class="md3-hero-alert-left">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #f59e0b;">pause_circle</span>
+                            <span id="overrideAlertText">Auto-publish stopped for today. Manual override active: 20 pushes remaining.</span>
+                        </div>
+                        <button class="md3-btn-text-sm" id="btnResumeAuto" onclick="triggerResumeAuto()" title="Re-enable background 10-minute auto-publishing for today">
+                            Resume Auto-Publish
+                        </button>
+                    </div>
+
                     <div class="md3-hero-timer-box">
                         <span class="material-symbols-outlined timer-icon">schedule</span>
                         <span class="timer-label">Next Scheduled Drop:</span>
@@ -67,9 +78,12 @@
 
                 <!-- 1-Click Action Buttons -->
                 <div class="md3-hero-actions">
-                    <button class="md3-btn-hero" id="btnPublishNowHero" onclick="triggerPublishNow()" title="Instantly publish the next reel to Instagram and YouTube right now">
+                    <button class="md3-btn-hero" id="btnPublishNowHero" onclick="triggerPublishNow()" title="Instantly publish the next reel to Instagram and YouTube right now (+20 manual override cap)">
                         <span class="material-symbols-outlined btn-icon">bolt</span>
-                        <span class="btn-label" id="btnPublishLabel">Publish Next Reel Now</span>
+                        <div>
+                            <span class="btn-label" id="btnPublishLabel">Publish Next Reel Now</span>
+                            <span class="btn-sublabel" id="btnPublishQuota">20 Manual Pushes Left</span>
+                        </div>
                     </button>
 
                     <button class="md3-btn-tonal" id="btnStageNextHero" onclick="triggerStageNext()" title="Queue an upcoming reel into the schedule">
@@ -90,10 +104,13 @@
                 </div>
                 <div class="stat-number-row">
                     <span class="stat-big-number" id="quotaPublishedNumber">0</span>
-                    <span class="stat-total-number">/ 50 Reels Today</span>
+                    <span class="stat-total-number">/ 50 Auto Reels</span>
                 </div>
                 <div class="md3-progress-track">
                     <div class="md3-progress-bar" id="quotaProgressBar" style="width: 0%;"></div>
+                </div>
+                <div class="stat-badge-row">
+                    <span class="md3-tonal-badge badge-manual" id="manualOverrideBadge">Manual Override: 0 / 20 Pushed</span>
                 </div>
                 <span class="stat-caption" id="quotaCaption">50 reels remaining for today's quota</span>
             </div>
@@ -109,7 +126,7 @@
                     <span class="stat-total-number">Reels Waiting</span>
                 </div>
                 <div class="stat-badge-row">
-                    <span class="md3-tonal-badge" id="queuePacingBadge">~28.8 min pacing</span>
+                    <span class="md3-tonal-badge" id="queuePacingBadge">10 min pacing</span>
                 </div>
                 <span class="stat-caption" id="queueNextCaption">No delay when using 1-Click Publish</span>
             </div>
@@ -133,6 +150,70 @@
 
         <!-- Main Workspace Flow -->
         <main class="md3-main-flow">
+
+            <!-- 2026 Persistent Character Universe & Recurring Cast Engine -->
+            <section class="md3-card md3-universe-card">
+                <div class="universe-header">
+                    <div class="universe-title-group">
+                        <div class="section-icon-container accent-purple">
+                            <span class="material-symbols-outlined">movie</span>
+                        </div>
+                        <div>
+                            <div class="universe-badge-row">
+                                <span class="md3-tonal-badge badge-universe" id="universeCategoryBadge">Recurring Character Universe</span>
+                                <span class="universe-episode-pill" id="universeEpisodePill">Season 1 · Episode 1</span>
+                                <span class="universe-act-pill">3-Act Viral Arc: Hook ➔ Escalation ➔ Payoff</span>
+                            </div>
+                            <h2 class="universe-title" id="universeTitle">Mochi & Co. (The Bistro Universe)</h2>
+                            <p class="universe-description" id="universeDescription">A bustling miniature cafe run by a mischievous orange cat and his unlikely animal crew.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Universe Switcher Pills -->
+                <div class="universe-selector-tabs" id="universeTabs">
+                    <button class="universe-tab active" onclick="selectUniverse('mochi_and_friends')">🐾 Mochi & Co. (Animal Comedy)</button>
+                    <button class="universe-tab" onclick="selectUniverse('baby_boss_ventures')">💼 Baby Boss (Satire)</button>
+                    <button class="universe-tab" onclick="selectUniverse('emotional_animal_sagas')">❤️ Paws of Hope (Rescue)</button>
+                    <button class="universe-tab" onclick="selectUniverse('fictional_pov')">🌌 Fictional POV (Alternate Reality)</button>
+                    <button class="universe-tab" onclick="selectUniverse('visual_asmr_satisfaction')">✨ Impossible Textures (ASMR)</button>
+                </div>
+
+                <!-- Recurring Cast Grid -->
+                <div class="universe-cast-container">
+                    <div class="cast-label">Recurring Cast & Consistent Character Models:</div>
+                    <div class="universe-cast-chips" id="universeCastChips">
+                        <div class="cast-chip">
+                            <span class="cast-emoji">🐱</span>
+                            <div class="cast-details">
+                                <span class="cast-name">Mochi</span>
+                                <span class="cast-role">Master Baker / Chaos</span>
+                            </div>
+                        </div>
+                        <div class="cast-chip">
+                            <span class="cast-emoji">🐶</span>
+                            <div class="cast-details">
+                                <span class="cast-name">Barnaby</span>
+                                <span class="cast-role">Bulldog Inspector</span>
+                            </div>
+                        </div>
+                        <div class="cast-chip">
+                            <span class="cast-emoji">🐾</span>
+                            <div class="cast-details">
+                                <span class="cast-name">Pip</span>
+                                <span class="cast-role">Nervous Assistant</span>
+                            </div>
+                        </div>
+                        <div class="cast-chip">
+                            <span class="cast-emoji">🐰</span>
+                            <div class="cast-details">
+                                <span class="cast-name">Luna</span>
+                                <span class="cast-role">Bunny Engineer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
             
             <!-- Section 1: Ready Videos Publishing Queue -->
             <section class="md3-card md3-section-card">
@@ -232,6 +313,6 @@
     <!-- MD3 Floating Snackbar / Toast Container -->
     <div class="md3-snackbar-container" id="snackbarContainer"></div>
 
-    <script src="/static/js/main.js"></script>
+    <script src="/static/js/main.js?v=2.5"></script>
 </body>
 </html>

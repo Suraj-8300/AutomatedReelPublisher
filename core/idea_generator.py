@@ -298,14 +298,43 @@ class IdeaGenerator:
 
     @staticmethod
     def generate_autonomous_idea(
-        genre: str = "science",
+        genre: str = "animal_universe",
         subgenre: Optional[str] = None,
         duration: int = 15,
         seed: Optional[int] = None
     ) -> Dict[str, Any]:
-        """Synthesizes a high-retention, fully coherent Reel from the curated knowledge catalog."""
+        """Synthesizes a high-retention, fully coherent Reel from the character universe or curated knowledge catalog."""
+        clean_genre = genre.lower() if genre else "animal_universe"
+
+        # Check for 2026 Character Universe & Viral Categories
+        universe_keys = {"animal_universe", "baby_comedy", "emotional_animal", "fictional_pov", "asmr_satisfying", "universe", "mochi_and_friends", "baby_boss_ventures", "emotional_animal_sagas"}
+        if clean_genre in universe_keys:
+            try:
+                from .universe_manager import UniverseManager, UNIVERSES
+                target_uid = clean_genre if clean_genre in UNIVERSES else None
+                if not target_uid and clean_genre != "universe":
+                    for uid, udata in UNIVERSES.items():
+                        if udata.get("category") == clean_genre:
+                            target_uid = uid
+                            break
+                ep = UniverseManager.generate_next_episode(universe_id=target_uid)
+                return {
+                    "title": ep["title"],
+                    "genre": ep["genre"],
+                    "subgenre": "episodic_universe",
+                    "hook": ep["hook"],
+                    "script": ep["script"],
+                    "keywords": [ep["genre"], "universe", "viral", "2026"],
+                    "source": "AutoReel Character Universe",
+                    "badge": "🎬 UNIVERSE",
+                    "theme": "neon_purple"
+                }
+            except Exception:
+                pass
+
         rng = random.Random(seed) if seed is not None else random.Random()
-        clean_genre = genre.lower() if genre and genre.lower() in AUTONOMOUS_GENRE_KEYS else "science"
+        if clean_genre not in AUTONOMOUS_GENRE_KEYS:
+            clean_genre = "science"
 
         available_keys = AUTONOMOUS_GENRE_KEYS.get(clean_genre, AUTONOMOUS_GENRE_KEYS["science"])
         chosen_key = rng.choice(available_keys)

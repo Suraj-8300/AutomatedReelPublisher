@@ -186,6 +186,31 @@ body.md3-body {
     box-shadow: 0 0 8px rgba(45, 212, 191, 0.6);
 }
 
+.chip-status-dot.offline {
+    background-color: #f87171;
+    box-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
+}
+
+.btn-error-ig {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    color: #fca5a5;
+    padding: 6px 12px;
+    border-radius: var(--md-shape-corner-small);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-error-ig:hover {
+    background: rgba(248, 113, 113, 0.25);
+    color: #ffffff;
+}
+
 /* ==============================================================================
    MD3 Hero Publishing Hub (The Centerpiece)
    ============================================================================== */
@@ -237,6 +262,13 @@ body.md3-body {
     font-weight: 600;
     color: var(--md-sys-color-secondary);
     width: fit-content;
+    transition: all 0.3s ease;
+}
+
+.md3-status-badge.stopped {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fbbf24;
 }
 
 .pulse-indicator {
@@ -246,6 +278,64 @@ body.md3-body {
     background: var(--md-sys-color-secondary);
     box-shadow: 0 0 10px var(--md-sys-color-secondary);
     animation: pulse 2s infinite;
+}
+
+.pulse-indicator.stopped {
+    background: #f59e0b;
+    box-shadow: 0 0 10px #f59e0b;
+    animation: none;
+}
+
+.md3-hero-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: var(--md-shape-corner-medium);
+    margin-top: 4px;
+    font-size: 13px;
+    color: #fef3c7;
+}
+
+.md3-hero-alert-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.md3-btn-text-sm {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #fef08a;
+    border-radius: var(--md-shape-corner-small);
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.md3-btn-text-sm:hover {
+    background: rgba(245, 158, 11, 0.35);
+    color: #ffffff;
+}
+
+.badge-manual {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.btn-sublabel {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.85;
+    letter-spacing: 0.3px;
 }
 
 @keyframes pulse {
@@ -463,12 +553,176 @@ body.md3-body {
 }
 
 /* ==============================================================================
-   Main Workspace Flow (Queue + Recently Published)
+   Main Workspace Flow (Universe + Queue + Recently Published)
    ============================================================================== */
 .md3-main-flow {
     display: flex;
     flex-direction: column;
     gap: 24px;
+}
+
+/* 2026 Character Universe Showcase Card */
+.md3-universe-card {
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(25, 27, 36, 0.95), rgba(20, 21, 28, 0.98));
+    border: 1px solid rgba(133, 112, 255, 0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 30px rgba(133, 112, 255, 0.08);
+}
+
+.universe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.universe-title-group {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.section-icon-container.accent-purple {
+    background: rgba(133, 112, 255, 0.15);
+    color: #a78bfa;
+}
+
+.universe-badge-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.badge-universe {
+    background: rgba(133, 112, 255, 0.2);
+    color: #c4b5fd;
+    border: 1px solid rgba(133, 112, 255, 0.35);
+}
+
+.universe-episode-pill {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+    background: rgba(45, 212, 191, 0.15);
+    color: #2dd4bf;
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    padding: 3px 8px;
+    border-radius: var(--md-shape-corner-full);
+}
+
+.universe-act-pill {
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    padding: 3px 8px;
+    border-radius: var(--md-shape-corner-full);
+}
+
+.universe-title {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--md-sys-color-on-surface);
+    margin: 4px 0 2px 0;
+    letter-spacing: -0.3px;
+}
+
+.universe-description {
+    font-size: 13px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin: 0;
+}
+
+.universe-selector-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 18px 0;
+}
+
+.universe-tab {
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline);
+    color: var(--md-sys-color-on-surface-variant);
+    border-radius: var(--md-shape-corner-full);
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.universe-tab:hover {
+    border-color: var(--md-sys-color-primary);
+    color: #ffffff;
+    background: var(--md-sys-color-surface-container);
+}
+
+.universe-tab.active {
+    background: var(--md-sys-color-primary-container);
+    border-color: var(--md-sys-color-primary);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(133, 112, 255, 0.25);
+}
+
+.universe-cast-container {
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-shape-corner-medium);
+    padding: 14px 18px;
+    border: 1px solid var(--md-sys-color-outline);
+}
+
+.cast-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 10px;
+}
+
+.universe-cast-chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cast-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--md-sys-color-surface-container);
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: var(--md-shape-corner-small);
+    padding: 6px 12px;
+    transition: transform 0.15s ease;
+}
+
+.cast-chip:hover {
+    transform: translateY(-1px);
+    border-color: var(--md-sys-color-outline-variant);
+}
+
+.cast-emoji {
+    font-size: 20px;
+}
+
+.cast-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.cast-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--md-sys-color-on-surface);
+}
+
+.cast-role {
+    font-size: 10px;
+    color: var(--md-sys-color-on-surface-variant);
 }
 
 .md3-section-card {

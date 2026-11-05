@@ -1,0 +1,159 @@
+{
+  "active_universe": "mochi_and_friends",
+  "universe_counters": {
+    "mochi_and_friends": {
+      "season": 1,
+      "episode": 17,
+      "history": [
+        {
+          "code": "S01E01",
+          "title": "Mochi & Co.: The Pancake Catastrophe (S01E01)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E02",
+          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E02)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E03",
+          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E03)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E04",
+          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E04)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E05",
+          "title": "Mochi & Co.: The Pancake Catastrophe (S01E05)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E06",
+          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E06)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E07",
+          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E07)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E08",
+          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E08)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E09",
+          "title": "Mochi & Co.: The Pancake Catastrophe (S01E09)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E10",
+          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E10)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E11",
+          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E11)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E12",
+          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E12)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E13",
+          "title": "Mochi & Co.: The Pancake Catastrophe (S01E13)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E14",
+          "title": "Mochi & Co.: The 100-Order Espresso Rush (S01E14)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E15",
+          "title": "Mochi & Co.: The Health Inspector's Surprise Visit (S01E15)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E16",
+          "title": "Mochi & Co.: The Secret Pizza Midnight Heist (S01E16)",
+          "category": "animal_universe"
+        },
+        {
+          "code": "S01E17",
+          "title": "Mochi & Co.: The Pancake Catastrophe (S01E17)",
+          "category": "animal_universe"
+        }
+      ]
+    },
+    "baby_boss_ventures": {
+      "season": 1,
+      "episode": 4,
+      "history": [
+        {
+          "code": "S01E01",
+          "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E01)",
+          "category": "baby_comedy"
+        },
+        {
+          "code": "S01E02",
+          "title": "Baby Boss Syndicate: Baby Street Food Mogul: The Pani Puri Empire (S01E02)",
+          "category": "baby_comedy"
+        },
+        {
+          "code": "S01E03",
+          "title": "Baby Boss Syndicate: Baby Boss on Morning Naps vs. EBITDA (S01E03)",
+          "category": "baby_comedy"
+        },
+        {
+          "code": "S01E04",
+          "title": "Baby Boss Syndicate: Baby Street Food Mogul: The Pani Puri Empire (S01E04)",
+          "category": "baby_comedy"
+        }
+      ]
+    },
+    "emotional_animal_sagas": {
+      "season": 1,
+      "episode": 2,
+      "history": [
+        {
+          "code": "S01E01",
+          "title": "Paws of Hope: The Storm Under the Red Bridge (S01E01)",
+          "category": "emotional_animal"
+        },
+        {
+          "code": "S01E02",
+          "title": "Paws of Hope: The Storm Under the Red Bridge (S01E02)",
+          "category": "emotional_animal"
+        }
+      ]
+    },
+    "fictional_pov": {
+      "season": 1,
+      "episode": 2,
+      "history": [
+        {
+          "code": "S01E01",
+          "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E01)",
+          "category": "fictional_pov"
+        },
+        {
+          "code": "S01E02",
+          "title": "Through Alternate Eyes: POV: You Are The Last Radio Operator in 2099 (S01E02)",
+          "category": "fictional_pov"
+        }
+      ]
+    },
+    "visual_asmr_satisfaction": {
+      "season": 1,
+      "episode": 0,
+      "history": []
+    }
+  }
+}

@@ -59,7 +59,42 @@ class AIVisualEngine:
         p = prompt.lower()
 
         # 1. Detect Semantic Domain & Palette
-        if any(w in p for w in ["ocean", "subterranean", "crust", "ringwoodite", "water", "sea", "abyss", "mantle"]):
+        if any(w in p for w in ["kitten", "cat", "mochi", "puppy", "dog", "bulldog", "barnaby", "bunny", "rabbit", "pip", "bistro", "bakery", "pancake", "espresso", "latte", "chef", "apron"]):
+            domain = "animal_universe"
+            bg_top = (32, 22, 16)               # Warm rustic amber wood
+            bg_bot = (14, 10, 8)                # Dark cozy cafe floor
+            primary_color = (245, 158, 11)      # Golden honey amber
+            accent_color = (251, 191, 36)       # Warm sunlight ray
+            secondary_color = (239, 68, 68)     # Mochi's red apron accent
+        elif any(w in p for w in ["baby", "infant", "toddler", "boss", "boardroom", "ceo", "ebitda", "pani puri", "momo", "sippy cup"]):
+            domain = "baby_comedy"
+            bg_top = (16, 24, 40)               # Corporate boardroom navy
+            bg_bot = (8, 12, 20)
+            primary_color = (59, 130, 246)      # Wall street blue
+            accent_color = (250, 204, 21)       # Gold Rolex / brass stall
+            secondary_color = (244, 63, 94)     # Red tie accent
+        elif any(w in p for w in ["scout", "stray", "rescue", "shivering", "storm", "bridge", "hearth", "fireplace", "calico"]):
+            domain = "emotional_animal"
+            bg_top = (18, 22, 34)               # Moody cinematic rain
+            bg_bot = (10, 12, 18)
+            primary_color = (249, 115, 22)      # Warm hearth fire
+            accent_color = (253, 186, 116)      # Gentle golden flashlight beam
+            secondary_color = (56, 189, 248)    # Rain reflection cyan
+        elif any(w in p for w in ["pov", "2099", "radio", "aurora", "antenna", "cyberpunk", "cockpit", "eyes"]):
+            domain = "fictional_pov"
+            bg_top = (14, 10, 32)               # Cyberpunk night sky
+            bg_bot = (6, 4, 16)
+            primary_color = (168, 85, 247)      # Neon violet HUD
+            accent_color = (34, 211, 238)       # Ionosphere cyan
+            secondary_color = (236, 72, 153)    # Synthwave pink
+        elif any(w in p for w in ["asmr", "glass", "crystal", "watermelon", "blade", "titanium", "honey", "slice", "textures", "satisfying"]):
+            domain = "asmr_satisfying"
+            bg_top = (10, 10, 12)               # Obsidian macro studio
+            bg_bot = (4, 4, 6)
+            primary_color = (244, 63, 94)       # Ruby fruit core
+            accent_color = (251, 191, 36)       # Viscous gold honey
+            secondary_color = (226, 232, 240)   # Sharp titanium reflection
+        elif any(w in p for w in ["ocean", "subterranean", "crust", "ringwoodite", "water", "sea", "abyss", "mantle"]):
             domain = "subterranean_ocean"
             bg_top = (4, 8, 22)
             bg_bot = (2, 4, 12)
@@ -127,7 +162,108 @@ class AIVisualEngine:
         center_x = TARGET_WIDTH // 2
         center_y = int(TARGET_HEIGHT * 0.48)
 
-        if domain == "subterranean_ocean":
+        if domain == "animal_universe":
+            # Warm Morning Sunlight Beams (Cafe Window Panes)
+            for i in range(8):
+                ray_x = 100 + i * 140 + rng.randint(-30, 30)
+                draw.polygon([
+                    (ray_x, 0),
+                    (ray_x + 90, 0),
+                    (ray_x + 240, TARGET_HEIGHT),
+                    (ray_x + 120, TARGET_HEIGHT)
+                ], fill=(accent_color[0] // 3, accent_color[1] // 3, accent_color[2] // 4))
+
+            # Miniature Bistro Wooden Counter & Shelves
+            counter_y = int(TARGET_HEIGHT * 0.65)
+            draw.rectangle([0, counter_y, TARGET_WIDTH, TARGET_HEIGHT], fill=(24, 16, 12))
+            draw.line([(0, counter_y), (TARGET_WIDTH, counter_y)], fill=primary_color, width=4)
+            # Cafe Shelf with Miniature Jars
+            shelf_y = int(TARGET_HEIGHT * 0.28)
+            draw.line([(80, shelf_y), (TARGET_WIDTH - 80, shelf_y)], fill=(60, 42, 30), width=6)
+            for j in range(7):
+                jx = 140 + j * 120
+                draw.rectangle([jx, shelf_y - 45, jx + 35, shelf_y], fill=(primary_color[0] // 2, primary_color[1] // 2, primary_color[2] // 2), outline=accent_color, width=2)
+
+            # Central Character Warm Halo & Silhouette
+            for r in range(220, 40, -25):
+                draw.ellipse([center_x - r, center_y - r, center_x + r, center_y + r],
+                             fill=(primary_color[0] * r // 260, primary_color[1] * r // 300, 15))
+            # Tiny Chef Hat / Ears Outline
+            draw.ellipse([center_x - 90, center_y - 60, center_x + 90, center_y + 110], fill=(220, 120, 40))
+            # Cat Ears
+            draw.polygon([(center_x - 80, center_y - 30), (center_x - 110, center_y - 120), (center_x - 30, center_y - 50)], fill=(200, 100, 30))
+            draw.polygon([(center_x + 80, center_y - 30), (center_x + 110, center_y - 120), (center_x + 30, center_y - 50)], fill=(200, 100, 30))
+            # Red Chef Scarf / Apron
+            draw.polygon([(center_x - 60, center_y + 70), (center_x + 60, center_y + 70), (center_x, center_y + 130)], fill=secondary_color)
+
+        elif domain == "baby_comedy":
+            # Corporate Boardroom Perspective or Neon Night Market
+            for i in range(12):
+                y_pos = int(TARGET_HEIGHT * 0.15) + i * 40
+                draw.line([(0, y_pos), (TARGET_WIDTH, y_pos)], fill=(20, 30, 48), width=1)
+            # Mahogany Desk
+            desk_y = int(TARGET_HEIGHT * 0.62)
+            draw.rectangle([0, desk_y, TARGET_WIDTH, TARGET_HEIGHT], fill=(18, 12, 10))
+            draw.line([(0, desk_y), (TARGET_WIDTH, desk_y)], fill=(120, 80, 50), width=4)
+            # Studio Broadcast Microphone Silhouette
+            mic_x = center_x + 180
+            draw.rectangle([mic_x - 20, desk_y - 140, mic_x + 20, desk_y - 40], fill=(45, 45, 55), outline=accent_color, width=2)
+            draw.line([(mic_x, desk_y - 40), (mic_x, desk_y)], fill=(80, 80, 90), width=6)
+            # Central Baby Executive Silhouette in Suit
+            draw.ellipse([center_x - 110, center_y - 80, center_x + 110, center_y + 100], fill=(245, 205, 180)) # Chubby head
+            draw.polygon([(center_x - 140, center_y + 70), (center_x + 140, center_y + 70), (center_x + 90, desk_y), (center_x - 90, desk_y)], fill=(20, 28, 45)) # Suit jacket
+            draw.polygon([(center_x - 15, center_y + 70), (center_x + 15, center_y + 70), (center_x, center_y + 140)], fill=secondary_color) # Red tie
+
+        elif domain == "emotional_animal":
+            # Cinematic Rain Streaks
+            for _ in range(80):
+                rx = rng.randint(20, TARGET_WIDTH - 20)
+                ry = rng.randint(40, TARGET_HEIGHT - 400)
+                draw.line([(rx, ry), (rx + 6, ry + 35)], fill=(secondary_color[0] // 2, secondary_color[1] // 2, secondary_color[2]), width=1)
+            # Cozy Warm Hearth / Fireplace Arc
+            hearth_w = 420
+            hearth_top = int(TARGET_HEIGHT * 0.42)
+            for r in range(160, 20, -20):
+                draw.ellipse([center_x - r, hearth_top + 160 - r, center_x + r, hearth_top + 160 + r],
+                             fill=(primary_color[0] * r // 180, primary_color[1] * r // 240, 20))
+            # Fireplace Embers Rising
+            for _ in range(35):
+                ex = center_x + rng.randint(-120, 120)
+                ey = hearth_top + 100 - rng.randint(0, 200)
+                er = rng.randint(2, 6)
+                draw.ellipse([ex - er, ey - er, ex + er, ey + er], fill=accent_color)
+
+        elif domain == "fictional_pov":
+            # First-Person Cyberpunk Visor & HUD Reticle
+            draw.ellipse([center_x - 300, center_y - 300, center_x + 300, center_y + 300], outline=primary_color, width=2)
+            draw.ellipse([center_x - 180, center_y - 180, center_x + 180, center_y + 180], outline=accent_color, width=1)
+            # HUD Horizon Line & Compass Ticks
+            draw.line([(80, center_y), (TARGET_WIDTH - 80, center_y)], fill=(primary_color[0] // 2, primary_color[1] // 2, primary_color[2]), width=1)
+            for tick in range(12):
+                tx = 120 + tick * 70
+                draw.line([(tx, center_y - 12), (tx, center_y + 12)], fill=accent_color, width=2)
+            # Audio Frequency Spectrum Wave
+            for step in range(25):
+                fx = 150 + step * 32
+                bar_h = rng.randint(10, 80)
+                draw.line([(fx, center_y + 180), (fx, center_y + 180 - bar_h)], fill=secondary_color, width=4)
+
+        elif domain == "asmr_satisfying":
+            # Concentric Glass Fruit & Prismatic Refraction
+            for layer in range(14, 2, -1):
+                rad = layer * 22
+                draw.ellipse([center_x - rad, center_y - rad, center_x + rad, center_y + rad],
+                             outline=(primary_color[0] * layer // 15, primary_color[1] * layer // 20, 140), width=3)
+            # Golden Honey Droplets with Specular Sparkles
+            for drop in range(6):
+                dx = center_x + rng.randint(-140, 140)
+                dy = center_y + 160 + drop * 65
+                draw.ellipse([dx - 18, dy - 26, dx + 18, dy + 26], fill=accent_color)
+                draw.ellipse([dx - 6, dy - 16, dx + 2, dy - 8], fill=(255, 255, 255))
+            # Titanium Blade Ray
+            draw.polygon([(0, center_y - 120), (TARGET_WIDTH, center_y - 40), (TARGET_WIDTH, center_y - 32), (0, center_y - 112)], fill=(240, 245, 255))
+
+        elif domain == "subterranean_ocean":
             # Subterranean Mantle Crust & Glowing Ringwoodite Ocean
             # Volumetric Caustic Light Rays
             for i in range(16):

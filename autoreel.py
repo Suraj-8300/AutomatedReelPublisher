@@ -337,7 +337,7 @@ def cmd_pub_queue(args):
     items = PublishingQueueManager.get_queue()
     print("\n" + "=" * 65)
     print(f"🚀 READY VIDEOS PUBLISHING QUEUE ({len(items)} items)")
-    print("   Pacing: 50 reels/day distribution (~28.8 min intervals)")
+    print("   Pacing: 50 reels/day distribution (10 min intervals)")
     print("=" * 65)
     if not items:
         print("  (Publishing queue is empty. Generated videos queue here for scheduled pacing)")
@@ -354,9 +354,9 @@ def cmd_upload_now(args):
     item_id = args.id
     dry_run = args.dry_run
     if item_id and item_id != "next":
-        res = PublishingQueueManager.publish_now(item_id, dry_run=dry_run)
+        res = PublishingQueueManager.publish_now(item_id, dry_run=dry_run, is_manual=True)
     else:
-        res = PublishingQueueManager.publish_next(dry_run=dry_run)
+        res = PublishingQueueManager.publish_next(dry_run=dry_run, is_manual=True)
 
     if res:
         print("\n" + "=" * 65)
@@ -412,6 +412,59 @@ def cmd_studio(args):
 # ==============================================================================
 # MAIN CLI DISPATCHER
 # ==============================================================================
+
+def cmd_check_meta(args):
+    """Diagnoses Instagram Meta Graph API connectivity and permissions."""
+    from publishers.instagram.publisher import MetaGraphPublisher
+    from publishers.instagram.config import META_ACCESS_TOKEN, INSTAGRAM_ACCOUNT_ID
+    print("\n" + "=" * 65)
+    print("🔍 META GRAPH API (INSTAGRAM REELS) DIAGNOSTIC")
+    print("=" * 65)
+    print(f"📌 Account ID:  {INSTAGRAM_ACCOUNT_ID}")
+    print(f"🔑 Token:       {META_ACCESS_TOKEN[:15]}..." if META_ACCESS_TOKEN else "❌ No token in .env")
+    pub = MetaGraphPublisher()
+    acc = pub.get_account_info()
+    if acc.get("authenticated"):
+        print("✅ Meta Graph API: CONNECTED & VALID")
+        print(f"👤 Username:      @{acc.get('username')}")
+        limit = pub.get_publishing_limit()
+        print(f"📊 24h Quota:     {limit.get('quota_usage', 0)}/{limit.get('quota_total', 100)} used")
+    else:
+        print("❌ Meta Graph API: ACCESS BLOCKED / INVALID")
+        print(f"⚠️ Error:         {acc.get('error')}")
+        print("\n💡 Resolution Steps:")
+        print("  1. Visit Meta Graph API Explorer: https://developers.facebook.com/tools/explorer/")
+        print("  2. Select your App & Page, add scopes: instagram_basic, instagram_content_publish, pages_show_list")
+        print("  3. Generate token & run: python3 autoreel.py set-meta-token <your_token>")
+    print("=" * 65 + "\n")
+
+def cmd_set_meta_token(args):
+    """Updates META_ACCESS_TOKEN in .env and tests it immediately."""
+    new_token = args.token.strip()
+    env_path = PROJECT_ROOT / ".env"
+    if env_path.exists():
+        lines = []
+        replaced = False
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip().startswith("META_ACCESS_TOKEN="):
+                    lines.append(f'META_ACCESS_TOKEN="{new_token}"\n')
+                    replaced = True
+                else:
+                    lines.append(line)
+        if not replaced:
+            lines.append(f'META_ACCESS_TOKEN="{new_token}"\n')
+        with open(env_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+    os.environ["META_ACCESS_TOKEN"] = new_token
+    print(f"✅ Updated META_ACCESS_TOKEN in {env_path}")
+    from publishers.instagram.publisher import MetaGraphPublisher
+    pub = MetaGraphPublisher(access_token=new_token)
+    acc = pub.get_account_info()
+    if acc.get("authenticated"):
+        print(f"🎉 Verified! Connected to @{acc.get('username')} (ID: {acc.get('id')})")
+    else:
+        print(f"⚠️ Token saved, but Meta returned: {acc.get('error')}")
 
 def main():
     parser = argparse.ArgumentParser(
@@ -480,6 +533,13 @@ def main():
     p_auth = subparsers.add_parser("auth-youtube", help="Authorize YouTube channel via Google OAuth 2.0 (port 8000)")
     p_auth.add_argument("--timeout", type=int, default=600, help="Timeout in seconds")
 
+    # Command: check-meta
+    p_meta = subparsers.add_parser("check-meta", aliases=["test-meta", "meta"], help="Test Meta Instagram Graph API status and permissions")
+
+    # Command: set-meta-token
+    p_set_token = subparsers.add_parser("set-meta-token", help="Update META_ACCESS_TOKEN in .env and test it")
+    p_set_token.add_argument("token", type=str, help="Fresh Meta Long-Lived User or Page Access Token")
+
     # Command: studio
     p_studio = subparsers.add_parser("studio", aliases=["web", "ui"], help="Start AutoReelStudio Web Dashboard")
     p_studio.add_argument("--port", type=int, default=8080, help="Web server port (default: 8080)")
@@ -513,6 +573,10 @@ def main():
         cmd_scheduler(args)
     elif args.command == "auth-youtube":
         cmd_auth_youtube(args)
+    elif args.command in ["check-meta", "test-meta", "meta"]:
+        cmd_check_meta(args)
+    elif args.command == "set-meta-token":
+        cmd_set_meta_token(args)
     elif args.command in ["studio", "web", "ui"]:
         cmd_studio(args)
 

@@ -1,5 +1,126 @@
 [
   {
+    "id": "pub_d7e7d5ad80",
+    "title": "Dashrath Manjhi The Mountain 400507",
+    "filename": "cdn_Dashrath_Manjhi_The_Mountain_400507.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Dashrath_Manjhi_The_Mountain_400507.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "status": "partially_published",
+    "published_at": "2026-11-05T21:15:29.524009+00:00",
+    "receipts": {
+      "instagram": {
+        "stem": "cdn_Dashrath_Manjhi_The_Mountain_400507",
+        "published_at": "2026-11-05 21:15:28 UTC",
+        "elapsed_seconds": 5.09,
+        "instagram_media_id": "1800335359297",
+        "instagram_permalink": "https://www.instagram.com/reel/deeafa69d1d/",
+        "caption": "Dashrath Manjhi The Mountain 400507\n\n#Shorts #Reels #Viral",
+        "is_simulated": true,
+        "scaling_mode": "pad"
+      }
+    },
+    "errors": {
+      "youtube": "<HttpError 400 when requesting None returned \"The user has exceeded the number of videos they may upload.\". Details: \"[{'message': 'The user has exceeded the number of videos they may upload.', 'domain': 'youtube.video', 'reason': 'uploadLimitExceeded'}]\">"
+    },
+    "instagram_permalink": "https://www.instagram.com/reel/deeafa69d1d/",
+    "youtube_shorts_url": null,
+    "youtube_watch_url": null,
+    "youtube_video_id": null
+  },
+  {
+    "id": "pub_99c65a196e",
+    "title": "The Antikythera 2000-Year-Ol e0d7dc",
+    "filename": "cdn_The_Antikythera_2000-Year-Ol_e0d7dc.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Antikythera_2000-Year-Ol_e0d7dc.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "published_at": "2026-11-05T21:01:12.320094+00:00",
+    "receipts": {
+      "youtube": {
+        "success": true,
+        "video_id": "8qUskUQgdGQ",
+        "shorts_url": "https://youtube.com/shorts/8qUskUQgdGQ",
+        "watch_url": "https://www.youtube.com/watch?v=8qUskUQgdGQ",
+        "title": "The Antikythera 2000-Year-Ol e0d7dc #Shorts",
+        "privacy_status": "public",
+        "file_size_mb": 13.55
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/8qUskUQgdGQ",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=8qUskUQgdGQ",
+    "youtube_video_id": "8qUskUQgdGQ",
+    "status": "partially_published",
+    "errors": {
+      "instagram": "Meta Graph API access blocked (OAuthException code 200). Account/Token restricted by Meta."
+    }
+  },
+  {
+    "id": "pub_121a2713c5",
+    "title": "The Panic of The Unfamiliar  85d53b",
+    "filename": "cdn_The_Panic_of_The_Unfamiliar__85d53b.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Panic_of_The_Unfamiliar__85d53b.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "published_at": "2026-11-05T20:53:37.042258+00:00",
+    "receipts": {
+      "youtube": {
+        "success": true,
+        "video_id": "-PtCly2kNBw",
+        "shorts_url": "https://youtube.com/shorts/-PtCly2kNBw",
+        "watch_url": "https://www.youtube.com/watch?v=-PtCly2kNBw",
+        "title": "The Panic of The Unfamiliar  85d53b #Shorts",
+        "privacy_status": "public",
+        "file_size_mb": 6.63
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/-PtCly2kNBw",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=-PtCly2kNBw",
+    "youtube_video_id": "-PtCly2kNBw",
+    "status": "partially_published",
+    "errors": {
+      "instagram": "Meta Graph API access blocked (OAuthException code 200). Account/Token restricted by Meta."
+    }
+  },
+  {
+    "id": "pub_c6b4c09c0b",
+    "title": "The Ocean Floating 400 Mil f752db",
+    "filename": "cdn_The_Ocean_Floating_400_Mil_f752db.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Ocean_Floating_400_Mil_f752db.mp4",
+    "platforms": [
+      "instagram",
+      "youtube"
+    ],
+    "published_at": "2026-11-05T20:47:48.366043+00:00",
+    "receipts": {
+      "youtube": {
+        "success": true,
+        "video_id": "BDGMC2zRR8o",
+        "shorts_url": "https://youtube.com/shorts/BDGMC2zRR8o",
+        "watch_url": "https://www.youtube.com/watch?v=BDGMC2zRR8o",
+        "title": "The Ocean Floating 400 Mil f752db #Shorts",
+        "privacy_status": "public",
+        "file_size_mb": 6.29
+      }
+    },
+    "instagram_permalink": null,
+    "youtube_shorts_url": "https://youtube.com/shorts/BDGMC2zRR8o",
+    "youtube_watch_url": "https://www.youtube.com/watch?v=BDGMC2zRR8o",
+    "youtube_video_id": "BDGMC2zRR8o",
+    "status": "partially_published",
+    "errors": {
+      "instagram": "Meta Graph API access blocked (OAuthException code 200). Account/Token restricted by Meta."
+    }
+  },
+  {
     "id": "pub_3379f023d5",
     "title": "The Silent Boötes Cosmic Sup e7074e",
     "filename": "cdn_The_Silent_Boötes_Cosmic_Sup_e7074e.mp4",
@@ -23,7 +144,11 @@
     "instagram_permalink": null,
     "youtube_shorts_url": "https://youtube.com/shorts/asvkbGcOTHE",
     "youtube_watch_url": "https://www.youtube.com/watch?v=asvkbGcOTHE",
-    "youtube_video_id": "asvkbGcOTHE"
+    "youtube_video_id": "asvkbGcOTHE",
+    "status": "partially_published",
+    "errors": {
+      "instagram": "Meta Graph API access blocked (OAuthException code 200). Account/Token restricted by Meta."
+    }
   },
   {
     "id": "pub_a22c6b3b74",

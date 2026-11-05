@@ -21,6 +21,7 @@ async function initApp() {
         fetchYouTubeStatus(),
         fetchQuota(),
         fetchIdeaBuffer(),
+        fetchUniverseStatus(),
         fetchPublishingQueue(),
         fetchRecentlyPublished()
     ]);
@@ -80,11 +81,16 @@ async function triggerPublishNow() {
         }
 
         if (data.success) {
-            let msg = '🎉 Reel published successfully!';
-            if (data.receipts && data.receipts.youtube && data.receipts.youtube.shorts_url) {
-                msg += ` YouTube Short: ${data.receipts.youtube.shorts_url}`;
+            if (data.partial) {
+                const igErr = data.errors?.instagram || 'Meta API access blocked';
+                showSnackbar(`⚠️ Published to YouTube, but Instagram failed: ${igErr}`, 'error');
+            } else {
+                let msg = '🎉 Reel published successfully to Instagram & YouTube!';
+                if (data.receipts && data.receipts.youtube && data.receipts.youtube.shorts_url) {
+                    msg += ` YouTube Short: ${data.receipts.youtube.shorts_url}`;
+                }
+                showSnackbar(msg, 'success');
             }
-            showSnackbar(msg, 'success');
             
             await Promise.all([
                 fetchPublishingQueue(),
@@ -145,14 +151,19 @@ async function uploadQueueItemNow(itemId) {
         });
         const data = await res.json();
         if (data.success) {
-            showSnackbar('🎉 Reel published live!', 'success');
+            if (data.partial) {
+                const igErr = data.errors?.instagram || 'Meta API access blocked';
+                showSnackbar(`⚠️ Published to YouTube, but Instagram failed: ${igErr}`, 'error');
+            } else {
+                showSnackbar('🎉 Reel published live to Instagram & YouTube!', 'success');
+            }
             await Promise.all([
                 fetchPublishingQueue(),
                 fetchRecentlyPublished(),
                 fetchQuota()
             ]);
         } else {
-            showSnackbar(`⚠️ Upload error: ${data.error || 'Failed'}`, 'error');
+            showSnackbar(`⚠️ Upload error: ${data.error || 'Failed to upload'}`, 'error');
         }
     } catch (err) {
         showSnackbar(`❌ Error: ${err.message}`, 'error');
@@ -308,6 +319,9 @@ function renderRecentList(items) {
 
         const igLink = item.instagram_permalink || (item.receipts?.instagram?.permalink);
         const ytLink = item.youtube_shorts_url || (item.receipts?.youtube?.shorts_url) || (item.youtube_video_id ? `https://youtube.com/shorts/${item.youtube_video_id}` : null);
+        const platforms = item.platforms || ['instagram', 'youtube'];
+        const hasIgTarget = platforms.includes('instagram') || platforms.includes('both');
+        const igError = item.errors?.instagram || '';
 
         return `
             <div class="md3-item-row">
@@ -317,6 +331,7 @@ function renderRecentList(items) {
                         <span class="item-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
                         <div class="item-meta-row">
                             <span>✨ Published ${timeAgo}</span>
+                            ${igError ? `<span style="color: #f87171; font-size: 11px;">⚠️ IG: ${escapeHtml(igError.slice(0, 45))}...</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -326,7 +341,12 @@ function renderRecentList(items) {
                             <span class="material-symbols-outlined" style="font-size: 16px;">photo_camera</span>
                             <span>Instagram</span>
                         </a>
-                    ` : ''}
+                    ` : (hasIgTarget ? `
+                        <button class="btn-item-action btn-error-ig" onclick="retryInstagram('${item.id}')" title="${escapeHtml(igError || 'Instagram upload failed')} (Click to retry now)">
+                            <span class="material-symbols-outlined" style="font-size: 16px; color: #f87171;">warning</span>
+                            <span style="color: #f87171;">Retry IG</span>
+                        </button>
+                    ` : '')}
                     ${ytLink ? `
                         <a href="${ytLink}" target="_blank" class="btn-item-action btn-link-yt" title="View short on YouTube">
                             <span class="material-symbols-outlined" style="font-size: 16px;">smart_display</span>
@@ -339,8 +359,14 @@ function renderRecentList(items) {
     }).join('');
 }
 
+// Global quota state
+let currentQuota = {
+    auto_publish_stopped: false,
+    remaining_manual: 20
+};
+
 /**
- * Fetch Daily Quota
+ * Fetch Daily Quota & Cadence Status
  */
 async function fetchQuota() {
     try {
@@ -348,21 +374,89 @@ async function fetchQuota() {
         if (!res.ok) return;
         const data = await res.json();
         const q = data.quota || {};
+        currentQuota = q;
 
-        const published = q.generated_today || 0;
-        const limit = q.daily_limit || 50;
-        const remaining = q.remaining_today !== undefined ? q.remaining_today : (limit - published);
-        const percent = Math.min(100, Math.round((published / limit) * 100));
+        const autoPublished = q.auto_published_today !== undefined ? q.auto_published_today : (q.generated_today || 0);
+        const manualPublished = q.manual_published_today || 0;
+        const autoLimit = q.daily_limit || 50;
+        const remainingAuto = q.remaining_today !== undefined ? q.remaining_today : (autoLimit - autoPublished);
+        const remainingManual = q.remaining_manual !== undefined ? q.remaining_manual : 20;
+        const isStopped = !!q.auto_publish_stopped;
+        const percent = Math.min(100, Math.round((autoPublished / autoLimit) * 100));
 
+        // Metric 1: 50 Auto Reels Target
         const numElem = document.getElementById('quotaPublishedNumber');
         const barElem = document.getElementById('quotaProgressBar');
         const capElem = document.getElementById('quotaCaption');
+        const manualBadge = document.getElementById('manualOverrideBadge');
 
-        if (numElem) numElem.innerText = published;
+        if (numElem) numElem.innerText = autoPublished;
         if (barElem) barElem.style.width = `${percent}%`;
-        if (capElem) capElem.innerText = `${remaining} reels remaining for today's quota`;
+        if (capElem) {
+            capElem.innerText = `${remainingAuto} auto reels remaining for today`;
+        }
+        if (manualBadge) {
+            manualBadge.innerText = `Manual Override: ${manualPublished} / 20 Pushed`;
+        }
+
+        // Hero Button Sublabel (Remaining manual pushes)
+        const subLabel = document.getElementById('btnPublishQuota');
+        if (subLabel) {
+            subLabel.innerText = `${remainingManual} Manual Pushes Left`;
+        }
+
+        // Hero Auto-Cadence Status Badge & Alert Banner
+        const heroBadge = document.getElementById('heroStatusBadge');
+        const heroPulse = document.getElementById('heroPulseIndicator');
+        const statusText = document.getElementById('autonomousStatusText');
+        const alertBanner = document.getElementById('overrideAlertBanner');
+        const alertText = document.getElementById('overrideAlertText');
+
+        if (isStopped) {
+            if (heroBadge) heroBadge.className = 'md3-status-badge stopped';
+            if (heroPulse) heroPulse.className = 'pulse-indicator stopped';
+            if (statusText) statusText.innerText = 'Auto-Publish Paused for Today · 1-Click Override Active';
+            if (alertBanner) alertBanner.style.display = 'flex';
+            if (alertText) {
+                alertText.innerText = `Auto-publish stopped for today. Manual override: ${remainingManual} of 20 reels left.`;
+            }
+        } else {
+            if (heroBadge) heroBadge.className = 'md3-status-badge';
+            if (heroPulse) heroPulse.className = 'pulse-indicator';
+            if (statusText) statusText.innerText = 'Autonomous Cadence Active · Paced at 10 Mins';
+            if (alertBanner) alertBanner.style.display = 'none';
+        }
+
+        updateCountdownDisplay();
     } catch (err) {
         console.warn('Error fetching quota:', err);
+    }
+}
+
+/**
+ * 1-Click Action: Resume Auto-Publish Today
+ */
+async function triggerResumeAuto() {
+    const btn = document.getElementById('btnResumeAuto');
+    if (btn) btn.disabled = true;
+    try {
+        showSnackbar('▶️ Resuming background 10-minute auto-publishing...', 'info');
+        const res = await fetch(`${API_BASE}/api/action/resume-auto`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSnackbar('✅ Auto-publishing resumed successfully!', 'success');
+            await fetchQuota();
+        } else {
+            showSnackbar(`⚠️ Could not resume: ${data.error || 'Failed'}`, 'error');
+        }
+    } catch (err) {
+        showSnackbar(`❌ Error: ${err.message}`, 'error');
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -391,12 +485,77 @@ async function fetchStatus() {
         if (!res.ok) return;
         const data = await res.json();
 
-        if (data.account && data.account.username) {
-            const igHandle = document.getElementById('igHandle');
-            if (igHandle) igHandle.innerText = `@${data.account.username}`;
+        const igHandle = document.getElementById('igHandle');
+        const igDot = document.getElementById('igStatusDot');
+        const chipIg = document.getElementById('chipInstagram');
+
+        if (data.authenticated) {
+            if (igHandle) igHandle.innerText = `@${data.account?.username || 'sun_27417'}`;
+            if (igDot) igDot.className = 'chip-status-dot online';
+            if (chipIg) chipIg.title = 'Meta Instagram Graph API — Connected';
+        } else {
+            const errReason = data.error || 'Blocked by Meta';
+            if (igHandle) igHandle.innerText = `@${data.account?.username || 'sun_27417'} (Meta Blocked)`;
+            if (igDot) igDot.className = 'chip-status-dot offline';
+            if (chipIg) {
+                chipIg.title = `Instagram API Blocked: ${errReason} — Click to update access token`;
+                chipIg.style.cursor = 'pointer';
+                chipIg.onclick = promptUpdateMetaToken;
+            }
         }
     } catch (err) {
         console.warn('Error fetching status:', err);
+    }
+}
+
+/**
+ * 1-Click Retry Instagram Publication for a Specific Reel
+ */
+async function retryInstagram(itemId) {
+    if (!itemId) return;
+    try {
+        showSnackbar('📸 Retrying Instagram Reels publication...', 'info');
+        const res = await fetch(`${API_BASE}/api/action/retry-instagram`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: itemId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSnackbar('🎉 Instagram Reel published successfully!', 'success');
+            await fetchRecentlyPublished();
+        } else {
+            showSnackbar(`❌ Instagram publish error: ${data.error || 'Failed'}`, 'error');
+        }
+    } catch (err) {
+        showSnackbar(`❌ Network error: ${err.message}`, 'error');
+    }
+}
+
+/**
+ * Update Meta Access Token Dialog
+ */
+async function promptUpdateMetaToken() {
+    const token = prompt('Enter your fresh Meta Long-Lived Access Token (or Page Access Token):');
+    if (!token || !token.trim()) return;
+
+    try {
+        showSnackbar('🔑 Updating and verifying Meta access token...', 'info');
+        const res = await fetch(`${API_BASE}/api/instagram/update-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token.trim() })
+        });
+        const data = await res.json();
+        if (data.authenticated) {
+            showSnackbar('✅ Meta access token verified & connected to Instagram!', 'success');
+            await fetchStatus();
+        } else {
+            showSnackbar(`⚠️ Meta token rejected: ${data.error || 'Invalid token'}`, 'error');
+            await fetchStatus();
+        }
+    } catch (err) {
+        showSnackbar(`❌ Error: ${err.message}`, 'error');
     }
 }
 
@@ -472,6 +631,11 @@ function updateCountdownDisplay() {
     const countdownElem = document.getElementById('nextDropCountdown');
     if (!countdownElem) return;
 
+    if (currentQuota && currentQuota.auto_publish_stopped) {
+        countdownElem.innerText = 'Paused for today (Manual override active)';
+        return;
+    }
+
     if (!nextScheduledTime) {
         countdownElem.innerText = 'Standby (Ready for 1-Click)';
         return;
@@ -531,6 +695,84 @@ function formatTimeAgo(date) {
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+/**
+ * 2026 Character Universe & Episodic Continuity Controller
+ */
+async function fetchUniverseStatus() {
+    try {
+        const res = await fetch(`${API_BASE}/api/universe/status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.success || !data.active) return;
+
+        const active = data.active;
+        const catBadge = document.getElementById('universeCategoryBadge');
+        const epPill = document.getElementById('universeEpisodePill');
+        const titleElem = document.getElementById('universeTitle');
+        const descElem = document.getElementById('universeDescription');
+        const castContainer = document.getElementById('universeCastChips');
+
+        if (catBadge) catBadge.innerText = (active.category || 'Character Universe').replace('_', ' ').toUpperCase();
+        if (epPill) epPill.innerText = `Season ${active.current_season || 1} · Episode ${active.current_episode || 1}`;
+        if (titleElem) titleElem.innerText = active.title || 'Character Universe';
+        if (descElem) descElem.innerText = active.description || '';
+
+        // Update active tab button
+        document.querySelectorAll('.universe-tab').forEach(tab => {
+            if (tab.getAttribute('onclick') && tab.getAttribute('onclick').includes(active.universe_id)) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        // Render cast chips
+        if (castContainer && active.cast && active.cast.length > 0) {
+            const emojiMap = {
+                'Orange Tabby Cat': '🐱',
+                'Old English Bulldog': '🐶',
+                'Golden Retriever Puppy': '🐾',
+                'White Lop Bunny': '🐰',
+                'Human Infant (10 Months)': '👶',
+                'Golden Retriever & Calico Kitten': '🐾'
+            };
+            castContainer.innerHTML = active.cast.map(c => {
+                const emoji = emojiMap[c.species] || '✨';
+                return `
+                    <div class="cast-chip" title="${escapeHtml(c.traits || '')}">
+                        <span class="cast-emoji">${emoji}</span>
+                        <div class="cast-details">
+                            <span class="cast-name">${escapeHtml(c.name)}</span>
+                            <span class="cast-role">${escapeHtml(c.species)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (err) {
+        console.warn('Error fetching universe status:', err);
+    }
+}
+
+async function selectUniverse(universeId) {
+    try {
+        showSnackbar(`Switching universe...`, 'info');
+        const res = await fetch(`${API_BASE}/api/universe/set-active`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ universe_id: universeId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSnackbar(`Universe updated to: ${data.active.title}`, 'success');
+            await fetchUniverseStatus();
+            await fetchIdeaBuffer();
+        }
+    } catch (err) {
+        showSnackbar('Failed to switch universe: ' + err.message, 'error');
+    }
 }
 
 /**

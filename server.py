@@ -95,11 +95,17 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             with open(template_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
+            content_bytes = content.encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(content_bytes)))
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
             self._set_cors_headers()
             self.end_headers()
-            self.wfile.write(content.encode("utf-8"))
+            self.wfile.write(content_bytes)
+            self.wfile.flush()
 
         # 2. Static Assets (CSS, JS, Images)
         elif url.path.startswith("/static/"):
@@ -119,11 +125,12 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header("Content-Type", mime)
                 self.send_header("Content-Length", str(file_path.stat().st_size))
-                self.send_header("Cache-Control", "public, max-age=3600")
+                self.send_header("Cache-Control", "no-cache, must-revalidate")
                 self._set_cors_headers()
                 self.end_headers()
                 with open(file_path, "rb") as f:
                     shutil.copyfileobj(f, self.wfile)
+                self.wfile.flush()
             else:
                 self.send_error(404, "Static asset not found")
 
@@ -247,6 +254,20 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self._set_cors_headers()
             self.end_headers()
             self.wfile.write(json.dumps({"success": True, "stats": stats}).encode("utf-8"))
+
+        # 11a-2. API: 2026 Character Universe & Episodic Continuity Status
+        elif url.path in ["/api/universe/status", "/api/universe/info"]:
+            from core.universe_manager import UniverseManager
+            res = {
+                "success": True,
+                "active": UniverseManager.get_active_universe_info(),
+                "universes": UniverseManager.get_all_universes()
+            }
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
 
         # 11b. API: YouTube Channel Status & Auth URL
         elif url.path == "/api/youtube/status":
@@ -428,6 +449,52 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(res).encode("utf-8"))
 
+        # 3-update. API: Update Meta Access Token & Re-verify
+        elif url.path == "/api/instagram/update-token":
+            new_token = (data.get("token") or "").strip()
+            if not new_token:
+                res = {"success": False, "error": "No token provided"}
+            else:
+                env_path = PROJECT_ROOT / ".env"
+                if env_path.exists():
+                    lines = []
+                    replaced = False
+                    with open(env_path, "r", encoding="utf-8") as f:
+                        for line in f:
+                            if line.strip().startswith("META_ACCESS_TOKEN="):
+                                lines.append(f'META_ACCESS_TOKEN="{new_token}"\n')
+                                replaced = True
+                            else:
+                                lines.append(line)
+                    if not replaced:
+                        lines.append(f'META_ACCESS_TOKEN="{new_token}"\n')
+                    with open(env_path, "w", encoding="utf-8") as f:
+                        f.writelines(lines)
+                os.environ["META_ACCESS_TOKEN"] = new_token
+                from publishers.instagram.publisher import MetaGraphPublisher
+                pub = MetaGraphPublisher(access_token=new_token)
+                acc = pub.get_account_info()
+                res = {
+                    "success": acc.get("authenticated", False),
+                    "authenticated": acc.get("authenticated", False),
+                    "error": acc.get("error", ""),
+                    "account": acc
+                }
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3-retry. API: Retry Instagram Publish for a Recent Reel
+        elif url.path == "/api/action/retry-instagram":
+            res = self._handle_retry_instagram(data)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
         # 3b. API: Publish an Existing Video File to YouTube Shorts
         elif url.path == "/api/youtube/publish":
             try:
@@ -467,9 +534,9 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             item_id = data.get("id")
             dry_run = data.get("dry_run", False)
             if item_id:
-                res = PublishingQueueManager.publish_now(item_id, dry_run=dry_run)
+                res = PublishingQueueManager.publish_now(item_id, dry_run=dry_run, is_manual=True)
             else:
-                res = PublishingQueueManager.publish_next(dry_run=dry_run)
+                res = PublishingQueueManager.publish_next(dry_run=dry_run, is_manual=True)
                 if res is None:
                     # Auto-fallback: Stage or synthesize fresh reel immediately on the fly
                     res = self._handle_publish_now_fallback(dry_run=dry_run)
@@ -487,6 +554,27 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self._set_cors_headers()
             self.end_headers()
             self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3d-3. API: Resume Auto-Publishing Today (Manual Override Unpause)
+        elif url.path in ["/api/action/resume-auto", "/api/action/resume-auto-publish"]:
+            from video_generation import QuotaGovernor
+            status = QuotaGovernor.resume_auto_publish()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "quota": status}).encode("utf-8"))
+
+        # 3d-4. API: Set Active Character Universe
+        elif url.path in ["/api/universe/set-active", "/api/universe/select"]:
+            from core.universe_manager import UniverseManager
+            universe_id = data.get("universe_id", "")
+            success = UniverseManager.set_active_universe(universe_id)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": success, "active": UniverseManager.get_active_universe_info()}).encode("utf-8"))
 
         # 3e. API: Cancel Scheduled Video in Publishing Queue
         elif url.path == "/api/publishing-queue/cancel":
@@ -617,16 +705,20 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             publisher = InstagramReelPublisher()
             acc = publisher.get_account_info()
             limit = publisher.get_publishing_limit()
+            is_auth = acc.get("authenticated", False)
             return {
-                "success": True,
+                "success": is_auth,
+                "authenticated": is_auth,
                 "account": acc,
-                "quota": limit
+                "quota": limit,
+                "error": acc.get("error", "")
             }
         except Exception as e:
             return {
                 "success": False,
+                "authenticated": False,
                 "error": str(e),
-                "account": {"username": "sun_27417", "id": INSTAGRAM_ACCOUNT_ID}
+                "account": {"username": "sun_27417", "id": INSTAGRAM_ACCOUNT_ID, "authenticated": False}
             }
 
     def _get_gallery_data(self):
@@ -930,6 +1022,71 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def _handle_retry_instagram(self, data: dict) -> dict:
+        """Retries uploading a previously published/partially-published video to Instagram Reels."""
+        item_id = data.get("id")
+        from publishers.recent_manager import RecentlyPublishedManager
+        items = RecentlyPublishedManager.get_recent(20)
+        target = next((i for i in items if i.get("id") == item_id), None)
+        if not target:
+            return {"success": False, "error": f"Item {item_id} not found in recent list"}
+
+        # Check if already published on IG
+        if target.get("instagram_permalink"):
+            return {
+                "success": True,
+                "message": "Already published to Instagram",
+                "permalink": target.get("instagram_permalink")
+            }
+
+        # Locate video file
+        raw_vpath = target.get("video_path", "")
+        vpath = Path(raw_vpath) if raw_vpath else None
+        if not vpath or not vpath.exists():
+            candidate = OUTPUT_DIR / Path(target.get("filename", "")).name
+            if candidate.exists():
+                vpath = candidate
+            else:
+                # Search reels_failed or reels_archive
+                failed_candidates = list(FAILED_DIR.glob(f"**/*{target.get('filename', '')}"))
+                if failed_candidates and failed_candidates[0].exists():
+                    vpath = failed_candidates[0]
+
+        if not vpath or not vpath.exists():
+            return {"success": False, "error": f"Video file not found on disk: {target.get('filename')}"}
+
+        try:
+            INBOX_DIR.mkdir(parents=True, exist_ok=True)
+            target_inbox_video = INBOX_DIR / vpath.name
+            shutil.copy(str(vpath), str(target_inbox_video))
+
+            caption = target.get("title", vpath.stem.replace("_", " "))
+            caption_file = INBOX_DIR / f"{vpath.stem}.txt"
+            with open(caption_file, "w", encoding="utf-8") as f:
+                f.write(f"{caption}\n\n#Shorts #Reels #Viral")
+
+            manager = ReelQueueManager()
+            result = manager.process_video_file(target_inbox_video, dry_run=False)
+
+            if result.get("success"):
+                receipt = result.get("receipt", {})
+                target.setdefault("receipts", {})["instagram"] = receipt
+                target["instagram_permalink"] = receipt.get("instagram_permalink")
+                if "errors" in target and "instagram" in target["errors"]:
+                    del target["errors"]["instagram"]
+                if not target.get("errors"):
+                    target["status"] = "published"
+                RecentlyPublishedManager.record_published(target)
+                return {
+                    "success": True,
+                    "permalink": receipt.get("instagram_permalink"),
+                    "media_id": receipt.get("instagram_media_id")
+                }
+            else:
+                return {"success": False, "error": result.get("error", "Instagram publish failed")}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     def _handle_stage_next_reel(self) -> dict:
         """Stages the next available reel into the publishing queue for scheduled release."""
         from publishers.dispatch_queue import PublishingQueueManager
@@ -941,34 +1098,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         if not allowed:
             return {"success": False, "error": msg}
 
-        # 1. Check for ready mp4s in output/
-        available_mp4s = sorted(
-            [f for f in OUTPUT_DIR.glob("*.mp4") if not f.name.startswith("test_") and not f.name.startswith("cdn_")],
-            key=lambda f: f.stat().st_mtime,
-            reverse=True
-        )
-        recent_filenames = {r.get("filename") for r in RecentlyPublishedManager.get_recent(20)}
-        queue_filenames = {i.get("filename") for i in PublishingQueueManager.get_queue()}
-
-        target_video = None
-        for candidate in available_mp4s:
-            if candidate.name not in recent_filenames and f"cdn_{candidate.name}" not in recent_filenames and candidate.name not in queue_filenames:
-                target_video = candidate
-                break
-
-        if target_video:
-            cdn_file = CDNOptimizer.optimize_for_cdn(target_video)
-            title = target_video.stem.replace("_", " ")
-            entry = PublishingQueueManager.enqueue(
-                video_path=cdn_file,
-                title=title,
-                platforms=["instagram", "youtube"],
-                instagram_meta={"caption": f"{title}\n\n#Shorts #Reels #Viral"},
-                youtube_meta={"title": f"{title} #Shorts", "description": title, "tags": ["Shorts", "Trending"]}
-            )
-            return {"success": True, "action": "staged_existing", "item": entry}
-
-        # 2. Synthesize fresh reel from Idea Queue
+        # Synthesize fresh reel from 2026 Character Universe Idea Queue
         from idea_generation import IdeaQueueManager, IdeaResearchEngine
         from video_generation import VideoGenerator
         idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
@@ -1019,7 +1149,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         
         item = stage_res.get("item")
         if item and item.get("id"):
-            return PublishingQueueManager.publish_now(item["id"], dry_run=dry_run)
+            return PublishingQueueManager.publish_now(item["id"], dry_run=dry_run, is_manual=True)
         return {"success": False, "error": "Failed to stage reel for immediate upload"}
 
 def start_scheduler_thread():
@@ -1033,35 +1163,37 @@ def start_scheduler_thread():
 
         while True:
             try:
-                # 1. Process scheduled items whose release time has arrived
-                PublishingQueueManager.process_due_items()
+                # 1. Process scheduled items only if auto-publishing is active today
+                auto_allowed, _ = QuotaGovernor.is_auto_publish_allowed()
+                if auto_allowed:
+                    PublishingQueueManager.process_due_items()
 
-                # 2. Maintain at least 1 video queued ahead if daily quota allows
-                allowed, remaining, _ = QuotaGovernor.can_generate()
-                if allowed and remaining > 0:
-                    queue = PublishingQueueManager.get_queue()
-                    active = [i for i in queue if i.get("status") in ["scheduled", "pending"]]
-                    if len(active) == 0:
-                        # Auto-stage the next reel in the queue from ready output files
-                        available_mp4s = sorted(
-                            [f for f in OUTPUT_DIR.glob("*.mp4") if not f.name.startswith("test_") and not f.name.startswith("cdn_")],
-                            key=lambda f: f.stat().st_mtime,
-                            reverse=True
-                        )
-                        recent_filenames = {r.get("filename") for r in RecentlyPublishedManager.get_recent(20)}
-                        for candidate in available_mp4s:
-                            if candidate.name not in recent_filenames and f"cdn_{candidate.name}" not in recent_filenames:
-                                cdn_file = CDNOptimizer.optimize_for_cdn(candidate)
-                                title = candidate.stem.replace("_", " ")
-                                entry = PublishingQueueManager.enqueue(
-                                    video_path=cdn_file,
-                                    title=title,
-                                    platforms=["instagram", "youtube"],
-                                    instagram_meta={"caption": f"{title}\n\n#Shorts #Reels #Viral"},
-                                    youtube_meta={"title": f"{title} #Shorts", "description": title, "tags": ["Shorts", "Trending"]}
-                                )
-                                print(f"🤖 [AutoScheduler] Auto-staged next reel: '{title}' for scheduled pacing.")
-                                break
+                    # 2. Maintain at least 1 video queued ahead if daily quota allows
+                    allowed, remaining, _ = QuotaGovernor.can_generate()
+                    if allowed and remaining > 0:
+                        queue = PublishingQueueManager.get_queue()
+                        active = [i for i in queue if i.get("status") in ["scheduled", "pending"]]
+                        if len(active) == 0:
+                            # Auto-stage the next reel in the queue from ready output files
+                            available_mp4s = sorted(
+                                [f for f in OUTPUT_DIR.glob("*.mp4") if not f.name.startswith("test_") and not f.name.startswith("cdn_")],
+                                key=lambda f: f.stat().st_mtime,
+                                reverse=True
+                            )
+                            recent_filenames = {r.get("filename") for r in RecentlyPublishedManager.get_recent(20)}
+                            for candidate in available_mp4s:
+                                if candidate.name not in recent_filenames and f"cdn_{candidate.name}" not in recent_filenames:
+                                    cdn_file = CDNOptimizer.optimize_for_cdn(candidate)
+                                    title = candidate.stem.replace("_", " ")
+                                    entry = PublishingQueueManager.enqueue(
+                                        video_path=cdn_file,
+                                        title=title,
+                                        platforms=["instagram", "youtube"],
+                                        instagram_meta={"caption": f"{title}\n\n#Shorts #Reels #Viral"},
+                                        youtube_meta={"title": f"{title} #Shorts", "description": title, "tags": ["Shorts", "Trending"]}
+                                    )
+                                    print(f"🤖 [AutoScheduler] Auto-staged next reel: '{title}' for scheduled pacing.")
+                                    break
             except Exception as e:
                 print(f"⚠️ Scheduler ticker error: {e}")
             time.sleep(30)

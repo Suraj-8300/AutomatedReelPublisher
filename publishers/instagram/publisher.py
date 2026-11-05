@@ -306,14 +306,35 @@ class MetaGraphPublisher:
     def get_account_info(self) -> Dict[str, Any]:
         """Fetches basic profile info (username, id) of the connected Instagram account."""
         if not self.is_configured():
-            return {"id": self.account_id, "username": "sun_27417"}
+            return {"id": self.account_id, "username": "sun_27417", "authenticated": False, "error": "Meta access token not configured in .env"}
         url = f"{self.base_url}/{self.account_id}?fields=id,name,username&access_token={self.access_token}"
         try:
             req = urllib.request.Request(url)
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                return json.loads(resp.read().decode("utf-8"))
-        except Exception:
-            return {"id": self.account_id, "username": "sun_27417"}
+                data = json.loads(resp.read().decode("utf-8"))
+                data["authenticated"] = True
+                return data
+        except urllib.error.HTTPError as e:
+            err_body = ""
+            try:
+                err_body = e.read().decode("utf-8")
+                err_json = json.loads(err_body)
+                err_body = err_json.get("error", {}).get("message", err_body)
+            except Exception:
+                pass
+            return {
+                "id": self.account_id,
+                "username": "sun_27417",
+                "authenticated": False,
+                "error": err_body or str(e)
+            }
+        except Exception as e:
+            return {
+                "id": self.account_id,
+                "username": "sun_27417",
+                "authenticated": False,
+                "error": str(e)
+            }
 
     def get_publishing_limit(self) -> Dict[str, Any]:
         """Fetches daily 24h Reels publishing quota usage for the account."""

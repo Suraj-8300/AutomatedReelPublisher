@@ -25,7 +25,7 @@ from publishers.instagram.queue_manager import ReelQueueManager as InstagramQueu
 from publishers.youtube.auth import YouTubeAuthenticator
 from publishers.youtube.publisher import YouTubePublisher
 
-DEFAULT_INTERVAL_MINUTES = 28.8 # 50 reels / 24 hours = 1 reel every ~28.8 minutes
+DEFAULT_INTERVAL_MINUTES = 10.0 # Paced release every 10 minutes (50 reels/day ceiling)
 
 class PublishingQueueManager:
     """Manages the queue of ready-to-publish videos and scheduled distribution."""
@@ -80,9 +80,9 @@ class PublishingQueueManager:
             ]
             if pending:
                 latest = max(pending)
-                sched_dt = max(latest + timedelta(minutes=interval_minutes), now + timedelta(minutes=5))
+                sched_dt = max(latest + timedelta(minutes=interval_minutes), now + timedelta(minutes=interval_minutes))
             else:
-                sched_dt = now + timedelta(minutes=5)
+                sched_dt = now + timedelta(minutes=interval_minutes)
 
         item_id = f"pub_{uuid.uuid4().hex[:10]}"
         platforms = platforms or ["instagram", "youtube"]
@@ -124,12 +124,29 @@ class PublishingQueueManager:
         return None
 
     @classmethod
-    def publish_now(cls, item_id: str, dry_run: bool = False) -> Dict[str, Any]:
+    def publish_now(cls, item_id: str, dry_run: bool = False, is_manual: bool = True) -> Dict[str, Any]:
         """
-        Instant One-Click Upload Now:
-        Bypasses the scheduled timer and immediately publishes the video
-        to all assigned platforms (Instagram Reels, YouTube Shorts, or both).
+        Instant One-Click Upload Now (or automated scheduled dispatch):
+        Bypasses scheduled timer (or executes scheduled timer).
+        Enforces daily quotas:
+          - Automated publish capped at 50/day.
+          - Manual 1-click override allows pushing limit up to 20 reels,
+            and halts auto-publishing for the remainder of that day.
         """
+        from video_generation.quota_governor import QuotaGovernor
+
+        # Enforce quota safety rules
+        if is_manual:
+            can_pub, remaining_m, q_msg = QuotaGovernor.can_manual_publish()
+            if not can_pub:
+                print(f"⛔ [PublishingQueue] Manual publish rejected: {q_msg}")
+                return {"success": False, "error": q_msg}
+        else:
+            auto_allowed, q_msg = QuotaGovernor.is_auto_publish_allowed()
+            if not auto_allowed:
+                print(f"⛔ [PublishingQueue] Auto publish rejected: {q_msg}")
+                return {"success": False, "error": q_msg}
+
         items = cls._load_data()
         target_idx = None
         for idx, item in enumerate(items):
@@ -156,8 +173,9 @@ class PublishingQueueManager:
         errors = {}
         overall_success = True
 
+        tag_str = "1-CLICK MANUAL OVERRIDE" if is_manual else "AUTOMATED SCHEDULED RELEASE"
         print("=" * 65)
-        print(f"🚀 [PublishingQueue] 1-CLICK UPLOAD NOW: {item['title']}")
+        print(f"🚀 [PublishingQueue] {tag_str}: {item['title']}")
         print(f"📁 Video:     {item['filename']}")
         print(f"🎯 Targets:   {', '.join(platforms).upper()}")
         print("=" * 65)
@@ -237,22 +255,50 @@ class PublishingQueueManager:
             cls._save_data(items)
             from .recent_manager import RecentlyPublishedManager
             RecentlyPublishedManager.record_published(item)
-            print(f"📦 [PublishingQueue] Removed '{item['title']}' from ready queue & added to Recently Published (rolling 10 limit).")
+
+            # Record in daily quota governor (triggers auto-publish stop if is_manual=True)
+            from video_generation.quota_governor import QuotaGovernor
+            QuotaGovernor.record_publish(is_manual=is_manual)
+
+            mode_desc = "Manual Override (Auto-publish stopped for today)" if is_manual else "Automated Scheduled Release"
+            print(f"📦 [PublishingQueue] [{mode_desc}] Removed '{item['title']}' from ready queue & added to Recently Published (rolling 10 limit).")
         else:
             # Failed to publish to any platform, retain in queue marked failed
             cls._save_data(items)
 
+        # Build human-readable error description with smart API diagnostics
+        err_msg = None
+        if errors:
+            formatted_errors = []
+            for k, v in errors.items():
+                v_str = str(v)
+                if "uploadLimitExceeded" in v_str or "number of videos they may upload" in v_str:
+                    formatted_errors.append("YouTube: Daily channel upload limit reached (Google 24h cap).")
+                elif "API access blocked" in v_str:
+                    formatted_errors.append("Instagram: Meta API access blocked. Reconnect token.")
+                else:
+                    formatted_errors.append(f"{k.capitalize()}: {v_str[:80]}")
+            err_msg = " | ".join(formatted_errors)
+
+        # If at least one target platform succeeded, mark as partial success so UI can update and report
+        has_any_success = bool(receipts)
+        is_partial = has_any_success and len(receipts) < len(platforms)
+
         return {
-            "success": overall_success,
+            "success": has_any_success,
+            "overall_success": overall_success,
+            "partial": is_partial,
             "id": item_id,
             "status": item["status"],
             "receipts": receipts,
             "errors": errors,
-            "published_at": item["published_at"]
+            "error": err_msg,
+            "published_at": item["published_at"],
+            "is_manual": is_manual
         }
 
     @classmethod
-    def publish_next(cls, dry_run: bool = False) -> Optional[Dict[str, Any]]:
+    def publish_next(cls, dry_run: bool = False, is_manual: bool = True) -> Optional[Dict[str, Any]]:
         """Publishes the earliest scheduled pending video immediately."""
         items = cls._load_data()
         pending = [
@@ -263,15 +309,20 @@ class PublishingQueueManager:
             return None
         # Sort by scheduled time
         pending.sort(key=lambda x: x.get("scheduled_time", ""))
-        return cls.publish_now(pending[0]["id"], dry_run=dry_run)
+        return cls.publish_now(pending[0]["id"], dry_run=dry_run, is_manual=is_manual)
 
     @classmethod
     def process_due_items(cls, dry_run: bool = False) -> List[Dict[str, Any]]:
         """
         Called by the scheduler ticker.
         Checks for any scheduled items whose release time has arrived (<= now).
-        Publishes them automatically.
+        Publishes them automatically if automated publishing is active today.
         """
+        from video_generation.quota_governor import QuotaGovernor
+        auto_allowed, reason = QuotaGovernor.is_auto_publish_allowed()
+        if not auto_allowed:
+            return []
+
         items = cls._load_data()
         now = datetime.now(timezone.utc)
         due_items = []
@@ -289,8 +340,14 @@ class PublishingQueueManager:
 
         results = []
         for item_id in due_items:
+            # Double check auto quota before dispatching each item
+            auto_allowed, _ = QuotaGovernor.is_auto_publish_allowed()
+            if not auto_allowed:
+                print("🛑 [Scheduler] Auto-publish limit or stop triggered. Halting scheduled releases.")
+                break
+
             print(f"⏰ [Scheduler] Triggering scheduled release for due item: {item_id}")
-            res = cls.publish_now(item_id, dry_run=dry_run)
+            res = cls.publish_now(item_id, dry_run=dry_run, is_manual=False)
             results.append(res)
         return results
 
