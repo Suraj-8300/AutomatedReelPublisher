@@ -303,3 +303,4 @@ class PublishingQueueManager:
         removed = len(items) - len(active)
         cls._save_data(active)
         return removed
+

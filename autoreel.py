@@ -165,7 +165,8 @@ def cmd_publish(args):
             return
         pub = YouTubePublisher()
         title = args.title or video_path.stem.replace("_", " ")
-        res = pub.upload_short(video_path, title=title, privacy_status="public" if not args.dry_run else "private")
+        privacy = args.privacy if not args.dry_run else "private"
+        res = pub.upload_short(video_path, title=title, privacy_status=privacy)
         print(f"Result: {res}")
 
 def cmd_auto(args):
@@ -369,6 +370,7 @@ def main():
     p_pub.add_argument("platform", choices=["instagram", "ig", "youtube", "yt"], help="Target platform")
     p_pub.add_argument("video", help="Path to video file")
     p_pub.add_argument("--title", default=None, help="Optional title")
+    p_pub.add_argument("--privacy", default="public", choices=["public", "unlisted", "private"], help="YouTube privacy status (default: public)")
     p_pub.add_argument("--dry-run", action="store_true", help="Simulate API upload in dry-run mode")
 
     # Command: auto

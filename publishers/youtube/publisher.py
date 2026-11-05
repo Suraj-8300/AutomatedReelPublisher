@@ -98,22 +98,26 @@ class YouTubePublisher:
         retry = 0
         max_retries = 5
 
-        while response is None:
-            try:
-                status, response = request.next_chunk()
-                if status:
-                    progress = int(status.progress() * 100)
-                    print(f"  ⏳ Upload Progress: {progress}% uploaded...")
-            except HttpError as e:
-                if e.resp.status in [500, 502, 503, 504]:
-                    retry += 1
-                    if retry > max_retries:
+        try:
+            while response is None:
+                try:
+                    status, response = request.next_chunk()
+                    if status:
+                        progress = int(status.progress() * 100)
+                        print(f"  ⏳ Upload Progress: {progress}% uploaded...")
+                except HttpError as e:
+                    if e.resp.status in [500, 502, 503, 504]:
+                        retry += 1
+                        if retry > max_retries:
+                            raise e
+                        sleep_secs = 2 ** retry
+                        print(f"  ⚠️ Transient HTTP {e.resp.status}. Retrying in {sleep_secs}s...")
+                        time.sleep(sleep_secs)
+                    else:
                         raise e
-                    sleep_secs = 2 ** retry
-                    print(f"  ⚠️ Transient HTTP {e.resp.status}. Retrying in {sleep_secs}s...")
-                    time.sleep(sleep_secs)
-                else:
-                    raise e
+        except Exception as e:
+            print(f"❌ YouTube Upload Failed: {e}")
+            return {"success": False, "error": str(e)}
 
         video_id = response.get("id")
         shorts_url = f"https://youtube.com/shorts/{video_id}"
