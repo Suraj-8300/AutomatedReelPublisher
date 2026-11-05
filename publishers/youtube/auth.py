@@ -16,6 +16,9 @@ from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 
+# Allow local HTTP callback for OAuth development
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
 from .config import (
     CLIENT_SECRET_FILE,
     TOKEN_FILE,
@@ -30,9 +33,11 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
 
     flow: Optional[Flow] = None
     auth_code: Optional[str] = None
+    last_path: Optional[str] = None
     error: Optional[str] = None
 
     def do_GET(self):
+        OAuthCallbackHandler.last_path = self.path
         parsed = urlparse(self.path)
         if parsed.path == REDIRECT_PATH:
             query = parse_qs(parsed.query)
@@ -118,6 +123,8 @@ class YouTubeAuthenticator:
             scopes=YOUTUBE_SCOPES,
             redirect_uri=REDIRECT_URI
         )
+        flow.autogenerate_code_verifier = False
+        flow.code_verifier = None
         return flow
 
     @staticmethod
@@ -176,7 +183,14 @@ class YouTubeAuthenticator:
             raise TimeoutError("OAuth authorization timed out before callback was received.")
 
         # Exchange authorization code for token
-        flow.fetch_token(code=OAuthCallbackHandler.auth_code)
+        try:
+            flow.fetch_token(code=OAuthCallbackHandler.auth_code)
+        except Exception as ex:
+            if OAuthCallbackHandler.last_path:
+                full_resp = f"http://localhost:{REDIRECT_PORT}{OAuthCallbackHandler.last_path}"
+                flow.fetch_token(authorization_response=full_resp)
+            else:
+                raise ex
         creds = flow.credentials
 
         with open(TOKEN_FILE, "w", encoding="utf-8") as f:
@@ -225,7 +239,12 @@ class YouTubeAuthenticator:
                             break
                     server.server_close()
                     if OAuthCallbackHandler.auth_code:
-                        flow.fetch_token(code=OAuthCallbackHandler.auth_code)
+                        try:
+                            flow.fetch_token(code=OAuthCallbackHandler.auth_code)
+                        except Exception:
+                            if OAuthCallbackHandler.last_path:
+                                full_resp = f"http://localhost:{REDIRECT_PORT}{OAuthCallbackHandler.last_path}"
+                                flow.fetch_token(authorization_response=full_resp)
                         with open(TOKEN_FILE, "w", encoding="utf-8") as f:
                             f.write(flow.credentials.to_json())
                         print("\n🎉 YouTube credentials successfully authorized in background listener!")
