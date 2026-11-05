@@ -9,7 +9,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from instagram_pipeline.config import (
+from publishers.instagram.config import (
     INBOX_DIR,
     PROCESSING_DIR,
     ARCHIVE_DIR,
@@ -21,11 +21,11 @@ from instagram_pipeline.config import (
     SAFE_ZONE_BOTTOM,
     DEFAULT_SCALING_MODE
 )
-from instagram_pipeline.preprocessor import VideoPreprocessor
-from instagram_pipeline.metadata_linker import MetadataLinker
-from instagram_pipeline.cloud_bridge import CloudBridge
-from instagram_pipeline.publisher import MetaGraphPublisher
-from instagram_pipeline.queue_manager import ReelQueueManager
+from publishers.instagram.preprocessor import VideoPreprocessor
+from publishers.instagram.metadata_linker import MetadataLinker
+from publishers.instagram.cloud_bridge import CloudBridge
+from publishers.instagram.publisher import MetaGraphPublisher
+from publishers.instagram.queue_manager import ReelQueueManager
 
 def cmd_check(args):
     """Inspects a video and displays a compliance report."""
@@ -175,7 +175,7 @@ def cmd_test(args):
 
 def cmd_blueprint(args):
     """Generates an end-to-end production blueprint for a high-retention Instagram Reel."""
-    from instagram_pipeline.blueprint_generator import generate_production_blueprint
+    from publishers.instagram.blueprint_generator import generate_production_blueprint
     bp = generate_production_blueprint(
         topic=args.topic,
         target_audience=args.audience,

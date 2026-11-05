@@ -114,13 +114,15 @@ class AIVisualEngine:
         image_path: Path,
         duration: float,
         motion_type: str = "zoom_in",
+        motion: Optional[str] = None,
         output_clip: Optional[Path] = None
     ) -> Path:
         """
         Transforms a static AI image into an animated 1080x1920 vertical video clip
         using smooth Ken Burns zoom and pan movements.
         """
-        clip_hash = hashlib.md5(f"{image_path.name}_{duration}_{motion_type}".encode()).hexdigest()[:10]
+        effective_motion = motion or motion_type
+        clip_hash = hashlib.md5(f"{image_path.name}_{duration}_{effective_motion}".encode()).hexdigest()[:10]
         if output_clip is None:
             output_clip = CACHE_DIR / f"clip_{clip_hash}.mp4"
 
@@ -130,15 +132,15 @@ class AIVisualEngine:
         frames_count = int(math.ceil(duration * TARGET_FPS))
 
         # Select motion filter
-        if motion_type == "zoom_out":
+        if effective_motion == "zoom_out":
             zoom_expr = f"max(1.18-0.0012*on,1.0)"
             x_expr = "iw/2-(iw/zoom/2)"
             y_expr = "ih/2-(ih/zoom/2)"
-        elif motion_type == "pan_left":
+        elif effective_motion == "pan_left":
             zoom_expr = "1.12"
             x_expr = f"min(x+1.2,iw-iw/zoom)"
             y_expr = "ih/2-(ih/zoom/2)"
-        elif motion_type == "pan_right":
+        elif effective_motion == "pan_right":
             zoom_expr = "1.12"
             x_expr = f"max(x-1.2,0)"
             y_expr = "ih/2-(ih/zoom/2)"

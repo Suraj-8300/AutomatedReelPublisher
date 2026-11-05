@@ -23,11 +23,11 @@ from core.cache_manager import CacheManager
 from core.animal_storyteller import AnimalStoryteller, VISUAL_STYLES, ACTIVITIES, STORY_ARCHETYPES
 from core.character_director import ANIMAL_SPECIES, UNUSUAL_DUOS
 from generate import run_pipeline
-from instagram_pipeline.config import INBOX_DIR, ARCHIVE_DIR, INSTAGRAM_ACCOUNT_ID, META_ACCESS_TOKEN
-from instagram_pipeline.preprocessor import VideoPreprocessor
-from instagram_pipeline.metadata_linker import MetadataLinker
-from instagram_pipeline.queue_manager import ReelQueueManager
-from instagram_pipeline.publisher import MetaGraphPublisher as InstagramReelPublisher
+from publishers.instagram.config import INBOX_DIR, ARCHIVE_DIR, INSTAGRAM_ACCOUNT_ID, META_ACCESS_TOKEN
+from publishers.instagram.preprocessor import VideoPreprocessor
+from publishers.instagram.metadata_linker import MetadataLinker
+from publishers.instagram.queue_manager import ReelQueueManager
+from publishers.instagram.publisher import MetaGraphPublisher as InstagramReelPublisher
 
 PORT = int(os.environ.get("PORT", 8080))
 
@@ -719,8 +719,8 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             yt_receipt = None
             if "youtube" in destinations or "both" in destinations:
                 try:
-                    from youtube_pipeline.auth import YouTubeAuthenticator
-                    from youtube_pipeline.publisher import YouTubePublisher
+                    from publishers.youtube.auth import YouTubeAuthenticator
+                    from publishers.youtube.publisher import YouTubePublisher
                     if YouTubeAuthenticator.is_authenticated():
                         pub = YouTubePublisher()
                         yt_receipt = pub.upload_short(

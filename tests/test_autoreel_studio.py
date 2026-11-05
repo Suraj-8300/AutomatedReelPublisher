@@ -18,7 +18,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from idea_generation import IdeaQueueManager, IdeaResearchEngine, MIN_QUEUE_THRESHOLD, TARGET_QUEUE_SIZE
-from video_generation import QuotaGovernor, DAILY_MAX_REELS
+from video_generation import QuotaGovernor, DAILY_MAX_REELS, AIVisualEngine
 from video_processing import CDNOptimizer, MetadataPackager
 from publishers.instagram.preprocessor import VideoPreprocessor
 from publishers.youtube.auth import YouTubeAuthenticator
@@ -111,6 +111,21 @@ class TestAutoReelStudioModularArchitecture(unittest.TestCase):
         self.assertIn("198990477835-2s5o6ggf09a3d0uqmdlhvs9f0aa5nc4l", auth_url)
         self.assertIn("redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauth%2Fyoutube%2Fcallback", auth_url)
         self.assertIn("youtube.upload", auth_url)
+
+    def test_ai_visual_motion_clip_specs(self):
+        """Verifies that the AI visual engine produces 1080x1920 9:16 vertical video motion clips."""
+        dummy_img = Path(PROJECT_ROOT) / "cache" / "test_frame.jpg"
+        if not dummy_img.exists():
+            AIVisualEngine._render_procedural_fallback_image(prompt="AI Motion Test", output_path=dummy_img, seed=101)
+
+        clip = AIVisualEngine.render_motion_clip(dummy_img, duration=0.5, motion="zoom_in")
+        self.assertTrue(clip.exists())
+        self.assertGreater(clip.stat().st_size, 1000)
+
+        probe = CDNOptimizer.probe_video(clip)
+        self.assertTrue(probe["valid"])
+        self.assertEqual(probe["video"]["width"], 1080)
+        self.assertEqual(probe["video"]["height"], 1920)
 
 if __name__ == "__main__":
     unittest.main()

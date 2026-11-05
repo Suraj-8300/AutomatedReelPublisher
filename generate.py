@@ -149,9 +149,9 @@ async def run_pipeline(
 
 def send_to_instagram_inbox(output_mp4: str, storyboard: dict, auto_publish: bool = False, dry_run: bool = False):
     import shutil
-    from instagram_pipeline.config import INBOX_DIR
-    from instagram_pipeline.metadata_linker import MetadataLinker
-    from instagram_pipeline.queue_manager import ReelQueueManager
+    from publishers.instagram.config import INBOX_DIR
+    from publishers.instagram.metadata_linker import MetadataLinker
+    from publishers.instagram.queue_manager import ReelQueueManager
 
     video_path = Path(output_mp4)
     target_video = INBOX_DIR / video_path.name

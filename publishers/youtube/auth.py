@@ -142,7 +142,11 @@ class YouTubeAuthenticator:
         OAuthCallbackHandler.auth_code = None
         OAuthCallbackHandler.error = None
 
-        auth_url, _ = cls.get_authorization_url()
+        auth_url, _ = flow.authorization_url(
+            access_type="offline",
+            include_granted_scopes="true",
+            prompt="consent"
+        )
 
         server = HTTPServer(("0.0.0.0", REDIRECT_PORT), OAuthCallbackHandler)
         server.timeout = 2.0
