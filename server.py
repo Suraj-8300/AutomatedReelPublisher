@@ -462,7 +462,7 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(res).encode("utf-8"))
 
         # 3d. API: 1-Click Upload Now (Bypass Scheduled Release Time)
-        elif url.path == "/api/publishing-queue/upload-now":
+        elif url.path in ["/api/publishing-queue/upload-now", "/api/action/publish-now"]:
             from publishers.dispatch_queue import PublishingQueueManager
             item_id = data.get("id")
             dry_run = data.get("dry_run", False)
@@ -471,7 +471,17 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
             else:
                 res = PublishingQueueManager.publish_next(dry_run=dry_run)
                 if res is None:
-                    res = {"success": False, "error": "No pending videos in publishing queue"}
+                    # Auto-fallback: Stage or synthesize fresh reel immediately on the fly
+                    res = self._handle_publish_now_fallback(dry_run=dry_run)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._set_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        # 3d-2. API: 1-Click Stage Next Reel for Scheduled Pacing
+        elif url.path in ["/api/action/stage-next", "/api/action/enqueue-next"]:
+            res = self._handle_stage_next_reel()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self._set_cors_headers()
@@ -920,14 +930,138 @@ class ReelServerHandler(SimpleHTTPRequestHandler):
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def _handle_stage_next_reel(self) -> dict:
+        """Stages the next available reel into the publishing queue for scheduled release."""
+        from publishers.dispatch_queue import PublishingQueueManager
+        from publishers.recent_manager import RecentlyPublishedManager
+        from video_processing import CDNOptimizer, MetadataPackager
+        from video_generation import QuotaGovernor
+
+        allowed, remaining, msg = QuotaGovernor.can_generate()
+        if not allowed:
+            return {"success": False, "error": msg}
+
+        # 1. Check for ready mp4s in output/
+        available_mp4s = sorted(
+            [f for f in OUTPUT_DIR.glob("*.mp4") if not f.name.startswith("test_") and not f.name.startswith("cdn_")],
+            key=lambda f: f.stat().st_mtime,
+            reverse=True
+        )
+        recent_filenames = {r.get("filename") for r in RecentlyPublishedManager.get_recent(20)}
+        queue_filenames = {i.get("filename") for i in PublishingQueueManager.get_queue()}
+
+        target_video = None
+        for candidate in available_mp4s:
+            if candidate.name not in recent_filenames and f"cdn_{candidate.name}" not in recent_filenames and candidate.name not in queue_filenames:
+                target_video = candidate
+                break
+
+        if target_video:
+            cdn_file = CDNOptimizer.optimize_for_cdn(target_video)
+            title = target_video.stem.replace("_", " ")
+            entry = PublishingQueueManager.enqueue(
+                video_path=cdn_file,
+                title=title,
+                platforms=["instagram", "youtube"],
+                instagram_meta={"caption": f"{title}\n\n#Shorts #Reels #Viral"},
+                youtube_meta={"title": f"{title} #Shorts", "description": title, "tags": ["Shorts", "Trending"]}
+            )
+            return {"success": True, "action": "staged_existing", "item": entry}
+
+        # 2. Synthesize fresh reel from Idea Queue
+        from idea_generation import IdeaQueueManager, IdeaResearchEngine
+        from video_generation import VideoGenerator
+        idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+        if not idea:
+            IdeaQueueManager.replenish_if_needed()
+            idea = IdeaQueueManager.pop_next_idea(auto_replenish=True)
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            video_path, telemetry = loop.run_until_complete(VideoGenerator.generate_reel(idea=idea))
+        finally:
+            loop.close()
+
+        cdn_video = CDNOptimizer.optimize_for_cdn(video_path)
+        ig_meta = MetadataPackager.package_for_instagram(
+            title=idea.get("title", ""),
+            genre=idea.get("genre", "science"),
+            hook=idea.get("hook", ""),
+            facts=idea.get("facts", ""),
+            payoff=idea.get("payoff", "")
+        )
+        yt_meta = MetadataPackager.package_for_youtube(
+            title=idea.get("title", ""),
+            genre=idea.get("genre", "science"),
+            hook=idea.get("hook", ""),
+            facts=idea.get("facts", ""),
+            payoff=idea.get("payoff", "")
+        )
+        entry = PublishingQueueManager.enqueue(
+            video_path=cdn_video,
+            title=idea.get("title", cdn_video.stem),
+            platforms=["instagram", "youtube"],
+            instagram_meta=ig_meta,
+            youtube_meta=yt_meta
+        )
+        return {"success": True, "action": "generated_and_staged", "item": entry}
+
+    def _handle_publish_now_fallback(self, dry_run: bool = False) -> dict:
+        """
+        Invoked when 'Publish Now' is pressed and no video was waiting in the queue.
+        Stages and immediately uploads the reel without waiting.
+        """
+        from publishers.dispatch_queue import PublishingQueueManager
+        stage_res = self._handle_stage_next_reel()
+        if not stage_res.get("success"):
+            return stage_res
+        
+        item = stage_res.get("item")
+        if item and item.get("id"):
+            return PublishingQueueManager.publish_now(item["id"], dry_run=dry_run)
+        return {"success": False, "error": "Failed to stage reel for immediate upload"}
+
 def start_scheduler_thread():
     """Background daemon thread to automatically release scheduled videos when their release time arrives."""
     import threading
     def _worker():
         from publishers.dispatch_queue import PublishingQueueManager
+        from publishers.recent_manager import RecentlyPublishedManager
+        from video_processing import CDNOptimizer
+        from video_generation import QuotaGovernor
+
         while True:
             try:
+                # 1. Process scheduled items whose release time has arrived
                 PublishingQueueManager.process_due_items()
+
+                # 2. Maintain at least 1 video queued ahead if daily quota allows
+                allowed, remaining, _ = QuotaGovernor.can_generate()
+                if allowed and remaining > 0:
+                    queue = PublishingQueueManager.get_queue()
+                    active = [i for i in queue if i.get("status") in ["scheduled", "pending"]]
+                    if len(active) == 0:
+                        # Auto-stage the next reel in the queue from ready output files
+                        available_mp4s = sorted(
+                            [f for f in OUTPUT_DIR.glob("*.mp4") if not f.name.startswith("test_") and not f.name.startswith("cdn_")],
+                            key=lambda f: f.stat().st_mtime,
+                            reverse=True
+                        )
+                        recent_filenames = {r.get("filename") for r in RecentlyPublishedManager.get_recent(20)}
+                        for candidate in available_mp4s:
+                            if candidate.name not in recent_filenames and f"cdn_{candidate.name}" not in recent_filenames:
+                                cdn_file = CDNOptimizer.optimize_for_cdn(candidate)
+                                title = candidate.stem.replace("_", " ")
+                                entry = PublishingQueueManager.enqueue(
+                                    video_path=cdn_file,
+                                    title=title,
+                                    platforms=["instagram", "youtube"],
+                                    instagram_meta={"caption": f"{title}\n\n#Shorts #Reels #Viral"},
+                                    youtube_meta={"title": f"{title} #Shorts", "description": title, "tags": ["Shorts", "Trending"]}
+                                )
+                                print(f"🤖 [AutoScheduler] Auto-staged next reel: '{title}' for scheduled pacing.")
+                                break
             except Exception as e:
                 print(f"⚠️ Scheduler ticker error: {e}")
             time.sleep(30)

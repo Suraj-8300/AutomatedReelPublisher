@@ -1,38 +1,5 @@
 [
   {
-    "id": "9f31a1f3f978",
-    "title": "The Cold Plasma Fire That Doesn't Burn Skin",
-    "genre": "science_paradoxes",
-    "hook": "Scientists created a flame so cold you can literally hold it in your bare hand.",
-    "script": "Scientists created a flame so cold you can literally hold it in your bare hand. Known as non-thermal atmospheric plasma, its molecules stay at room temperature while stripping electrons from bacteria. It can sterilize deep wounds and kill viruses in seconds without causing any tissue damage or pain.",
-    "scenes": [
-      {
-        "text": "Scientists created a flame so cold you can literally hold it in your bare hand.",
-        "visual_prompt": "Cinematic macro shot of a human hand holding a glowing violet-purple cold plasma flame without burning, futuristic laboratory background, dark volumetric lighting, photorealistic 8k, 9:16 vertical aspect ratio",
-        "motion": "zoom_in"
-      },
-      {
-        "text": "Known as non-thermal atmospheric plasma, its molecules stay at room temperature while stripping electrons from bacteria.",
-        "visual_prompt": "Ultra-detailed microscopic 3D render of vibrant purple cold plasma arcs destroying bacterial cell walls, bio-medical visualization, Unreal Engine 5 render, glowing particles, 9:16 vertical aspect ratio",
-        "motion": "parallax_dolly"
-      },
-      {
-        "text": "It can sterilize deep wounds and kill viruses in seconds without causing any tissue damage or pain.",
-        "visual_prompt": "Futuristic medical device emitting soft purple plasma beam gently treating skin in high-tech surgical bay, warm ambient lighting, depth of field, 8k award-winning photography, 9:16 vertical aspect ratio",
-        "motion": "zoom_out"
-      }
-    ],
-    "facts": "Non-thermal atmospheric plasma operates at 25 degrees Celsius. It destroys 99.9% of bacteria and viruses in seconds without harming human tissue, revolutionizing wound healing and space medicine.",
-    "payoff": "In five years, hospitals might treat deep infections by simply waving a cold purple flame over your skin.",
-    "visual_style": "photorealistic",
-    "suggested_voice": "en-US-GuyNeural",
-    "suggested_music": "action_hybrid",
-    "caption_style": "high_impact",
-    "duration": 15,
-    "created_at": 1793906956.995952,
-    "status": "ready"
-  },
-  {
     "id": "f752db071ddb",
     "title": "The Ocean Floating 400 Miles Under Earth's Crust",
     "genre": "science_paradoxes",

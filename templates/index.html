@@ -3,492 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoReelStudio — Autonomous AI Video Generator & Meta Reels Publisher</title>
+    <title>AutoReelStudio — Autonomous Social Reel Publisher</title>
+    
+    <!-- Google Fonts & Material Symbols (Material Design 3) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
-    <div class="wrapper">
-        <!-- Top Navigation & Brand Header -->
-        <header class="header">
-            <div class="brand-row">
-                <div class="logo-box">
-                    <span class="logo-icon">⚡</span>
-                    <div>
-                        <h1>AutoReelStudio</h1>
-                        <p class="subtitle">Autonomous AI Video Studio (ReelMakerAI) & Direct Meta Graph API Publisher (ReelPublisher)</p>
-                    </div>
+<body class="md3-body">
+    <div class="md3-container">
+        
+        <!-- MD3 Top App Bar -->
+        <header class="md3-top-app-bar">
+            <div class="md3-brand">
+                <div class="md3-brand-icon">
+                    <span class="material-symbols-outlined">auto_videocam</span>
                 </div>
-                <div class="header-pills">
-                    <!-- Idea Queue Buffer Indicator -->
-                    <div class="storage-pill" id="ideaQueuePill" title="Creative Ideas Buffer (Maintains 10-15 ideas)">
-                        <span class="storage-icon">💡</span>
-                        <span id="queueBufferText">Queue: 14 ideas</span>
-                        <button class="btn-clean-cache" onclick="replenishIdeaQueue()" title="Replenish idea queue if below 10">🔄</button>
-                    </div>
+                <div class="md3-brand-text">
+                    <span class="md3-brand-title">AutoReelStudio</span>
+                    <span class="md3-brand-badge">Autonomous 50/Day</span>
+                </div>
+            </div>
 
-                    <!-- Daily 50-Reel Quota Indicator -->
-                    <div class="storage-pill" id="dailyQuotaPill" title="Daily Generation Safety Cap (50/day)">
-                        <span class="storage-icon">🎯</span>
-                        <span id="dailyQuotaText">Daily: 0/50</span>
-                    </div>
+            <!-- Connected Platform Status Chips -->
+            <div class="md3-channel-chips">
+                <div class="md3-chip md3-chip-ig" id="chipInstagram" title="Meta Instagram Graph API">
+                    <span class="material-symbols-outlined chip-icon">photo_camera</span>
+                    <span class="chip-text" id="igHandle">@sun_27417</span>
+                    <span class="chip-status-dot online"></span>
+                </div>
 
-                    <!-- Ready Videos Publishing Queue Pill -->
-                    <div class="storage-pill" id="publishingQueuePill" onclick="togglePublishingQueue()" style="cursor: pointer;" title="Ready Videos Scheduled Queue (Click to view & 1-click upload)">
-                        <span class="storage-icon">🚀</span>
-                        <span id="publishingQueueText">Publish Queue: 0</span>
-                    </div>
-
-                    <!-- Storage & Cache Monitor -->
-                    <div class="storage-pill" id="storagePill" title="Temporary render clips & audio cache">
-                        <span class="storage-icon">💾</span>
-                        <span id="cacheUsageText">Cache: 0 MB</span>
-                        <button class="btn-clean-cache" onclick="clearCacheStorage()" title="Clear temporary cache files">🧹 Clean</button>
-                    </div>
-
-                    <!-- Live Meta Account Status Card -->
-                    <div class="account-pill" id="accountStatusPill" title="Meta Graph API Instagram Account">
-                        <div class="status-dot online"></div>
-                        <div class="account-details">
-                            <span class="account-handle" id="igHandle">@sun_27417</span>
-                            <span class="account-quota" id="igQuota">Meta Quota: 100/100 remaining</span>
-                        </div>
-                    </div>
-
-                    <!-- Live YouTube Shorts Account Status Card -->
-                    <div class="account-pill youtube-pill" id="youtubeStatusPill" title="YouTube Data API v3 Channel">
-                        <div class="status-dot offline" id="ytStatusDot"></div>
-                        <div class="account-details">
-                            <span class="account-handle" id="ytHandle">YouTube Shorts</span>
-                            <span class="account-quota" id="ytStatusText">Checking auth...</span>
-                        </div>
-                    </div>
+                <div class="md3-chip md3-chip-yt" id="chipYouTube" title="YouTube Data API v3 Channel">
+                    <span class="material-symbols-outlined chip-icon">smart_display</span>
+                    <span class="chip-text" id="ytHandle">EGO X</span>
+                    <span class="chip-status-dot online" id="ytStatusDot"></span>
                 </div>
             </div>
         </header>
 
-        <!-- Main Workspace Container -->
-        <div class="workspace-grid">
-            <!-- Left Column: Controls & Prompt Generator -->
-            <section class="card control-panel">
-                <div class="section-title">
-                    <span>1. Creative Strategy & Storyboard</span>
-                    <span class="badge badge-accent">Intelligent Engine</span>
-                </div>
-
-                <!-- Top Studio Mode Switcher -->
-                <div class="studio-type-switcher">
-                    <button type="button" class="studio-btn active" id="btnStudioStandard" onclick="switchStudioMode('standard')">
-                        <span>⚡ Standard Reels Studio</span>
-                    </button>
-                    <button type="button" class="studio-btn" id="btnStudioAnimal" onclick="switchStudioMode('animal')">
-                        <span>🐾 Animal & Character Story Studio</span>
-                    </button>
-                </div>
-
-                <!-- ================= STANDARD STUDIO CONTROLS ================= -->
-                <div id="standardStudioSection">
-                    <!-- Generation Mode -->
-                    <div class="form-row">
-                        <div class="form-group col-half">
-                            <label for="modeSelect">Generation Mode</label>
-                            <select id="modeSelect">
-                                <option value="balanced" selected>⚖️ Balanced (Multi-Genre Rotation)</option>
-                                <option value="comedy">😂 Comedy Mode (Humor & Memes)</option>
-                                <option value="educational">🔬 Educational Mode (Science & Facts)</option>
-                                <option value="story">📖 Story Mode (Narratives & Fiction)</option>
-                                <option value="cinematic">🎬 Cinematic Mode (Action & Edits)</option>
-                                <option value="surprise">🎲 Surprise Mode (Unexpected Formats)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group col-half">
-                            <label for="genreSelect">Content Genre</label>
-                            <select id="genreSelect" onchange="rollIdea()">
-                                <option value="RANDOM">🎲 Any / Autonomous Creative Choice</option>
-                                <option value="comedy">😂 Funny & Comedy Reels</option>
-                                <option value="meme">💀 Meme Reels & POV Tropes</option>
-                                <option value="science">🔬 Scientific & Educational</option>
-                                <option value="mysteries">🔍 Interesting Facts & Mysteries</option>
-                                <option value="informative">💡 Serious & Informative</option>
-                                <option value="emotional">✨ Emotional & Motivational</option>
-                                <option value="storytelling">📖 Storytelling & Narratives</option>
-                                <option value="animation">🎨 Animated Cartoons & Motion Comics</option>
-                                <option value="cinematic">🎬 Movie Edits & Action Scenes</option>
-                            </select>
-                        </div>
+        <!-- MD3 Hero 1-Click Publishing Hub -->
+        <section class="md3-hero-card">
+            <div class="md3-hero-glow"></div>
+            <div class="md3-hero-content">
+                <div class="md3-hero-meta">
+                    <div class="md3-status-badge">
+                        <span class="pulse-indicator"></span>
+                        <span id="autonomousStatusText">Autonomous Cadence Active · Paced at ~28.8 Mins</span>
                     </div>
-
-                    <div class="form-group">
-                        <label>Idea & Topic Strategy</label>
-                        <div class="idea-mode-tabs">
-                            <button type="button" class="btn-tab active" id="tabAutoIdea" onclick="setIdeaMode('auto')">✨ Autonomous (Engine Invents Idea)</button>
-                            <button type="button" class="btn-tab" id="tabCustomIdea" onclick="setIdeaMode('custom')">✍️ Custom Topic / My Prompt</button>
-                        </div>
-                        <div class="input-with-action">
-                            <input type="text" id="promptInput" placeholder="Leave empty for infinite autonomous creation, or click '🎲 Roll Fresh Idea'...">
-                            <button class="btn-secondary" id="btnRollTopic" onclick="rollIdea()" title="Generate Random Creative Topic">🎲 Roll Fresh Idea</button>
-                        </div>
-                        <p id="ideaModeHint" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px;">
-                            💡 <strong>Autonomous Mode:</strong> The engine automatically invents an original, non-repeating concept for you.
-                        </p>
+                    <h1 class="md3-hero-headline">Autonomous Reel Publishing</h1>
+                    <p class="md3-hero-description">
+                        High-quality AI reels are generated, optimized, and published automatically to Instagram Reels and YouTube Shorts at a steady pace of 50 reels per day.
+                    </p>
+                    
+                    <div class="md3-hero-timer-box">
+                        <span class="material-symbols-outlined timer-icon">schedule</span>
+                        <span class="timer-label">Next Scheduled Drop:</span>
+                        <span class="timer-value" id="nextDropCountdown">Calculating...</span>
                     </div>
                 </div>
 
-                <!-- ================= ANIMAL & CHARACTER STORY STUDIO ================= -->
-                <div id="animalStudioSection" style="display: none;">
-                    <div class="form-row">
-                        <div class="form-group col-half">
-                            <label for="animalSpeciesSelect">🐾 Hero Animal Character</label>
-                            <select id="animalSpeciesSelect" onchange="onAnimalOptionChange()">
-                                <option value="RANDOM">🎲 Any / Autonomous Animal Pick</option>
-                                <option value="kitten" selected>🐱 Kitten / Baby Cat</option>
-                                <option value="puppy">🐶 Puppy / Golden Retriever</option>
-                                <option value="rabbit">🐰 Mini Bunny / Lop Rabbit</option>
-                                <option value="capybara">🦫 Zen Capybara</option>
-                                <option value="panda">🐼 Baby Giant Panda</option>
-                                <option value="red_panda">🦊 Fluffy Red Panda</option>
-                                <option value="duckling">🐥 Yellow Duckling</option>
-                                <option value="otter">🦦 Playful River Otter</option>
-                                <option value="raccoon">🦝 Clever Bandit Raccoon</option>
-                                <option value="fox">🦊 Crimson Baby Fox</option>
-                                <option value="hamster">🐹 Fluffy Dwarf Hamster</option>
-                                <option value="penguin">🐧 Baby Emperor Penguin</option>
-                                <option value="squirrel">🐿️ Curious Acorn Squirrel</option>
-                                <option value="bear_cub">🐻 Tiny Brown Bear Cub</option>
-                                <option value="hedgehog">🦔 Pygmy Hedgehog</option>
-                                <option value="baby_lion">🦁 Royal Baby Lion Cub</option>
-                                <option value="baby_tiger">🐯 Striped Baby Tiger</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group col-half" style="display: flex; flex-direction: column; justify-content: flex-end;">
-                            <label class="duo-checkbox-row" title="Feature an unusual best-friends animal pair">
-                                <input type="checkbox" id="animalDuoCheckbox" onchange="onAnimalOptionChange()">
-                                <span>🤝 Unusual Animal Duo Mode</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-half">
-                            <label for="animalStyleSelect">🎨 Visual Filmmaking Style</label>
-                            <select id="animalStyleSelect" onchange="onAnimalOptionChange()">
-                                <option value="pixar_3d" selected>🎬 Pixar 3D Animation (Glossy Eyes & Warm Rim)</option>
-                                <option value="photorealistic">📸 Photorealistic (Nat Geo 8K Fur & Macro)</option>
-                                <option value="cartoon_2d">🎨 2D Hand-Drawn (Studio Ghibli Whimsical)</option>
-                                <option value="anime">🌸 Anime Aesthetic (Makoto Shinkai Skies)</option>
-                                <option value="stop_motion">🧶 Handcrafted Stop-Motion (Felt & Clay)</option>
-                                <option value="fantasy_world">✨ Fantasy & Magical World (Glowing Flora)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group col-half">
-                            <label for="animalGenreSelect">🎭 Story Narrative Type</label>
-                            <select id="animalGenreSelect" onchange="onAnimalOptionChange()">
-                                <option value="cute" selected>💖 Cute & Heartwarming Friendship</option>
-                                <option value="funny">😂 Funny & Kitchen Chaos</option>
-                                <option value="adventure">🗺️ Tiny Epic Adventure</option>
-                                <option value="emotional">🥺 Emotional & Wholesome</option>
-                                <option value="unexpected_funny">🤪 Unexpected & Quirky</option>
-                                <option value="educational">🌿 Educational Nature Story</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="animalActivitySelect">🛠️ Human-Like Animal Activity</label>
-                        <select id="animalActivitySelect" onchange="onAnimalOptionChange()">
-                            <option value="RANDOM">🎲 Autonomous Activity Match</option>
-                            <option value="baking_pancakes" selected>🥞 Baking Breakfast Pancakes</option>
-                            <option value="running_bakery">🥐 Opening a Tiny Village Bakery</option>
-                            <option value="camping_adventure">⛺ Camping Under the Stars</option>
-                            <option value="driving_mini_car">🚗 Cruising in a Miniature Toy Car</option>
-                            <option value="birthday_surprise">🎂 Preparing a Surprise Birthday Party</option>
-                            <option value="secret_garden_quest">🗝️ Discovering a Mysterious Secret Door</option>
-                            <option value="tiny_office_day">💼 Working at a Matchbox-Sized Office</option>
-                            <option value="rescue_and_friendship">☔ Rescuing a Lost Friend in the Rain</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>🐾 Story Premise / Custom Idea</label>
-                        <div class="input-with-action">
-                            <input type="text" id="animalPromptInput" placeholder="Leave empty for autonomous creative story, or specify your custom concept...">
-                            <button class="btn-secondary" id="btnRollAnimalStory" onclick="rollAnimalStory()" title="Roll Character & Storyline Concept">🎲 Roll Animal Story</button>
-                        </div>
-                    </div>
-
-                    <!-- Live Character Profile & Narrative Preview Card -->
-                    <div id="characterPreviewCard" class="character-preview-card" style="display: none;">
-                        <div class="character-card-header">
-                            <span class="character-card-title" id="charCardTitle">🐾 Hero Character Sheet</span>
-                            <span class="badge badge-accent" id="charStyleBadge">Pixar 3D</span>
-                        </div>
-                        <div class="character-details-grid" id="charDetailsGrid">
-                            <!-- Populated by JS -->
-                        </div>
-                        <div class="story-scenes-preview" id="charScenesPreview">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-half">
-                        <label>Target Duration</label>
-                        <div class="duration-grid">
-                            <label class="duration-chip">
-                                <input type="radio" name="duration" value="10">
-                                <span>10s</span>
-                            </label>
-                            <label class="duration-chip">
-                                <input type="radio" name="duration" value="15" checked>
-                                <span>15s</span>
-                            </label>
-                            <label class="duration-chip">
-                                <input type="radio" name="duration" value="30">
-                                <span>30s</span>
-                            </label>
-                            <label class="duration-chip">
-                                <input type="radio" name="duration" value="60">
-                                <span>60s</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group col-half">
-                        <label for="captionStyleSelect">Caption & Typography Style</label>
-                        <select id="captionStyleSelect">
-                            <option value="karaoke" selected>⚡ Karaoke (Word-by-Word Active Pop)</option>
-                            <option value="high_impact">🔥 High Impact (1-2 Word Rapid Flash)</option>
-                            <option value="clean_minimal">✨ Clean Minimal (Understated Subtitles)</option>
-                            <option value="cinematic">🎬 Cinematic (Documentary Wide-Track)</option>
-                            <option value="dynamic_phrase">💬 Dynamic Phrase (Natural Clauses)</option>
-                            <option value="meme">💀 Meme Style (Classic Bold Upper)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-half">
-                        <label for="voiceSelect">Neural Voice Actor</label>
-                        <select id="voiceSelect">
-                            <option value="AUTO" selected>🤖 Auto-Genre Selection</option>
-                            <option value="en-US-ChristopherNeural">Christopher (Energetic & Viral)</option>
-                            <option value="en-US-GuyNeural">Guy (Authoritative & Deep Mystery)</option>
-                            <option value="en-US-JennyNeural">Jenny (Expressive & Engaging Female)</option>
-                            <option value="en-US-AvaNeural">Ava (Conversational Storyteller)</option>
-                            <option value="en-US-AndrewNeural">Andrew (Charismatic & Deep Male)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group col-half">
-                        <label for="musicSelect">Soundtrack & SFX Style</label>
-                        <select id="musicSelect">
-                            <option value="AUTO" selected>🤖 Auto-Genre Selection</option>
-                            <option value="comedy_bounce">Comedy Bounce (Playful & Upbeat)</option>
-                            <option value="cyber_pulse">Cyber Pulse (Punchy Synthwave)</option>
-                            <option value="deep_mystery">Deep Mystery (Dark Drone & Swells)</option>
-                            <option value="cinematic_drive">Cinematic Drive (Suspense & Tension)</option>
-                            <option value="emotional_piano">Emotional Piano (Melancholic & Warm)</option>
-                            <option value="action_hybrid">Action Hybrid (Sub-bass & Driving Hits)</option>
-                            <option value="curiosity_lofi">Curiosity Lo-Fi (Warm Minor Chords)</option>
-                            <option value="horror_tension">Horror Tension (Dissonant Drone)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-half">
-                        <label for="seedInput">Creative Seed (Optional Reproducibility)</label>
-                        <input type="number" id="seedInput" placeholder="e.g. 482910 (or empty for random)">
-                    </div>
-
-                    <div class="form-group col-half">
-                        <label for="targetPlatformSelect">Publish Destination</label>
-                        <select id="targetPlatformSelect">
-                            <option value="both" selected>🚀 Multi-Platform (Instagram + YouTube Shorts)</option>
-                            <option value="instagram">📸 Instagram Reels Only</option>
-                            <option value="youtube">▶️ YouTube Shorts Only</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group" style="width: 100%;">
-                        <label for="publishMode">Execution Mode</label>
-                        <select id="publishMode">
-                            <option value="live" selected>🔴 Live Publish (Post live to connected accounts)</option>
-                            <option value="dry_run">🧪 Dry-Run Test (Simulate APIs without live upload)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Action Button Matrix -->
-                <div class="action-matrix">
-                    <!-- Primary 1-Click Hero Button -->
-                    <button class="btn-hero" id="btnOneClick" onclick="triggerOneClickPublish()">
-                        <span class="btn-icon">⚡</span>
-                        <div class="btn-text">
-                            <span class="btn-main" id="btnMainText">1-Click Generate & Multi-Publish</span>
-                            <span class="btn-sub" id="btnSubText">Auto-synthesize 9:16 video & distribute live to Instagram & YouTube Shorts</span>
-                        </div>
+                <!-- 1-Click Action Buttons -->
+                <div class="md3-hero-actions">
+                    <button class="md3-btn-hero" id="btnPublishNowHero" onclick="triggerPublishNow()" title="Instantly publish the next reel to Instagram and YouTube right now">
+                        <span class="material-symbols-outlined btn-icon">bolt</span>
+                        <span class="btn-label" id="btnPublishLabel">Publish Next Reel Now</span>
                     </button>
 
-                    <div class="secondary-actions">
-                        <!-- Generate Video Only -->
-                        <button class="btn-action" id="btnGenerateOnly" onclick="triggerGenerateDraft()">
-                            <span>🎬 Generate Video Only (Draft / Preview)</span>
-                        </button>
+                    <button class="md3-btn-tonal" id="btnStageNextHero" onclick="triggerStageNext()" title="Queue an upcoming reel into the schedule">
+                        <span class="material-symbols-outlined btn-icon">add_circle</span>
+                        <span class="btn-label">Stage Next Reel</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MD3 Stats Metrics Cards Grid -->
+        <section class="md3-stats-grid">
+            <!-- Metric 1: Daily 50-Reels Quota -->
+            <div class="md3-card md3-stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Daily Distribution Target</span>
+                    <span class="material-symbols-outlined stat-icon">track_changes</span>
+                </div>
+                <div class="stat-number-row">
+                    <span class="stat-big-number" id="quotaPublishedNumber">0</span>
+                    <span class="stat-total-number">/ 50 Reels Today</span>
+                </div>
+                <div class="md3-progress-track">
+                    <div class="md3-progress-bar" id="quotaProgressBar" style="width: 0%;"></div>
+                </div>
+                <span class="stat-caption" id="quotaCaption">50 reels remaining for today's quota</span>
+            </div>
+
+            <!-- Metric 2: Ready Scheduled Queue -->
+            <div class="md3-card md3-stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Ready In Queue</span>
+                    <span class="material-symbols-outlined stat-icon">pending_actions</span>
+                </div>
+                <div class="stat-number-row">
+                    <span class="stat-big-number" id="queueScheduledNumber">0</span>
+                    <span class="stat-total-number">Reels Waiting</span>
+                </div>
+                <div class="stat-badge-row">
+                    <span class="md3-tonal-badge" id="queuePacingBadge">~28.8 min pacing</span>
+                </div>
+                <span class="stat-caption" id="queueNextCaption">No delay when using 1-Click Publish</span>
+            </div>
+
+            <!-- Metric 3: AI Creative Idea Buffer -->
+            <div class="md3-card md3-stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">AI Creative Buffer</span>
+                    <span class="material-symbols-outlined stat-icon">lightbulb</span>
+                </div>
+                <div class="stat-number-row">
+                    <span class="stat-big-number" id="ideaBufferNumber">13</span>
+                    <span class="stat-total-number">Ideas Stored</span>
+                </div>
+                <div class="stat-badge-row">
+                    <span class="md3-tonal-badge" id="ideaRuleBadge">Maintains 10–15 Ideas</span>
+                </div>
+                <span class="stat-caption">Auto-replenishes if below 10</span>
+            </div>
+        </section>
+
+        <!-- Main Workspace Flow -->
+        <main class="md3-main-flow">
+            
+            <!-- Section 1: Ready Videos Publishing Queue -->
+            <section class="md3-card md3-section-card">
+                <div class="section-card-header">
+                    <div class="section-card-title-group">
+                        <div class="section-icon-container">
+                            <span class="material-symbols-outlined">hourglass_top</span>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Ready Videos Publishing Queue</h2>
+                            <p class="section-subtitle">Videos staged for timed distribution across Instagram & YouTube</p>
+                        </div>
+                    </div>
+                    <div class="section-header-actions">
+                        <span class="md3-chip md3-chip-sm" id="queueCountChip">0 Scheduled</span>
                     </div>
                 </div>
 
-                <!-- Live Status & Progress Box -->
-                <div id="statusBox" class="status-container" style="display: none;">
-                    <div class="status-header">
-                        <div class="spinner" id="statusSpinner"></div>
-                        <span id="statusTitle">Processing Pipeline...</span>
-                    </div>
-                    <p id="statusMessage" class="status-details">Starting engine...</p>
-                    <div class="progress-bar-bg" id="progressBarBg">
-                        <div class="progress-bar-fill" id="progressBar"></div>
-                    </div>
+                <!-- Queue Empty State -->
+                <div class="md3-empty-state" id="queueEmptyState">
+                    <span class="material-symbols-outlined empty-icon">check_circle</span>
+                    <p class="empty-title">Queue is clear</p>
+                    <p class="empty-desc">The next reel will be automatically staged by the background scheduler, or click <strong>Publish Next Reel Now</strong> above to dispatch immediately.</p>
                 </div>
+
+                <!-- Queue List -->
+                <div class="md3-queue-list" id="queueList"></div>
             </section>
 
-            <!-- Right Column: Interactive Reel Preview & Inspector -->
-            <section class="card preview-panel">
-                <div class="section-title">
-                    <span>2. Reel Inspection & Player</span>
-                    <span id="videoStatusBadge" class="badge badge-dim">No Video</span>
-                </div>
-
-                <div class="phone-frame">
-                    <div class="empty-state" id="emptyPreview">
-                        <div class="empty-icon">📱</div>
-                        <h3>9:16 Vertical Reel Player</h3>
-                        <p>Generate a video to preview full-screen Instagram-native visuals, synchronized captions, and procedural audio.</p>
-                    </div>
-                    <video id="mainVideoPlayer" controls playsinline style="display: none;"></video>
-                    <!-- Safe Zone Overlay Canvas/Layer -->
-                    <div id="safeZoneOverlay" class="safe-zone-overlay" style="display: none;">
-                        <div class="danger-zone danger-top">
-                            <span>Top 220px (Meta Header / Back / Camera)</span>
+            <!-- Section 2: Recently Published Reels (Last 10 Archive) -->
+            <section class="md3-card md3-section-card">
+                <div class="section-card-header">
+                    <div class="section-card-title-group">
+                        <div class="section-icon-container accent-amber">
+                            <span class="material-symbols-outlined">stars</span>
                         </div>
-                        <div class="safe-zone-guide">
-                            <span>Safe Content Area (1080 x 1320)</span>
-                        </div>
-                        <div class="danger-zone danger-bottom">
-                            <span>Bottom 380px (Meta Caption / Audio / Actions)</span>
+                        <div>
+                            <h2 class="section-title">Recently Published Reels</h2>
+                            <p class="section-subtitle">Last 10 published reels · Older reels are permanently cleaned from disk</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Video Controls & Inspector Buttons -->
-                <div class="preview-actions" id="previewActions" style="display: none;">
-                    <button class="btn-publish-direct" id="btnPublishActive" onclick="publishActiveVideo()">
-                        <span>📲 Publish This Reel to Instagram</span>
-                    </button>
-
-                    <div class="tool-row">
-                        <button class="btn-tool" onclick="toggleSafeZoneOverlay()">
-                            <span id="safeZoneBtnText">📐 Toggle Safe Zones</span>
-                        </button>
-                        <button class="btn-tool" onclick="inspectActiveVideo()">
-                            <span>🔍 Audit Specs & QC</span>
-                        </button>
-                        <a id="btnDownloadActive" class="btn-tool" download="reel.mp4">
-                            <span>⬇️ Download</span>
-                        </a>
+                    <div class="section-header-actions">
+                        <span class="md3-chip md3-chip-sm" id="recentCountChip">0 / 10 Active</span>
                     </div>
                 </div>
 
-                <!-- Spec & QC Inspection Drawer -->
-                <div id="specAuditDrawer" class="spec-drawer" style="display: none;">
-                    <div class="spec-drawer-header">
-                        <h4>📊 Quality Control & Technical Audit</h4>
-                        <button class="btn-close-drawer" onclick="closeSpecAudit()">✕</button>
-                    </div>
-                    <div id="specAuditContent" class="spec-audit-grid">
-                        <!-- Populated by JS -->
-                    </div>
+                <!-- Recently Published Empty State -->
+                <div class="md3-empty-state" id="recentEmptyState" style="display: none;">
+                    <span class="material-symbols-outlined empty-icon">video_library</span>
+                    <p class="empty-title">No reels published yet today</p>
+                    <p class="empty-desc">Reels published automatically or via 1-Click will appear here with live links.</p>
                 </div>
+
+                <!-- Recently Published List -->
+                <div class="md3-recent-list" id="recentList"></div>
             </section>
-        </div>
 
-        <!-- Section 2.5: Ready Videos Scheduled Publishing Queue -->
-        <section class="card queue-section" id="publishingQueueSection" style="margin-bottom: 24px;">
-            <div class="gallery-title-row">
-                <div class="section-title">
-                    <span>🚀 Ready Videos Publishing Queue</span>
-                    <span class="count-pill" id="publishingQueueCountBadge">0 Scheduled</span>
-                    <span style="font-size: 12px; color: #8ca2c4; margin-left: 10px;">Paced Distribution (~28.8m intervals) · 50 Reels/Day</span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-secondary" onclick="publishNextDueNow()" title="Immediately upload the earliest scheduled video right now">⚡ Upload Next Now</button>
-                    <button class="btn-secondary" onclick="loadPublishingQueue()">🔄 Refresh</button>
-                </div>
-            </div>
+            <!-- Section 3: Optional Collapsible Creator (Kept neat & unobtrusive) -->
+            <section class="md3-card md3-accordion-card">
+                <details class="md3-details" id="manualCreatorDetails">
+                    <summary class="md3-summary">
+                        <div class="summary-left">
+                            <span class="material-symbols-outlined summary-icon">tune</span>
+                            <span class="summary-title">Manual Custom Reel Synthesizer (Optional)</span>
+                        </div>
+                        <span class="material-symbols-outlined summary-arrow">expand_more</span>
+                    </summary>
+                    <div class="md3-accordion-body">
+                        <p class="accordion-hint">Leave blank to let the autonomous AI research engine pick the highest-converting topic, or specify a custom theme:</p>
+                        <div class="custom-prompt-row">
+                            <div class="md3-text-field">
+                                <input type="text" id="customPromptInput" placeholder="e.g. Why deep sea creatures glow in total darkness" autocomplete="off">
+                            </div>
+                            <button class="md3-btn-primary" id="btnCustomGenerate" onclick="triggerCustomReel()">
+                                <span class="material-symbols-outlined">auto_fix_high</span>
+                                <span>Generate & Stage</span>
+                            </button>
+                        </div>
+                    </div>
+                </details>
+            </section>
 
-            <div id="publishingQueueContainer">
-                <div class="empty-state" id="publishingQueueEmpty" style="padding: 24px; text-align: center; color: #536b8e;">
-                    <p style="margin: 0; font-size: 14px;">No videos waiting in queue. When you generate videos or run autonomous production, ready videos queue here for scheduled pacing, or you can click "Upload Now" at any moment.</p>
-                </div>
-                <div class="publishing-queue-list" id="publishingQueueList" style="display: grid; gap: 12px; margin-top: 12px;">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </section>
+        </main>
 
-        <!-- Section 2.6: Recently Published Reels (Last 10 Rolling Buffer) -->
-        <section class="card recent-section" id="recentlyPublishedSection" style="margin-bottom: 24px;">
-            <div class="gallery-title-row">
-                <div class="section-title">
-                    <span>✨ Recently Published Reels</span>
-                    <span class="count-pill" id="recentPublishedBadge">0 / 10 Active</span>
-                    <span style="font-size: 12px; color: #8ca2c4; margin-left: 10px;">Rolling 10 Archive · Older Reels Automatically Deleted Forever</span>
-                </div>
-                <button class="btn-secondary" onclick="loadRecentlyPublished()">🔄 Refresh</button>
+        <!-- MD3 Footer -->
+        <footer class="md3-footer">
+            <span>AutoReelStudio · Autonomous Reel Generation & Social Publisher</span>
+            <div class="footer-links">
+                <span>Instagram Graph API & YouTube Data API v3</span>
+                <span>•</span>
+                <span id="cacheUsageFooter">Storage Cache: ~97 MB</span>
             </div>
+        </footer>
 
-            <div id="recentlyPublishedContainer">
-                <div class="empty-state" id="recentlyPublishedEmpty" style="padding: 24px; text-align: center; color: #536b8e;">
-                    <p style="margin: 0; font-size: 14px;">No published reels in rolling archive yet. Once reels are uploaded to Instagram or YouTube, the last 10 live reels appear here with their direct platform links.</p>
-                </div>
-                <div class="recent-published-grid" id="recentlyPublishedList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 14px;">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Generated Video Gallery -->
-        <section class="card gallery-section">
-            <div class="gallery-title-row">
-                <div class="section-title">
-                    <span>🎬 Reel Archive & Draft Library</span>
-                    <span class="count-pill" id="galleryCount">0 videos</span>
-                </div>
-                <button class="btn-secondary" onclick="loadGallery()">🔄 Refresh Archive</button>
-            </div>
-
-            <div class="gallery-grid" id="galleryGrid">
-                <!-- Video cards rendered by JS -->
-            </div>
-        </section>
     </div>
 
-    <!-- Inspector Modal for Gallery Items -->
-    <div id="inspectModal" class="modal-backdrop" style="display: none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3 id="modalVideoTitle">Reel Technical & QC Audit</h3>
-                <button class="btn-close-modal" onclick="closeInspectModal()">✕</button>
-            </div>
-            <div class="modal-body" id="modalAuditBody">
-                <p>Auditing video container...</p>
-            </div>
-        </div>
-    </div>
+    <!-- MD3 Floating Snackbar / Toast Container -->
+    <div class="md3-snackbar-container" id="snackbarContainer"></div>
 
     <script src="/static/js/main.js"></script>
 </body>
