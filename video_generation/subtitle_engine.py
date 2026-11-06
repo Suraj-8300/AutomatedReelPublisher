@@ -26,23 +26,23 @@ class SubtitleEngine:
         ass_hash = hashlib.md5(f"{len(words_timing)}_{style}_{words_timing[0]['word'] if words_timing else ''}".encode()).hexdigest()[:8]
         out_ass = CACHE_DIR / f"subs_{style}_{ass_hash}.ass"
 
-        # Style definitions (MarginV=440 ensures safe-zone compliance above UI buttons)
+        # Style definitions (MarginV=480 ensures safe-zone compliance above UI buttons, large bold font)
         styles_map = {
             "karaoke": (
-                "Style: Karaoke,Arial,64,&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,"
-                "-1,0,0,0,100,100,0,0,1,3.5,1.5,2,40,40,460,1"
+                "Style: Karaoke,Arial,96,&H00FFFFFF,&H0000FFFF,&H00000000,&H90000000,"
+                "-1,0,0,0,100,100,0,0,1,6.5,3.5,2,40,40,480,1"
             ),
             "high_impact": (
-                "Style: HighImpact,Impact,74,&H0000F5FF,&H00000000,&H00000000,&H90000000,"
-                "-1,0,0,0,105,100,1,0,1,4.5,2.0,2,30,30,460,1"
+                "Style: HighImpact,Impact,106,&H0000F5FF,&H00000000,&H00000000,&H90000000,"
+                "-1,0,0,0,105,100,1,0,1,7.5,4.0,2,30,30,480,1"
             ),
             "clean_minimal": (
-                "Style: CleanMinimal,Helvetica,52,&H00FFFFFF,&H00000000,&H00000000,&H60000000,"
-                "0,0,0,0,100,100,0,0,1,1.5,0.8,2,50,50,450,1"
+                "Style: CleanMinimal,Helvetica,92,&H00FFFFFF,&H00000000,&H00000000,&H80000000,"
+                "-1,0,0,0,100,100,0,0,1,5.5,2.5,2,40,40,480,1"
             ),
             "cinematic": (
-                "Style: Cinematic,Georgia,56,&H00F0F4FC,&H00000000,&H00000000,&H80000000,"
-                "0,0,0,0,100,100,2,0,1,2.0,1.0,2,40,40,450,1"
+                "Style: Cinematic,Georgia,94,&H00F0F4FC,&H00000000,&H00000000,&H80000000,"
+                "-1,0,0,0,100,100,1,0,1,6.0,3.0,2,40,40,480,1"
             )
         }
         chosen_style = styles_map.get(style, styles_map["karaoke"])
@@ -63,8 +63,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
         events = []
         if style == "karaoke":
-            # Group words into 3-5 word phrases with active word highlighting
-            chunk_size = 4
+            # Group words into 2-3 word phrases with active word highlighting for high legibility
+            chunk_size = 3
             for i in range(0, len(words_timing), chunk_size):
                 chunk = words_timing[i:i + chunk_size]
                 if not chunk:
@@ -80,8 +80,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
                 events.append(f"Dialogue: 0,{start_time},{end_time},Karaoke,,0,0,0,,{karaoke_text.strip()}")
         else:
-            # Phrase-level display
-            chunk_size = 4
+            # Phrase-level display (2-3 words per chunk)
+            chunk_size = 3
             for i in range(0, len(words_timing), chunk_size):
                 chunk = words_timing[i:i + chunk_size]
                 if not chunk:

@@ -1,104 +1,49 @@
 [
   {
-    "id": "pub_c79ea0c7fd",
-    "title": "Stack vs Heap Memory: The Real Cause of StackOverflow",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Stack_vs_Heap_Memory_The_R_ffbd21.mp4",
-    "filename": "cdn_Stack_vs_Heap_Memory_The_R_ffbd21.mp4",
+    "id": "pub_a2c750dd76",
+    "title": "Redis is Single-Threaded: How it Serves 100K Req/Sec",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Redis_is_SingleThreaded_Ho_8bb2af.mp4",
+    "filename": "cdn_Redis_is_SingleThreaded_Ho_8bb2af.mp4",
     "platforms": [
       "instagram",
       "youtube"
     ],
     "status": "scheduled",
-    "created_at": "2026-11-05T22:33:22.569556+00:00",
-    "scheduled_time": "2026-11-06T03:33:22.569556+00:00",
+    "created_at": "2026-11-06T06:00:28.201591+00:00",
+    "scheduled_time": "2026-11-06T11:00:28.201591+00:00",
     "published_at": null,
     "instagram_meta": {
-      "caption": "Why does infinite recursion cause a StackOverflow, but memory leaks happen on the Heap?\n\nThe Stack is ultra-fast, contiguous LIFO memory managed automatically by the CPU stack pointer for local variables and return addresses. The Heap is dynamic, fragmented memory allocated at runtime via malloc. When deep recursion exceeds stack bounds, the stack pointer collides with protected memory.\n\nUse tail-call optimization or iterative loops with heap data structures to process deep recursive trees safely.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#viral #trending #characteruniverse #reels #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "caption": "Redis runs on a single CPU core, yet it outpaces multithreaded databases ten times its size.\n\nRedis avoids multithreading because mutex lock contention and thread context switching kill performance. Instead, it uses Linux epoll I/O multiplexing. A single non-blocking event loop handles thousands of concurrent socket connections entirely in L3 cache without a single thread lock.\n\nIn low-latency memory systems, avoiding lock contention is faster than throwing 64 CPU cores at the problem.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n.\n.\n#systemdesign #softwareengineering #distributedsystems #coding #backend #kafka #redis #softwaredevelopment #reels #explore #trending #instareels #fyp",
       "hashtags": [
-        "#viral",
-        "#trending",
-        "#characteruniverse",
-        "#reels",
+        "#systemdesign",
+        "#softwareengineering",
+        "#distributedsystems",
+        "#coding",
+        "#backend",
+        "#kafka",
+        "#redis",
+        "#softwaredevelopment",
         "#reels",
         "#explore",
         "#trending",
         "#instareels",
-        "#fyp",
-        "#aigenerated",
-        "#alteredcontent",
-        "#syntheticmedia"
+        "#fyp"
       ],
-      "title": "Stack vs Heap Memory: The Real Cause of StackOverflow"
+      "title": "Redis is Single-Threaded: How it Serves 100K Req/Sec"
     },
     "youtube_meta": {
-      "title": "Stack vs Heap Memory: The Real Cause of StackOverflow #Shorts",
-      "description": "Why does infinite recursion cause a StackOverflow, but memory leaks happen on the Heap?\n\nThe Stack is ultra-fast, contiguous LIFO memory managed automatically by the CPU stack pointer for local variables and return addresses. The Heap is dynamic, fragmented memory allocated at runtime via malloc. When deep recursion exceeds stack bounds, the stack pointer collides with protected memory.\n\nUse tail-call optimization or iterative loops with heap data structures to process deep recursive trees safely.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Studyshorts #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "title": "Redis is Single-Threaded: How it Serves 100K Req/Sec #Shorts",
+      "description": "Redis runs on a single CPU core, yet it outpaces multithreaded databases ten times its size.\n\nRedis avoids multithreading because mutex lock contention and thread context switching kill performance. Instead, it uses Linux epoll I/O multiplexing. A single non-blocking event loop handles thousands of concurrent socket connections entirely in L3 cache without a single thread lock.\n\nIn low-latency memory systems, avoiding lock contention is faster than throwing 64 CPU cores at the problem.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n#Shorts #Viral #Facts #Systemdesign #Curiosity #Trending",
       "tags": [
         "Shorts",
         "YouTubeShorts",
-        "Viral",
-        "Trending",
-        "Storytelling",
-        "Cinematic",
-        "AlteredContent",
-        "SyntheticMedia",
-        "AIGenerated",
-        "AICharacter"
-      ],
-      "category_id": "24",
-      "privacy_status": "public"
-    },
-    "receipts": {},
-    "errors": {}
-  },
-  {
-    "id": "pub_f0617397e3",
-    "title": "The Quantum Eraser That Rewrites The Past",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Quantum_Eraser_That_Re_990705.mp4",
-    "filename": "cdn_The_Quantum_Eraser_That_Re_990705.mp4",
-    "platforms": [
-      "instagram",
-      "youtube"
-    ],
-    "status": "scheduled",
-    "created_at": "2026-11-05T22:33:52.987948+00:00",
-    "scheduled_time": "2026-11-06T08:33:22.569556+00:00",
-    "published_at": null,
-    "instagram_meta": {
-      "caption": "Physicists built an experiment that proves a photon's past can be changed after it already landed.\n\nIn the Delayed Choice Quantum Eraser experiment, particles act as waves when paths are unknown, but collapse into solid particles if measurement info is preserved — even if that measurement happens AFTER the particle hits the sensor.\n\nAt the quantum scale, time is not a one-way street — the future literally decides what the past did.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#science #physics #mindblown #didyouknow #cosmos #scientificfacts #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
-      "hashtags": [
-        "#science",
-        "#physics",
-        "#mindblown",
-        "#didyouknow",
-        "#cosmos",
-        "#scientificfacts",
-        "#reels",
-        "#explore",
-        "#trending",
-        "#instareels",
-        "#fyp",
-        "#aigenerated",
-        "#alteredcontent",
-        "#syntheticmedia"
-      ],
-      "title": "The Quantum Eraser That Rewrites The Past"
-    },
-    "youtube_meta": {
-      "title": "The Quantum Eraser That Rewrites The Past #Shorts",
-      "description": "Physicists built an experiment that proves a photon's past can be changed after it already landed.\n\nIn the Delayed Choice Quantum Eraser experiment, particles act as waves when paths are unknown, but collapse into solid particles if measurement info is preserved — even if that measurement happens AFTER the particle hits the sensor.\n\nAt the quantum scale, time is not a one-way street — the future literally decides what the past did.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Scienceparadoxes #Curiosity #Trending #AlteredContent #SyntheticMedia",
-      "tags": [
-        "Shorts",
-        "YouTubeShorts",
-        "ScienceFacts",
-        "Physics",
-        "Cosmos",
-        "MindBlowing",
-        "ScientificFacts",
-        "AlteredContent",
-        "SyntheticMedia",
-        "AIGenerated",
-        "AICharacter"
+        "SystemDesign",
+        "SoftwareEngineering",
+        "DistributedSystems",
+        "Kafka",
+        "Backend",
+        "Coding",
+        "CloudArchitecture"
       ],
       "category_id": "28",
       "privacy_status": "public"
@@ -107,130 +52,70 @@
     "errors": {}
   },
   {
-    "id": "pub_1b02583f9a",
-    "title": "The Boötes Void: The 330 Million Light-Year Abyss",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Botes_Void_The_330_Mil_b37fde.mp4",
-    "filename": "cdn_The_Botes_Void_The_330_Mil_b37fde.mp4",
+    "id": "pub_148397ef54",
+    "title": "Big-O Time Complexity: Why O(N²) Destroys Production",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_BigO_Time_Complexity_Why_O_4ce5f7.mp4",
+    "filename": "cdn_BigO_Time_Complexity_Why_O_4ce5f7.mp4",
     "platforms": [
       "instagram",
       "youtube"
     ],
     "status": "scheduled",
-    "created_at": "2026-11-05T22:34:17.305962+00:00",
-    "scheduled_time": "2026-11-06T13:33:22.569556+00:00",
+    "created_at": "2026-11-06T06:00:41.556196+00:00",
+    "scheduled_time": "2026-11-06T16:00:28.201591+00:00",
     "published_at": null,
     "instagram_meta": {
-      "caption": "There is an empty sphere in the cosmos 330 million light-years across that should contain 10,000 galaxies — but contains almost nothing.\n\nDiscovered in 1981, the Boötes Supervoid is so massive that if the Milky Way were at its center, humanity wouldn't have discovered other galaxies until the 1960s with radio telescopes. Astronomers believe smaller cosmic voids merged like soap bubbles.\n\nIt remains the largest supervoid in the observable universe, a silent reminder of how vast and empty reality truly is.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#science #physics #mindblown #didyouknow #cosmos #scientificfacts #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "caption": "The difference between O(1) and O(N²) is the difference between 1 millisecond and 30,000 years.\n\nFor 1,000 items, an O(N) algorithm runs 1,000 operations. But an O(N²) nested loop runs 1 million operations. At 1 million items, O(N) takes 1 millisecond, while O(N²) takes 1 trillion operations — freezing your server forever.\n\nAlways replace nested loops with Hash Maps to transform O(N²) operations into O(1) lookups.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n.\n.\n#computerscience #algorithms #codinginterview #bigo #programming #softwaredeveloper #csstudents #reels #explore #trending #instareels #fyp",
       "hashtags": [
-        "#science",
-        "#physics",
-        "#mindblown",
-        "#didyouknow",
-        "#cosmos",
-        "#scientificfacts",
+        "#computerscience",
+        "#algorithms",
+        "#codinginterview",
+        "#bigo",
+        "#programming",
+        "#softwaredeveloper",
+        "#csstudents",
         "#reels",
         "#explore",
         "#trending",
         "#instareels",
-        "#fyp",
-        "#aigenerated",
-        "#alteredcontent",
-        "#syntheticmedia"
+        "#fyp"
       ],
-      "title": "The Boötes Void: The 330 Million Light-Year Abyss"
+      "title": "Big-O Time Complexity: Why O(N²) Destroys Production"
     },
     "youtube_meta": {
-      "title": "The Boötes Void: The 330 Million Light-Year Abyss #Shorts",
-      "description": "There is an empty sphere in the cosmos 330 million light-years across that should contain 10,000 galaxies — but contains almost nothing.\n\nDiscovered in 1981, the Boötes Supervoid is so massive that if the Milky Way were at its center, humanity wouldn't have discovered other galaxies until the 1960s with radio telescopes. Astronomers believe smaller cosmic voids merged like soap bubbles.\n\nIt remains the largest supervoid in the observable universe, a silent reminder of how vast and empty reality truly is.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Scienceparadoxes #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "title": "Big-O Time Complexity: Why O(N²) Destroys Production #Shorts",
+      "description": "The difference between O(1) and O(N²) is the difference between 1 millisecond and 30,000 years.\n\nFor 1,000 items, an O(N) algorithm runs 1,000 operations. But an O(N²) nested loop runs 1 million operations. At 1 million items, O(N) takes 1 millisecond, while O(N²) takes 1 trillion operations — freezing your server forever.\n\nAlways replace nested loops with Hash Maps to transform O(N²) operations into O(1) lookups.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n#Shorts #Viral #Facts #Studyshorts #Curiosity #Trending",
       "tags": [
         "Shorts",
         "YouTubeShorts",
-        "ScienceFacts",
-        "Physics",
-        "Cosmos",
-        "MindBlowing",
-        "ScientificFacts",
-        "AlteredContent",
-        "SyntheticMedia",
-        "AIGenerated",
-        "AICharacter"
+        "ComputerScience",
+        "BigO",
+        "Algorithms",
+        "CodingInterview",
+        "DataStructures",
+        "SoftwareEngineer"
       ],
-      "category_id": "28",
+      "category_id": "27",
       "privacy_status": "public"
     },
     "receipts": {},
     "errors": {}
   },
   {
-    "id": "pub_f625dbff9c",
-    "title": "The Ocean Floating 400 Miles Under Earth's Crust",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_The_Ocean_Floating_400_Mil_ec4e24.mp4",
-    "filename": "cdn_The_Ocean_Floating_400_Mil_ec4e24.mp4",
+    "id": "pub_2382159035",
+    "title": "False Sharing: The Hardware Glitch Killing Multithreading",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_False_Sharing_The_Hardware_fed21c.mp4",
+    "filename": "cdn_False_Sharing_The_Hardware_fed21c.mp4",
     "platforms": [
       "instagram",
       "youtube"
     ],
     "status": "scheduled",
-    "created_at": "2026-11-05T22:34:39.806225+00:00",
-    "scheduled_time": "2026-11-06T18:33:22.569556+00:00",
+    "created_at": "2026-11-06T06:01:19.276660+00:00",
+    "scheduled_time": "2026-11-06T21:00:28.201591+00:00",
     "published_at": null,
     "instagram_meta": {
-      "caption": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined.\n\n400 miles beneath North America, seismic data revealed water trapped inside a rare blue mineral called ringwoodite. It doesn't slosh around as liquid; it exists as hydroxide ions locked within the crystal lattice under 1,000 degrees heat and 200,000 atmospheres of pressure.\n\nThis discovery proves Earth's surface oceans didn't arrive via comets — they literally seeped out from inside our own mantle.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#science #physics #mindblown #didyouknow #cosmos #scientificfacts #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
-      "hashtags": [
-        "#science",
-        "#physics",
-        "#mindblown",
-        "#didyouknow",
-        "#cosmos",
-        "#scientificfacts",
-        "#reels",
-        "#explore",
-        "#trending",
-        "#instareels",
-        "#fyp",
-        "#aigenerated",
-        "#alteredcontent",
-        "#syntheticmedia"
-      ],
-      "title": "The Ocean Floating 400 Miles Under Earth's Crust"
-    },
-    "youtube_meta": {
-      "title": "The Ocean Floating 400 Miles Under Earth's Crust #Shorts",
-      "description": "There is a hidden ocean inside Earth holding three times more water than all surface oceans combined.\n\n400 miles beneath North America, seismic data revealed water trapped inside a rare blue mineral called ringwoodite. It doesn't slosh around as liquid; it exists as hydroxide ions locked within the crystal lattice under 1,000 degrees heat and 200,000 atmospheres of pressure.\n\nThis discovery proves Earth's surface oceans didn't arrive via comets — they literally seeped out from inside our own mantle.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Scienceparadoxes #Curiosity #Trending #AlteredContent #SyntheticMedia",
-      "tags": [
-        "Shorts",
-        "YouTubeShorts",
-        "ScienceFacts",
-        "Physics",
-        "Cosmos",
-        "MindBlowing",
-        "ScientificFacts",
-        "AlteredContent",
-        "SyntheticMedia",
-        "AIGenerated",
-        "AICharacter"
-      ],
-      "category_id": "28",
-      "privacy_status": "public"
-    },
-    "receipts": {},
-    "errors": {}
-  },
-  {
-    "id": "pub_ff9e167f0f",
-    "title": "CPU Branch Prediction: Why Sorted Data Runs 6x Faster",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_CPU_Branch_Prediction_Why__fdff0f.mp4",
-    "filename": "cdn_CPU_Branch_Prediction_Why__fdff0f.mp4",
-    "platforms": [
-      "instagram",
-      "youtube"
-    ],
-    "status": "scheduled",
-    "created_at": "2026-11-05T22:35:08.290113+00:00",
-    "scheduled_time": "2026-11-06T23:33:22.569556+00:00",
-    "published_at": null,
-    "instagram_meta": {
-      "caption": "Your CPU runs faster when your data is sorted — and the reason is an invisible crystal ball inside the silicon.\n\nModern CPU pipelines are 15 to 20 stages deep. When code reaches an if statement, waiting for the memory lookup wastes 20 clock cycles. The Branch Predictor uses history tables to guess the outcome. If correct, execution flows seamlessly at 4 billion instructions per second.\n\nSorting an array makes an unsorted loop run six times faster, purely by feeding the CPU predictor clean patterns.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#computerengineering #hardware #silicon #cpu #microprocessor #lowlevel #assembly #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "caption": "You added 8 CPU threads to make your program faster, and it ran ten times slower. Here is why.\n\nCPUs do not read single bytes from RAM; they fetch 64-byte chunks called Cache Lines. If Thread 1 on Core 0 modifies Variable A, and Thread 2 on Core 1 modifies independent Variable B right next to it, the hardware invalidates the entire cache line across all cores via MESI protocol.\n\nThe CPU cores spend 95% of their time fighting over cache coherence buses instead of doing actual computation.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n.\n.\n#computerengineering #hardware #silicon #cpu #microprocessor #lowlevel #assembly #reels #explore #trending #instareels #fyp",
       "hashtags": [
         "#computerengineering",
         "#hardware",
@@ -243,16 +128,13 @@
         "#explore",
         "#trending",
         "#instareels",
-        "#fyp",
-        "#aigenerated",
-        "#alteredcontent",
-        "#syntheticmedia"
+        "#fyp"
       ],
-      "title": "CPU Branch Prediction: Why Sorted Data Runs 6x Faster"
+      "title": "False Sharing: The Hardware Glitch Killing Multithreading"
     },
     "youtube_meta": {
-      "title": "CPU Branch Prediction: Why Sorted Data Runs 6x Faster #Shorts",
-      "description": "Your CPU runs faster when your data is sorted — and the reason is an invisible crystal ball inside the silicon.\n\nModern CPU pipelines are 15 to 20 stages deep. When code reaches an if statement, waiting for the memory lookup wastes 20 clock cycles. The Branch Predictor uses history tables to guess the outcome. If correct, execution flows seamlessly at 4 billion instructions per second.\n\nSorting an array makes an unsorted loop run six times faster, purely by feeding the CPU predictor clean patterns.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Computerengineering #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "title": "False Sharing: The Hardware Glitch Killing Multithreading #Shorts",
+      "description": "You added 8 CPU threads to make your program faster, and it ran ten times slower. Here is why.\n\nCPUs do not read single bytes from RAM; they fetch 64-byte chunks called Cache Lines. If Thread 1 on Core 0 modifies Variable A, and Thread 2 on Core 1 modifies independent Variable B right next to it, the hardware invalidates the entire cache line across all cores via MESI protocol.\n\nThe CPU cores spend 95% of their time fighting over cache coherence buses instead of doing actual computation.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n#Shorts #Viral #Facts #Computerengineering #Curiosity #Trending",
       "tags": [
         "Shorts",
         "YouTubeShorts",
@@ -262,11 +144,7 @@
         "Microprocessor",
         "Assembly",
         "LowLevel",
-        "Silicon",
-        "AlteredContent",
-        "SyntheticMedia",
-        "AIGenerated",
-        "AICharacter"
+        "Silicon"
       ],
       "category_id": "28",
       "privacy_status": "public"
@@ -275,20 +153,20 @@
     "errors": {}
   },
   {
-    "id": "pub_39d5f2413d",
+    "id": "pub_f9bee14764",
     "title": "Why Roman Concrete Gets Stronger Over 2,000 Years",
-    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Why_Roman_Concrete_Gets_St_018143.mp4",
-    "filename": "cdn_Why_Roman_Concrete_Gets_St_018143.mp4",
+    "video_path": "/home/suraj/Lab/Projects/AutoReelStudio/output/cdn_Why_Roman_Concrete_Gets_St_132d63.mp4",
+    "filename": "cdn_Why_Roman_Concrete_Gets_St_132d63.mp4",
     "platforms": [
       "instagram",
       "youtube"
     ],
     "status": "scheduled",
-    "created_at": "2026-11-05T22:35:55.152030+00:00",
-    "scheduled_time": "2026-11-07T04:33:22.569556+00:00",
+    "created_at": "2026-11-06T06:01:40.061460+00:00",
+    "scheduled_time": "2026-11-07T02:00:28.201591+00:00",
     "published_at": null,
     "instagram_meta": {
-      "caption": "Ancient Roman harbors have been battered by ocean waves for 2,000 years — and they are harder today than when they were built.\n\nMIT geologists discovered Romans mixed quicklime at extreme temperatures, leaving microscopic lime clasts. When seawater cracks the concrete, it dissolves the lime, precipitating calcium carbonate that literally heals the cracks in real time.\n\nModern concrete crumbles in 50 years, but ancient Roman chemistry engineered self-healing stone that outlives empires.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment.\n\n.\n.\n#ancienthistory #archaeology #mysteries #ancientcivilization #historyfacts #engineering #reels #explore #trending #instareels #fyp #aigenerated #alteredcontent #syntheticmedia",
+      "caption": "Ancient Roman harbors have been battered by ocean waves for 2,000 years — and they are harder today than when they were built.\n\nMIT geologists discovered Romans mixed quicklime at extreme temperatures, leaving microscopic lime clasts. When seawater cracks the concrete, it dissolves the lime, precipitating calcium carbonate that literally heals the cracks in real time.\n\nModern concrete crumbles in 50 years, but ancient Roman chemistry engineered self-healing stone that outlives empires.\n\nDrop your thoughts in the comments! 👇 Save this reel for later 📌\n\n.\n.\n#ancienthistory #archaeology #mysteries #ancientcivilization #historyfacts #engineering #reels #explore #trending #instareels #fyp",
       "hashtags": [
         "#ancienthistory",
         "#archaeology",
@@ -300,16 +178,13 @@
         "#explore",
         "#trending",
         "#instareels",
-        "#fyp",
-        "#aigenerated",
-        "#alteredcontent",
-        "#syntheticmedia"
+        "#fyp"
       ],
       "title": "Why Roman Concrete Gets Stronger Over 2,000 Years"
     },
     "youtube_meta": {
       "title": "Why Roman Concrete Gets Stronger Over 2,000 Years #Shorts",
-      "description": "Ancient Roman harbors have been battered by ocean waves for 2,000 years — and they are harder today than when they were built.\n\nMIT geologists discovered Romans mixed quicklime at extreme temperatures, leaving microscopic lime clasts. When seawater cracks the concrete, it dissolves the lime, precipitating calcium carbonate that literally heals the cracks in real time.\n\nModern concrete crumbles in 50 years, but ancient Roman chemistry engineered self-healing stone that outlives empires.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n\n---\n🤖 Altered / Synthetic Content Disclosure:\nThis video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n---\n\n#Shorts #Viral #Facts #Ancientmysteries #Curiosity #Trending #AlteredContent #SyntheticMedia",
+      "description": "Ancient Roman harbors have been battered by ocean waves for 2,000 years — and they are harder today than when they were built.\n\nMIT geologists discovered Romans mixed quicklime at extreme temperatures, leaving microscopic lime clasts. When seawater cracks the concrete, it dissolves the lime, precipitating calcium carbonate that literally heals the cracks in real time.\n\nModern concrete crumbles in 50 years, but ancient Roman chemistry engineered self-healing stone that outlives empires.\n\nSubscribe for daily mind-blowing facts & stories! 🔔\n\n#Shorts #Viral #Facts #Ancientmysteries #Curiosity #Trending",
       "tags": [
         "Shorts",
         "YouTubeShorts",
@@ -317,11 +192,7 @@
         "History",
         "Archaeology",
         "EngineeringMarvels",
-        "Antikythera",
-        "AlteredContent",
-        "SyntheticMedia",
-        "AIGenerated",
-        "AICharacter"
+        "Antikythera"
       ],
       "category_id": "27",
       "privacy_status": "public"

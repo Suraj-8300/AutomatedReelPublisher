@@ -31,9 +31,8 @@ class MetadataPackager:
             "ocean_and_cosmos": ["#space", "#universe", "#astronomy", "#deepsea", "#ocean"]
         }
 
-        tags = genre_tags.get(genre, ["#viral", "#trending", "#characteruniverse", "#reels"])
-        # Mandatory AI / Altered Content compliance tags for Meta & Instagram
-        common_tags = ["#reels", "#explore", "#trending", "#instareels", "#fyp", "#aigenerated", "#alteredcontent", "#syntheticmedia"]
+        tags = genre_tags.get(genre, ["#viral", "#trending", "#engineering", "#reels"])
+        common_tags = ["#reels", "#explore", "#trending", "#instareels", "#fyp"]
         full_tags = " ".join(tags + common_tags)
 
         # Dynamic call-to-action tailored to genre
@@ -48,9 +47,8 @@ class MetadataPackager:
         else:
             cta = "Drop your thoughts in the comments! 👇 Save this reel for later 📌"
 
-        ai_disclosure = "\n\n🤖 Notice: This video contains altered/synthetic character animation and voiceover created for fictional entertainment."
         body = f"{facts}\n\n{payoff}".strip()
-        caption = f"{hook}\n\n{body}\n\n{cta}{ai_disclosure}\n\n.\n.\n{full_tags}" if body else f"{hook}\n\n{cta}{ai_disclosure}\n\n.\n.\n{full_tags}"
+        caption = f"{hook}\n\n{body}\n\n{cta}\n\n.\n.\n{full_tags}" if body else f"{hook}\n\n{cta}\n\n.\n.\n{full_tags}"
         return {
             "caption": caption.strip(),
             "hashtags": tags + common_tags,
@@ -101,16 +99,9 @@ class MetadataPackager:
             "YouTubeShorts",
             "Viral",
             "Trending",
-            "Storytelling",
-            "Cinematic"
-        ]) + ["AlteredContent", "SyntheticMedia", "AIGenerated", "AICharacter"]))
-
-        ai_disclosure_banner = (
-            "\n\n---\n"
-            "🤖 Altered / Synthetic Content Disclosure:\n"
-            "This video contains synthetic or altered media (AI-generated character animation and synthetic voiceover created for fictional storytelling and entertainment).\n"
-            "---"
-        )
+            "SoftwareEngineering",
+            "Science"
+        ])))
 
         description = f"""{hook}
 
@@ -119,9 +110,8 @@ class MetadataPackager:
 {payoff}
 
 Subscribe for daily mind-blowing facts & stories! 🔔
-{ai_disclosure_banner}
 
-#Shorts #Viral #Facts #{genre.replace('_', '').capitalize()} #Curiosity #Trending #AlteredContent #SyntheticMedia
+#Shorts #Viral #Facts #{genre.replace('_', '').capitalize()} #Curiosity #Trending
 """
 
         return {

@@ -3,7 +3,7 @@
   "universe_counters": {
     "system_design": {
       "season": 1,
-      "episode": 2,
+      "episode": 3,
       "history": [
         {
           "code": "S01E01",
@@ -14,6 +14,11 @@
           "code": "S01E02",
           "title": "Consistent Hashing: How Discord Scales",
           "hook": "What happens when a database node crashes with 50 million active users?"
+        },
+        {
+          "code": "S01E03",
+          "title": "Redis Single-Threaded: 100K Req/Sec",
+          "hook": "Why is Redis single-threaded yet capable of handling 100,000 requests per second?"
         }
       ]
     },
