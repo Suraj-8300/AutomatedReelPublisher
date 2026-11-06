@@ -129,11 +129,9 @@ class TestDirectPublishing(unittest.TestCase):
         dummy_companion.write_text("{\"title\": \"test\"}")
 
         try:
-            with patch("instagram.publisher.MetaGraphPublisher.is_configured", return_value=True), \
-                 patch("instagram.cloud_bridge.CloudBridge.upload", return_value="https://test.url/vid.mp4"), \
-                 patch("instagram.publisher.MetaGraphPublisher.create_container", return_value="c123"), \
-                 patch("instagram.publisher.MetaGraphPublisher.poll_status", return_value=True), \
-                 patch("instagram.publisher.MetaGraphPublisher.publish_media", return_value="m123"):
+            mock_pipeline_res = {"success": True, "media_id": "m123", "permalink": "https://instagram.com/reel/m123"}
+            with patch("autoreel.MetaGraphPublisher.is_configured", return_value=True), \
+                 patch("autoreel.MetaGraphPublisher.publish_pipeline", return_value=mock_pipeline_res):
 
                 final_path = publish_direct(
                     video_path=dummy_video,

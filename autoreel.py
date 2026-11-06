@@ -153,32 +153,28 @@ def publish_direct(
 
     ig_success = False
     yt_success = False
+    ig_media_id = None
+    yt_url = None
 
     # 1. Instagram Direct Upload
     if "instagram" in platforms or "all" in platforms:
         print("\n📸 Publishing to Instagram Reels...")
         try:
             ig_pub = MetaGraphPublisher()
-            if dry_run:
-                sim_id, upload_uri = ig_pub.create_resumable_container(caption=caption, dry_run=True)
-                print(f"  ✅ [Dry-Run] Container initialized: {sim_id}")
-                print(f"  🎉 [Dry-Run] Instagram Reel publishing simulated successfully.")
-                ig_success = True
+            if not ig_pub.is_configured() and not dry_run:
+                print("  ❌ Instagram credentials missing in .env")
             else:
-                if not ig_pub.is_configured():
-                    print("  ❌ Instagram credentials missing in .env")
-                else:
-                    # Upload video via Cloud Bridge or Resumable API
-                    print("  ⚡ Ingesting media for Instagram Graph API...")
-                    cloud_bridge = CloudBridge()
-                    public_url = cloud_bridge.upload(video_path)
-                    print(f"  🔗 Staged public URL: {public_url}")
-
-                    container_id = ig_pub.create_container(video_url=public_url, caption=caption)
-                    print(f"  ⏳ Container ID: {container_id}. Polling encoding status...")
-                    ig_pub.poll_status(container_id)
-                    media_id = ig_pub.publish_media(container_id)
-                    print(f"  🎉 Published Instagram Reel! Media ID: {media_id}")
+                res = ig_pub.publish_pipeline(
+                    video_path=video_path,
+                    caption=caption,
+                    dry_run=dry_run
+                )
+                if res.get("success"):
+                    ig_media_id = res.get("media_id")
+                    ig_permalink = res.get("permalink")
+                    print(f"  🎉 Published Instagram Reel! Media ID: {ig_media_id}")
+                    if ig_permalink:
+                        print(f"  🔗 Instagram URL: {ig_permalink}")
                     ig_success = True
         except Exception as e:
             print(f"  ❌ Instagram Publishing Failed: {e}")
@@ -191,6 +187,7 @@ def publish_direct(
                 print(f"  ✅ [Dry-Run] YouTube Shorts payload validated.")
                 print(f"  🎉 [Dry-Run] YouTube Short publishing simulated successfully.")
                 yt_success = True
+                yt_url = "https://youtube.com/shorts/dry_run_simulation"
             else:
                 yt_pub = YouTubePublisher()
                 res = yt_pub.upload_short(
@@ -199,7 +196,8 @@ def publish_direct(
                     description=caption
                 )
                 if res.get("success"):
-                    print(f"  🎉 Published YouTube Short: {res.get('shorts_url')}")
+                    yt_url = res.get("shorts_url")
+                    print(f"  🎉 Published YouTube Short: {yt_url}")
                     yt_success = True
                 else:
                     print(f"  ❌ YouTube upload failed: {res.get('error')}")
@@ -246,6 +244,33 @@ def publish_direct(
                 comp_dest = PUBLISHED_DIR / companion.name
                 shutil.move(str(companion), str(comp_dest))
                 print(f"   📄 Companion metadata moved: {companion.name} -> published/{comp_dest.name}")
+
+        # Record publication links in history
+        history_file = PROJECT_ROOT / "data" / "published_history.json"
+        history_file.parent.mkdir(parents=True, exist_ok=True)
+        history = []
+        if history_file.exists():
+            try:
+                import json
+                with open(history_file, "r", encoding="utf-8") as f:
+                    history = json.load(f)
+            except Exception:
+                history = []
+
+        ig_url = ig_permalink if 'ig_permalink' in locals() and ig_permalink else (f"https://www.instagram.com/reel/{ig_media_id}/" if ig_media_id else None)
+        entry = {
+            "filename": dest_path.name,
+            "title": title,
+            "caption": caption,
+            "published_at": datetime.datetime.now().isoformat(),
+            "youtube_url": yt_url,
+            "instagram_id": ig_media_id,
+            "instagram_url": ig_url,
+        }
+        history.insert(0, entry)
+        import json
+        with open(history_file, "w", encoding="utf-8") as f:
+            json.dump(history, f, indent=2)
 
     print("\n✅ Publishing process finished.\n")
     return final_path
@@ -309,6 +334,14 @@ def main():
     batch_parser.add_argument("--platform", choices=["instagram", "youtube", "all"], default="all",
                               help="Platform to publish to if --publish is set")
     batch_parser.add_argument("--no-wiki", action="store_true", help="Disable Wikipedia feed topic enrichment")
+
+    # Command: publish-all
+    pub_all_parser = subparsers.add_parser("publish-all", help="Publish all videos in output/ to YouTube & Instagram (gemini videos published last)")
+    pub_all_parser.add_argument("--dry-run", action="store_true", help="Simulate upload without actual posting")
+
+    # Command: serve
+    srv_parser = subparsers.add_parser("serve", help="Launch the AutoReelStudio Modern Web Studio UI")
+    srv_parser.add_argument("--port", type=int, default=8080, help="Server port (default: 8080)")
 
     # Command: topics
     subparsers.add_parser("topics", help="Show today's 10-reel schedule and trending topics")
@@ -376,6 +409,14 @@ def main():
             auto_publish=args.publish,
             platform=args.platform,
         )
+
+    elif args.command == "publish-all":
+        from scripts.publish_all_output import run_publish_all
+        run_publish_all()
+
+    elif args.command == "serve":
+        from server import run_server
+        run_server(port=args.port)
 
     elif args.command == "topics":
         print("\n" + "=" * 65)
