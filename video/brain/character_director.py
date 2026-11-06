@@ -74,6 +74,16 @@ DISTINCTIVE_MARKINGS = [
     "round button eyes and a cute tip of white fur on the tail"
 ]
 
+STORY_ENVIRONMENTS = [
+    "cozy sunlit French artisan bakery with marble countertops, copper saucepans, and warm morning sunlight",
+    "bustling neon-lit night street food stall with sizzling hot woks, hanging paper lanterns, and fragrant steam",
+    "charming vintage London cafe with dark mahogany wood counters and gleaming brass espresso machines",
+    "cozy fireside living room with rain pattering gently against the window and a warm amber fireplace glow",
+    "quaint flower shop with colorful overflowing blooms, terra cotta pots, and sunny greenhouse windows",
+    "busy seaside harbour fish market with weathered wooden docks, sea mist, and seagulls flying overhead",
+    "sunlit woodland cottage porch surrounded by wildflowers, potted ferns, and soft morning dew"
+]
+
 
 class CharacterDirector:
     """Manages visual identity, character consistency tokens, and duo dynamics."""
@@ -81,7 +91,8 @@ class CharacterDirector:
     @staticmethod
     def create_character_profile(
         species: Optional[str] = None,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        setting: Optional[str] = None
     ) -> Dict[str, Any]:
         rng = random.Random(seed) if seed is not None else random.Random()
 
@@ -93,6 +104,12 @@ class CharacterDirector:
 
         markings = rng.choice(DISTINCTIVE_MARKINGS)
         accessory = rng.choice(ACCESSORIES)
+        env = setting or rng.choice(STORY_ENVIRONMENTS)
+
+        character_token = (
+            f"a photorealistic {spec_data['label']} named {spec_data['default_name']} with {markings}, "
+            f"wearing {accessory} in {env}"
+        )
 
         return {
             "name": spec_data["default_name"],
@@ -101,7 +118,9 @@ class CharacterDirector:
             "size": spec_data["size"],
             "markings": markings,
             "accessory": accessory,
-            "signature": f"{spec_data['label']} named {spec_data['default_name']}, {markings}, wearing {accessory}"
+            "setting": env,
+            "signature": f"{spec_data['label']} named {spec_data['default_name']}, {markings}, wearing {accessory}",
+            "character_token": character_token
         }
 
     @staticmethod

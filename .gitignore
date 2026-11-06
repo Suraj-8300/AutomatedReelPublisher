@@ -17,6 +17,10 @@ __pycache__/
 # Operational Queues & Transcoding Workdirs
 cache/*
 !cache/.gitkeep
+video/cache/*
+!video/cache/.gitkeep
+data/audit_snapshots/
+data/test_consistency/
 output/*
 !output/.gitkeep
 published/*

@@ -31,6 +31,7 @@ from video.brain.ugc_director import UGCDirector
 from video.visuals.cinematic import CinematicEngine
 from video.visuals.animator import ManimAnimator
 from video.visuals.broll import BRollEngine
+from video.visuals.consistent_story import ConsistentStoryEngine
 from video.audio.voice_engine import VoiceEngine
 from video.audio.music_engine import MusicEngine
 from video.compose.ken_burns import KenBurnsEngine
@@ -53,7 +54,7 @@ class ReelGenerator:
         output_filename: Optional[str] = None,
         voice_override: Optional[str] = None,
         music_override: Optional[str] = None,
-        visuals_override: Optional[str] = "broll",
+        visuals_override: Optional[str] = "auto",
     ) -> Tuple[Path, Dict[str, Any]]:
         """
         Generates a complete high-quality vertical Reel for the given topic.
@@ -177,19 +178,36 @@ class ReelGenerator:
                 and bool(script_data.get("manim_code"))
             )
 
-            if use_manim and visuals_override not in ("broll", "auto"):
+            is_narrative_pillar = detected_pillar in (
+                "animal_story", "storytelling", "cute_animals",
+                "anthropomorphic_animal", "ai_baby_adult", "ugc_lifestyle", "cinematic"
+            )
+
+            if use_manim and visuals_override not in ("broll", "consistent", "ai"):
                 # 5a. Render Manim animated diagram
                 print("⚙️  Rendering Manim animation...")
                 manim_code  = script_data.get("manim_code", "")
                 scene_class = script_data.get("scene_class", "AutoReelScene")
                 anim_clip   = ManimAnimator.render(manim_code, scene_class=scene_class)
                 scene_clips = [anim_clip]
-            elif visuals_override == "ai":
-                print(f"🎨 Generating AI visual scenes ({detected_pillar})...")
-                image_paths = CinematicEngine.fetch_scene_images(scenes, pillar=detected_pillar)
-                scene_clips = KenBurnsEngine.animate_scenes(image_paths, durations)
-            else:
-                # 5b. Authentic Live-Action HD Video Footage (Mixkit & Coverr B-Roll Engine)
+
+            elif visuals_override in ("consistent", "character", "story") or (
+                visuals_override in (None, "auto") and is_narrative_pillar
+            ):
+                # 5b. Character & Narrative Consistency Engine (Zero disconnected stock video clips)
+                print(f"🐾 Consistent Character Engine: Sourcing continuous visual narrative ({detected_pillar})...")
+                character_token = script_data.get("character_token", "")
+                seed = script_data.get("seed", 42)
+                scene_clips = ConsistentStoryEngine.generate_scenes(
+                    scenes=scenes,
+                    durations=durations,
+                    character_token=character_token,
+                    seed=seed,
+                    run_id=run_id
+                )
+
+            elif visuals_override == "broll" or (visuals_override in (None, "auto") and not is_narrative_pillar):
+                # 5c. Authentic Live-Action HD Video Footage (Coverr & Mixkit B-Roll) for Documentary Science
                 print(f"🎬 Sourcing real live-action HD video clips ({detected_pillar})...")
                 try:
                     scene_clips = BRollEngine.fetch_and_process_scenes(
@@ -198,9 +216,28 @@ class ReelGenerator:
                         run_id=run_id
                     )
                 except Exception as e:
-                    print(f"  ⚠️  Live stock video sourcing fallback ({e}) — applying cinematic camera motion...")
-                    image_paths = CinematicEngine.fetch_scene_images(scenes, pillar=detected_pillar)
-                    scene_clips = KenBurnsEngine.animate_scenes(image_paths, durations)
+                    print(f"  ⚠️  Live stock video sourcing fallback ({e}) — applying consistent story motion...")
+                    character_token = script_data.get("character_token", "")
+                    scene_clips = ConsistentStoryEngine.generate_scenes(
+                        scenes=scenes,
+                        durations=durations,
+                        character_token=character_token,
+                        seed=42,
+                        run_id=run_id
+                    )
+
+            else:
+                # 5d. AI Visual Scenes with Cinematic Motion
+                print(f"🎨 Generating AI visual scenes ({detected_pillar})...")
+                character_token = script_data.get("character_token", "")
+                seed = script_data.get("seed", 42)
+                scene_clips = ConsistentStoryEngine.generate_scenes(
+                    scenes=scenes,
+                    durations=durations,
+                    character_token=character_token,
+                    seed=seed,
+                    run_id=run_id
+                )
 
             # ── Step 6: Generate Music Bed ────────────────────────────
             print(f"🎵 Generating music bed ({music_style})...")

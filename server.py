@@ -293,7 +293,7 @@ class ReelStudioHandler(SimpleHTTPRequestHandler):
         prompt = req.get("prompt", "auto")
         voice = req.get("voice")
         music = req.get("music")
-        visuals = req.get("visuals", "broll")
+        visuals = req.get("visuals", "auto")
 
         with state_lock:
             if generation_state["is_generating"]:

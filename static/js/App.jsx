@@ -25,7 +25,7 @@ function App() {
     const [prompt, setPrompt] = useState("");
     const [voice, setVoice] = useState("female");
     const [music, setMusic] = useState("heartwarming_story");
-    const [visuals, setVisuals] = useState("broll");
+    const [visuals, setVisuals] = useState("consistent");
     const [isGenerating, setIsGenerating] = useState(false);
 
     // Video preview modal
@@ -588,8 +588,9 @@ function CreateTab({
                         onChange={e => setVisuals(e.target.value)}
                         className="w-full p-3 rounded-xl glass-card text-sm text-gray-200 border border-white/10 focus:outline-none"
                     >
-                        <option value="broll">Authentic Live-Action HD Video (B-Roll)</option>
-                        <option value="ai">Photorealistic AI Cinematic Frames</option>
+                        <option value="consistent">✨ AI Character Continuity (Story & Animals - Consistent Character)</option>
+                        <option value="broll">🎬 Authentic Live-Action HD Video (B-Roll Clips)</option>
+                        <option value="ai">🎨 Photorealistic AI Frames</option>
                     </select>
                 </div>
             </div>

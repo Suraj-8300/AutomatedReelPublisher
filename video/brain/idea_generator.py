@@ -7,9 +7,11 @@ Stage 2: Feeds that viral prompt back to Gemini to generate the synchronized 3-A
 """
 
 import json
+import random
 from typing import Dict, Any, Optional
 
 from video.brain.script_writer import _call_gemini, _extract_json
+from video.brain.character_director import CharacterDirector
 
 
 class IdeaGenerator:
@@ -86,7 +88,8 @@ Return ONLY valid JSON in this exact structure:
         """
         Full 2-Stage Pipeline:
         1. Formulate high-engaging viral prompt from Gemini.
-        2. Feed prompt back to Gemini to generate the synchronized 3-Act script with entity-bound queries.
+        2. Feed prompt back to Gemini to generate the synchronized 3-Act script
+           with character continuity, locked visual tokens, and entity-bound queries.
         """
         print("🧠 Stage 1: Brainstorming high-engagement viral concept from Gemini...")
         prompt_data = cls.generate_viral_prompt(pillar=pillar)
@@ -96,33 +99,47 @@ Return ONLY valid JSON in this exact structure:
         voice_style = prompt_data.get("voice_style", "female")
         music_style = prompt_data.get("music_style", "heartwarming_story")
 
+        # Create persistent character continuity profile
+        char_profile = None
+        character_token = ""
+        seed = random.randint(1000, 99999)
+
+        if pillar in ("animal_story", "storytelling", "cute_animals", "anthropomorphic_animal"):
+            char_profile = CharacterDirector.create_character_profile(
+                species=subject.split()[-1] if subject else "kitten",
+                seed=seed
+            )
+            character_token = char_profile.get("character_token", "")
+            print(f"   🐾 Character Profile: {char_profile['label']} named '{char_profile['name']}'")
+            print(f"   🔒 Consistency Token: {character_token[:80]}...")
+
         print(f"   💡 Concept: '{topic}'")
         print(f"   🎯 Subject Entity: '{subject}'")
 
-        print("✍️  Stage 2: Generating entity-synchronized 3-Act script...")
+        print("✍️  Stage 2: Generating entity-synchronized 3-Act script with character continuity...")
         stage2_prompt = f"""You are a master viral vertical video scriptwriter.
 Using this viral concept and subject:
 Topic: {topic}
 Subject Entity: {subject}
 Concept: {viral_prompt}
 Pillar: {pillar}
+Character Visual Token: {character_token}
 
 Write a high-retention 25-30 second vertical script formatted for Instagram Reels and YouTube Shorts.
 
-CRITICAL REQUIREMENTS FOR PERFECT VISUAL-AUDIO SYNCHRONIZATION:
+CRITICAL REQUIREMENTS FOR PERFECT VISUAL-AUDIO SYNCHRONIZATION AND CHARACTER CONTINUITY:
 1. Every scene's spoken sentence ('text') must describe what is happening in the visual.
-2. For every scene, all 'search_queries' MUST specifically pair the subject entity '{subject}' WITH the scene's exact action.
-   Examples for '{subject}':
-   - Scene 1 (The Hook): ['{subject} alone', 'sad {subject}', '{subject} looking up']
-   - Scene 2 (The Action/Care): ['petting {subject}', 'feeding {subject}', 'holding {subject}']
-   - Scene 3 (The Payoff): ['{subject} running', '{subject} playing', 'happy {subject}']
-   NEVER output generic, disconnected words like 'hands', 'office', 'laptop', or 'meeting'.
-   Every query MUST feature the subject '{subject}'.
+2. For every scene, 'prompt' MUST depict the EXACT SAME CHARACTER and SETTING.
+   - Start the prompt with: '{character_token}' (if provided) or '{subject}'.
+   - Then describe the specific action and camera angle for that scene.
+   - Add: 'photorealistic, 8k, cinematic lighting, 9:16 vertical'.
+3. 'search_queries' MUST specifically pair '{subject}' with the scene's exact action.
 
 Return ONLY valid JSON in this exact structure:
 {{
   "title": "{topic}",
   "subject_entity": "{subject}",
+  "character_token": "{character_token}",
   "hook": "Opening hook sentence (max 15 words)",
   "escalation": "2 sentences explaining the turning point or care",
   "payoff": "1 sentence delivering the joyful or inspiring payoff",
@@ -132,18 +149,21 @@ Return ONLY valid JSON in this exact structure:
     {{
       "scene_num": 1,
       "text": "Exact spoken narration for scene 1 (15-20 words)",
+      "prompt": "{character_token}, scene 1 action showing {subject}, wide establishing shot, cinematic lighting, 8k, 9:16 vertical",
       "visual_action": "Specific visual action showing {subject}",
       "search_queries": ["query 1 with {subject}", "query 2 with {subject}"]
     }},
     {{
       "scene_num": 2,
       "text": "Exact spoken narration for scene 2 (20-25 words)",
+      "prompt": "{character_token}, scene 2 action showing {subject}, medium action shot, warm lighting, 8k, 9:16 vertical",
       "visual_action": "Specific visual action showing {subject}",
       "search_queries": ["query 1 with {subject}", "query 2 with {subject}"]
     }},
     {{
       "scene_num": 3,
       "text": "Exact spoken narration for scene 3 (15-20 words)",
+      "prompt": "{character_token}, scene 3 action showing {subject}, joyful close-up payoff shot, golden lighting, 8k, 9:16 vertical",
       "visual_action": "Specific visual action showing {subject}",
       "search_queries": ["query 1 with {subject}", "query 2 with {subject}"]
     }}
@@ -166,16 +186,23 @@ Return ONLY valid JSON in this exact structure:
             payoff = script_data.get("payoff", "").strip()
             script_data["narration"] = f"{hook} {escalation} {payoff}".strip()
 
-        # Inject subject entity into each scene for downstream engines
+        # Inject subject entity, character token, and seed into script_data
         script_data["topic"] = topic
         script_data["subject_entity"] = subject
         script_data["pillar"] = pillar
+        script_data["character_token"] = character_token or script_data.get("character_token", "")
+        script_data["seed"] = seed
+        if char_profile:
+            script_data["character_profile"] = char_profile
+
         script_data.setdefault("voice_style", voice_style)
         script_data.setdefault("music_style", music_style)
 
-        # Standardize keywords from search_queries
+        # Standardize keywords and prompts
         for s in script_data.get("scenes", []):
             queries = s.get("search_queries", [])
             s["keywords"] = queries or [f"{subject} cute", subject]
+            if not s.get("prompt") and character_token:
+                s["prompt"] = f"{character_token}, {s.get('visual_action', s.get('text', ''))}, 9:16 vertical, photorealistic, 8k"
 
         return script_data

@@ -305,8 +305,8 @@ def main():
                             help="Platform to publish to if --publish is set")
     gen_parser.add_argument("--voice", type=str, default=None, help="Voice style override")
     gen_parser.add_argument("--music", type=str, default=None, help="Music style override")
-    gen_parser.add_argument("--visuals", choices=["broll", "ai", "auto"], default="broll",
-                            help="Visual approach: 'broll' for real live-action HD video clips (default), 'ai' for AI imagery")
+    gen_parser.add_argument("--visuals", choices=["consistent", "broll", "ai", "auto"], default="auto",
+                            help="Visual approach: 'consistent' for character-locked continuity (default), 'broll' for stock video, 'ai' for AI")
     gen_parser.add_argument("--dry-run", action="store_true", help="Simulate upload without actual posting")
 
     # Command: auto (2-stage Gemini idea generation -> synchronized video)
@@ -379,7 +379,7 @@ def main():
 
         voice = getattr(args, "voice", None)
         music = getattr(args, "music", None)
-        visuals = getattr(args, "visuals", "broll")
+        visuals = getattr(args, "visuals", "auto")
 
         mp4_path, meta = ReelGenerator.generate(
             topic=topic,
