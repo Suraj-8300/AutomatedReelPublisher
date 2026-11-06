@@ -117,6 +117,42 @@ class TestDirectPublishing(unittest.TestCase):
         self.assertTrue(music_path.exists())
         self.assertGreater(music_path.stat().st_size, 5000)
 
+    def test_publish_moves_video_from_output_to_published(self):
+        """Verifies that publishing a video moves it from output/ to published/ to avoid multiple publish."""
+        from unittest.mock import patch, MagicMock
+        from video.config import OUTPUT_DIR, PUBLISHED_DIR
+        from autoreel import publish_direct
+
+        dummy_video = OUTPUT_DIR / "test_lifecycle_reel_123.mp4"
+        dummy_companion = OUTPUT_DIR / "test_lifecycle_reel_123.json"
+        dummy_video.write_text("dummy video content")
+        dummy_companion.write_text("{\"title\": \"test\"}")
+
+        try:
+            with patch("instagram.publisher.MetaGraphPublisher.is_configured", return_value=True), \
+                 patch("instagram.cloud_bridge.CloudBridge.upload", return_value="https://test.url/vid.mp4"), \
+                 patch("instagram.publisher.MetaGraphPublisher.create_container", return_value="c123"), \
+                 patch("instagram.publisher.MetaGraphPublisher.poll_status", return_value=True), \
+                 patch("instagram.publisher.MetaGraphPublisher.publish_media", return_value="m123"):
+
+                final_path = publish_direct(
+                    video_path=dummy_video,
+                    platforms=["instagram"],
+                    title="Test Reel",
+                    dry_run=False
+                )
+
+                self.assertFalse(dummy_video.exists(), "Original video should be removed from output/")
+                self.assertTrue(final_path.exists(), "Video must exist in destination")
+                self.assertEqual(final_path.parent.resolve(), PUBLISHED_DIR.resolve())
+                self.assertTrue((PUBLISHED_DIR / "test_lifecycle_reel_123.json").exists(), "Companion metadata should move")
+
+        finally:
+            # Cleanup test files
+            for p in [dummy_video, dummy_companion, PUBLISHED_DIR / "test_lifecycle_reel_123.mp4", PUBLISHED_DIR / "test_lifecycle_reel_123.json"]:
+                if p.exists():
+                    p.unlink()
+
 
 if __name__ == "__main__":
     unittest.main()

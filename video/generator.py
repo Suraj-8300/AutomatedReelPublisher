@@ -483,16 +483,20 @@ class BatchGenerator:
 
     @staticmethod
     def _publish(mp4_path: Path, topic: str, platform: str = "all") -> None:
-        """Triggers direct publishing via the platform publishers."""
+        """Triggers direct publishing and moves video to published/ to avoid multiple publish."""
         try:
             import sys
+            import shutil
+            import datetime
             sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
             from instagram.publisher import MetaGraphPublisher
             from instagram.cloud_bridge import CloudBridge
             from youtube.publisher import YouTubePublisher
+            from video.config import PUBLISHED_DIR
 
             platforms = ["instagram", "youtube"] if platform == "all" else [platform]
             safe_title = topic[:95] + " #Shorts" if len(topic) < 92 else topic[:91] + "... #Shorts"
+            published_any = False
 
             if "instagram" in platforms:
                 try:
@@ -504,6 +508,7 @@ class BatchGenerator:
                         ig.poll_status(container_id)
                         media_id = ig.publish_media(container_id)
                         print(f"   📸 Instagram published: {media_id}")
+                        published_any = True
                 except Exception as e:
                     print(f"   ⚠️  Instagram failed: {e}")
 
@@ -513,8 +518,18 @@ class BatchGenerator:
                     res = yt.upload_short(video_path=mp4_path, title=safe_title, description=topic)
                     if res.get("success"):
                         print(f"   ▶️  YouTube published: {res.get('shorts_url')}")
+                        published_any = True
                 except Exception as e:
                     print(f"   ⚠️  YouTube failed: {e}")
+
+            if published_any and mp4_path.exists() and mp4_path.parent.resolve() != PUBLISHED_DIR.resolve():
+                PUBLISHED_DIR.mkdir(parents=True, exist_ok=True)
+                dest = PUBLISHED_DIR / mp4_path.name
+                if dest.exists():
+                    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    dest = PUBLISHED_DIR / f"{mp4_path.stem}_{ts}{mp4_path.suffix}"
+                shutil.move(str(mp4_path), str(dest))
+                print(f"   📦 Moved to published/{dest.name} (preventing multiple publish)")
 
         except Exception as e:
             print(f"   ⚠️  Publishing error: {e}")

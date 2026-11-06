@@ -21,6 +21,8 @@ if _venv_python.exists() and sys.prefix != str(_venv_dir):
             pass
 
 import argparse
+import shutil
+import datetime
 from typing import Optional, List
 
 # Ensure PROJECT_ROOT is in sys.path
@@ -95,6 +97,23 @@ def check_auth_status():
         except Exception as e:
             print(f"  ❌ OAuth Token Verification Error: {e}")
 
+    # 3. Output & Published Folders Audit
+    from video.config import OUTPUT_DIR, PUBLISHED_DIR
+    out_videos = sorted(list(OUTPUT_DIR.glob("*.mp4")))
+    pub_videos = sorted(list(PUBLISHED_DIR.glob("*.mp4")))
+    print("\n📁 [STORAGE & PUBLISHING STATUS]")
+    print(f"  🎬 Output (Ready to Publish): {len(out_videos)} video(s) in {OUTPUT_DIR.relative_to(PROJECT_ROOT)}")
+    for v in out_videos[:5]:
+        print(f"     - {v.name}")
+    if len(out_videos) > 5:
+        print(f"     ... and {len(out_videos) - 5} more")
+
+    print(f"  📦 Published (Archived):      {len(pub_videos)} video(s) in {PUBLISHED_DIR.relative_to(PROJECT_ROOT)}")
+    for v in pub_videos[:5]:
+        print(f"     - {v.name}")
+    if len(pub_videos) > 5:
+        print(f"     ... and {len(pub_videos) - 5} more")
+
     print("=" * 65 + "\n")
 
 
@@ -104,12 +123,22 @@ def publish_direct(
     title: str,
     caption: Optional[str] = None,
     dry_run: bool = False
-):
-    """Publishes a video file directly to YouTube and/or Instagram with zero queueing."""
+) -> Path:
+    """
+    Publishes a video file directly to YouTube and/or Instagram with zero queueing.
+    Upon successful publishing, moves the video from output/ to published/ to avoid double-publishing.
+    """
     video_path = Path(video_path).resolve()
     if not video_path.exists():
         print(f"❌ Error: Video file does not exist: {video_path}")
         sys.exit(1)
+
+    from video.config import PUBLISHED_DIR
+    PUBLISHED_DIR.mkdir(parents=True, exist_ok=True)
+
+    if video_path.parent.resolve() == PUBLISHED_DIR.resolve():
+        print(f"\n⚠️  WARNING: '{video_path.name}' is already located in published/ directory!")
+        print("   This video was previously published. Proceeding with requested upload...\n")
 
     caption = caption or title
     print("\n" + "=" * 65)
@@ -122,6 +151,9 @@ def publish_direct(
     print(f"🧪 Dry-Run:   {dry_run}")
     print("=" * 65)
 
+    ig_success = False
+    yt_success = False
+
     # 1. Instagram Direct Upload
     if "instagram" in platforms or "all" in platforms:
         print("\n📸 Publishing to Instagram Reels...")
@@ -131,6 +163,7 @@ def publish_direct(
                 sim_id, upload_uri = ig_pub.create_resumable_container(caption=caption, dry_run=True)
                 print(f"  ✅ [Dry-Run] Container initialized: {sim_id}")
                 print(f"  🎉 [Dry-Run] Instagram Reel publishing simulated successfully.")
+                ig_success = True
             else:
                 if not ig_pub.is_configured():
                     print("  ❌ Instagram credentials missing in .env")
@@ -146,6 +179,7 @@ def publish_direct(
                     ig_pub.poll_status(container_id)
                     media_id = ig_pub.publish_media(container_id)
                     print(f"  🎉 Published Instagram Reel! Media ID: {media_id}")
+                    ig_success = True
         except Exception as e:
             print(f"  ❌ Instagram Publishing Failed: {e}")
 
@@ -156,6 +190,7 @@ def publish_direct(
             if dry_run:
                 print(f"  ✅ [Dry-Run] YouTube Shorts payload validated.")
                 print(f"  🎉 [Dry-Run] YouTube Short publishing simulated successfully.")
+                yt_success = True
             else:
                 yt_pub = YouTubePublisher()
                 res = yt_pub.upload_short(
@@ -165,12 +200,55 @@ def publish_direct(
                 )
                 if res.get("success"):
                     print(f"  🎉 Published YouTube Short: {res.get('shorts_url')}")
+                    yt_success = True
                 else:
                     print(f"  ❌ YouTube upload failed: {res.get('error')}")
         except Exception as e:
             print(f"  ❌ YouTube Publishing Failed: {e}")
 
+    # 3. Post-Publishing: Move from output/ to published/ to avoid multiple publish
+    target_ig = "instagram" in platforms or "all" in platforms
+    target_yt = "youtube" in platforms or "all" in platforms
+
+    overall_success = False
+    if target_ig and target_yt:
+        overall_success = ig_success or yt_success
+    elif target_ig:
+        overall_success = ig_success
+    elif target_yt:
+        overall_success = yt_success
+
+    final_path = video_path
+
+    if dry_run:
+        print("\n🧪 [Dry-Run] Video would be moved from output/ to published/ (skipped during simulation).")
+    elif overall_success and video_path.exists() and video_path.parent.resolve() != PUBLISHED_DIR.resolve():
+        dest_path = PUBLISHED_DIR / video_path.name
+        if dest_path.exists():
+            ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            dest_path = PUBLISHED_DIR / f"{video_path.stem}_{ts}{video_path.suffix}"
+
+        shutil.move(str(video_path), str(dest_path))
+        final_path = dest_path
+
+        print("\n" + "=" * 65)
+        print("📦 MOVED TO PUBLISHED (AVOIDING MULTIPLE PUBLISH)")
+        print("=" * 65)
+        print(f"   From: output/{video_path.name}")
+        print(f"   To:   published/{dest_path.name}")
+        print(f"   🔒 Video is securely archived in published/ and removed from output/.")
+        print("=" * 65)
+
+        # Move companion metadata files if any exist (.json, .md)
+        for ext in [".json", ".md"]:
+            companion = video_path.with_suffix(ext)
+            if companion.exists() and companion.parent.resolve() != PUBLISHED_DIR.resolve():
+                comp_dest = PUBLISHED_DIR / companion.name
+                shutil.move(str(companion), str(comp_dest))
+                print(f"   📄 Companion metadata moved: {companion.name} -> published/{comp_dest.name}")
+
     print("\n✅ Publishing process finished.\n")
+    return final_path
 
 
 def main():

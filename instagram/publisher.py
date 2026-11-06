@@ -245,6 +245,11 @@ class MetaGraphPublisher:
         except Exception:
             return f"https://www.instagram.com/{media_id}"
 
+    # Backward-compatible convenience aliases
+    create_container = create_reel_container
+    poll_status = poll_container_status
+    publish_media = publish_reel
+
     def publish_pipeline(
         self,
         video_path: Optional[Path] = None,

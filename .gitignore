@@ -19,6 +19,8 @@ cache/*
 !cache/.gitkeep
 output/*
 !output/.gitkeep
+published/*
+!published/.gitkeep
 reels_inbox/*
 !reels_inbox/.gitkeep
 reels_processing/*

@@ -236,6 +236,11 @@ class CloudBridge:
 
         self.s3_client = boto3.client(**client_kwargs)
 
+    def upload(self, local_path: Path, object_key: Optional[str] = None) -> str:
+        """Convenience wrapper that returns the public ingestion URL directly."""
+        res = self.upload_file(local_path, object_key=object_key)
+        return res.get("url", "") if isinstance(res, dict) else str(res)
+
     def upload_file(self, local_path: Path, object_key: Optional[str] = None) -> Dict[str, Any]:
         """
         Uploads/Exposes a local media file to provide a public HTTPS URL for Meta ingestion.

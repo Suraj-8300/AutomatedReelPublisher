@@ -10,9 +10,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 VIDEO_DIR = Path(__file__).resolve().parent
 CACHE_DIR = VIDEO_DIR / "cache"
 OUTPUT_DIR = PROJECT_ROOT / "output"
+PUBLISHED_DIR = PROJECT_ROOT / "published"
 
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+PUBLISHED_DIR.mkdir(parents=True, exist_ok=True)
 
 def _load_dotenv():
     env_path = PROJECT_ROOT / ".env"

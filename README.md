@@ -70,7 +70,8 @@ AutoReelStudio/
 ├── tests/                       # Verification test suite
 │   └── test_publishing.py      # Unit & integration tests for all platforms
 │
-├── output/                      # Stored render & published videos
+├── output/                      # Freshly rendered videos ready for publication
+├── published/                   # Safely archived videos (moved automatically after publishing)
 ├── .env                         # Global environment file (Instagram tokens & cloud keys)
 ├── .env.example                 # Example environment template
 └── requirements.txt             # Python dependencies
@@ -171,8 +172,10 @@ Uses Gemini to brainstorm a high-retention concept prompt (Stage 1), then genera
 # Faststart optimize for mobile CDN streaming
 ./autoreel.py optimize /path/to/video.mp4 --output /path/to/optimized.mp4
 
-# Publish an existing video file directly
-./autoreel.py publish /path/to/video.mp4 --platform all --title "Amazing Fact" --caption "Wait till the end! #Viral"
+# Publish an existing video file directly (automatically moves to published/ upon success)
+./autoreel.py publish output/my_video.mp4 --platform all --title "Amazing Fact" --caption "Wait till the end! #Viral"
+
+> **Zero Duplicate Publishing Guarantee:** As soon as a video is published to YouTube Shorts or Instagram Reels, AutoReelStudio automatically moves it (and any companion `.json` or `.md` metadata) from `output/` to `published/`. If you ever attempt to publish a file already in `published/`, AutoReelStudio flags a visible duplicate-publication warning.
 ```
 
 ---
@@ -181,7 +184,7 @@ Uses Gemini to brainstorm a high-retention concept prompt (Stage 1), then genera
 ```bash
 python3 -m unittest discover tests
 ```
-*(All 11 unit tests pass with 0 warnings/errors).*
+*(All 21 unit tests pass with 0 warnings/errors).*
 
 ---
 
