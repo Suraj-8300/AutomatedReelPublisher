@@ -13,10 +13,12 @@ Generation engine:
 from .cdn_optimizer import CDNOptimizer
 from .metadata_packager import MetadataPackager
 from .generator import ReelGenerator, BatchGenerator
+from .brain.ugc_director import UGCDirector
 
 __all__ = [
     "CDNOptimizer",
     "MetadataPackager",
     "ReelGenerator",
     "BatchGenerator",
+    "UGCDirector",
 ]

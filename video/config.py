@@ -49,22 +49,26 @@ DEFAULT_VOICE = os.getenv("DEFAULT_VOICE", "female")
 
 # --- Pillar → Voice + Music mapping ---
 PILLAR_VOICE = {
-    "animal_story": "female",
-    "storytelling": "female",
-    "cute_animals": "female",
-    "cinematic":    "dark_mystery",
-    "science":      "documentary",
-    "mechanical":   "british",
-    "explainer":    "documentary",
+    "animal_story":  "female",
+    "storytelling":  "female",
+    "cute_animals":  "female",
+    "ugc_lifestyle": "female",
+    "ugc_ad":        "female",
+    "cinematic":     "dark_mystery",
+    "science":       "documentary",
+    "mechanical":    "british",
+    "explainer":     "documentary",
 }
 PILLAR_MUSIC = {
-    "animal_story": "heartwarming_story",
-    "storytelling": "heartwarming_story",
-    "cute_animals": "heartwarming_story",
-    "cinematic":    "deep_mystery",
-    "science":      "ambient_glow",
-    "mechanical":   "cyber_pulse",
-    "explainer":    "curiosity_lofi",
+    "animal_story":  "heartwarming_story",
+    "storytelling":  "heartwarming_story",
+    "cute_animals":  "heartwarming_story",
+    "ugc_lifestyle": "upbeat_summer",
+    "ugc_ad":        "upbeat_summer",
+    "cinematic":     "deep_mystery",
+    "science":       "ambient_glow",
+    "mechanical":    "cyber_pulse",
+    "explainer":     "curiosity_lofi",
 }
 
 # --- Pollinations.ai Image Config ---

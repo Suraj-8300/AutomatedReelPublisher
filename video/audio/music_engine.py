@@ -24,6 +24,7 @@ CHANNELS = 2
 STYLE_PROFILES = {
     "heartwarming_story": (65.4,  32.7, 130.8,  76, "Warm acoustic & piano chords — cute animals & emotional storytelling"),
     "uplifting_journey":  (73.4,  36.7, 146.8,  92, "Bright hopeful melody — rescue journeys & joyful endings"),
+    "upbeat_summer":      (82.4,  41.2, 164.8, 118, "Upbeat acoustic pop & warm summer rhythm — UGC, lifestyle & product showcases"),
     "cyber_pulse":        (65.4,  32.7, 130.8, 120, "Electronic pulse — tech/mechanical"),
     "deep_mystery":       (55.0,  27.5, 110.0,  90, "Dark ambient — cinematic/sci-fi"),
     "curiosity_lofi":     (73.4,  36.7, 146.8, 100, "Soft lo-fi — explainer/educational"),

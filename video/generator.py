@@ -27,6 +27,7 @@ from video.sources.wikipedia_feed import WikipediaFeed
 from video.brain.pillar_router import PillarRouter
 from video.brain.script_writer import ScriptWriter
 from video.brain.idea_generator import IdeaGenerator
+from video.brain.ugc_director import UGCDirector
 from video.visuals.cinematic import CinematicEngine
 from video.visuals.animator import ManimAnimator
 from video.visuals.broll import BRollEngine
@@ -105,10 +106,19 @@ class ReelGenerator:
                 except Exception:
                     pass
 
-            # ── Step 3: Generate Script via Gemini ────────────────────
+            # ── Step 3: Generate Script via Gemini / UGC Director ───
             is_auto_idea = not topic or topic.strip().lower() in ("auto", "none", "")
 
-            if is_auto_idea and GEMINI_API_KEY:
+            if detected_pillar == "ugc_lifestyle":
+                print("🎬 UGC Director: Building master UGC lifestyle ad & consistency blueprint...")
+                blueprint = UGCDirector.create_solpopa_blueprint(concept_hook=topic if not is_auto_idea else "Wait… mango soda actually tastes like this?")
+                UGCDirector.export_blueprint_files(blueprint)
+                script_data = blueprint
+                topic = blueprint.get("title", topic)
+                metadata["topic"] = topic
+                metadata["ugc_blueprint"] = blueprint
+                print(f"   ✅ UGC Blueprint generated & exported to output/ for '{topic}'")
+            elif is_auto_idea and GEMINI_API_KEY:
                 print("🧠 Auto-generating high-retention reel via 2-stage Gemini flow...")
                 script_data = IdeaGenerator.generate_synchronized_reel_idea(pillar=detected_pillar)
                 topic = script_data.get("topic", "An Extraordinary Story")

@@ -195,7 +195,7 @@ def main():
     gen_parser = subparsers.add_parser("generate", help="Synthesize a new 9:16 Reel (AI script, voice, visuals & audio)")
     gen_parser.add_argument("--topic", type=str, default=None,
                             help="Topic for the reel (auto-brainstormed via 2-stage Gemini flow if omitted)")
-    gen_parser.add_argument("--pillar", choices=["animal_story", "storytelling", "cinematic", "science", "mechanical", "explainer", "auto"],
+    gen_parser.add_argument("--pillar", choices=["animal_story", "storytelling", "cinematic", "science", "mechanical", "explainer", "ugc_lifestyle", "ugc", "auto"],
                             default="animal_story", help="Content pillar (default: animal_story)")
     gen_parser.add_argument("--publish", action="store_true", help="Automatically publish after generation")
     gen_parser.add_argument("--platform", choices=["instagram", "youtube", "all"], default="all",
@@ -208,12 +208,21 @@ def main():
 
     # Command: auto (2-stage Gemini idea generation -> synchronized video)
     auto_parser = subparsers.add_parser("auto", help="Auto-generate a viral reel via 2-stage Gemini flow (prompt -> idea -> video)")
-    auto_parser.add_argument("--pillar", choices=["animal_story", "storytelling", "cinematic", "science", "mechanical", "explainer", "auto"],
+    auto_parser.add_argument("--pillar", choices=["animal_story", "storytelling", "cinematic", "science", "mechanical", "explainer", "ugc_lifestyle", "ugc", "auto"],
                              default="animal_story", help="Content pillar (default: animal_story)")
     auto_parser.add_argument("--publish", action="store_true", help="Automatically publish after generation")
     auto_parser.add_argument("--platform", choices=["instagram", "youtube", "all"], default="all",
                              help="Platform to publish to if --publish is set")
     auto_parser.add_argument("--dry-run", action="store_true", help="Simulate upload without actual posting")
+
+    # Command: ugc (UGC lifestyle & product ad with full production blueprint)
+    ugc_parser = subparsers.add_parser("ugc", help="Generate a UGC lifestyle ad & product reel with complete production blueprint")
+    ugc_parser.add_argument("--hook", type=str, default="Wait… mango soda actually tastes like this?",
+                            help="UGC hook concept (default: 'Wait… mango soda actually tastes like this?')")
+    ugc_parser.add_argument("--publish", action="store_true", help="Automatically publish after generation")
+    ugc_parser.add_argument("--platform", choices=["instagram", "youtube", "all"], default="all",
+                            help="Platform to publish to if --publish is set")
+    ugc_parser.add_argument("--dry-run", action="store_true", help="Simulate upload without actual posting")
 
     # Command: batch
     batch_parser = subparsers.add_parser("batch", help="Generate a full day's batch of 10+ reels")
@@ -244,14 +253,18 @@ def main():
     if args.command == "status":
         check_auth_status()
 
-    elif args.command in ("generate", "auto"):
-        topic = getattr(args, "topic", None)
-        pillar = getattr(args, "pillar", "animal_story")
-        pillar = None if pillar == "auto" else pillar
+    elif args.command in ("generate", "auto", "ugc"):
+        if args.command == "ugc":
+            topic = getattr(args, "hook", "Wait… mango soda actually tastes like this?")
+            pillar = "ugc_lifestyle"
+        else:
+            topic = getattr(args, "topic", None)
+            pillar = getattr(args, "pillar", "animal_story")
+            pillar = None if pillar == "auto" else pillar
 
-        # If topic is not provided or command is 'auto', trigger 2-stage Gemini flow
-        if not topic:
-            topic = "auto"
+            # If topic is not provided or command is 'auto', trigger 2-stage Gemini flow
+            if not topic:
+                topic = "auto"
 
         voice = getattr(args, "voice", None)
         music = getattr(args, "music", None)

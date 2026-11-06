@@ -48,10 +48,13 @@ ASS_STYLES = {
 
 # Pillar → subtitle style mapping
 PILLAR_SUBTITLE_STYLE = {
-    "cinematic":  "cinematic",
-    "science":    "karaoke",
-    "mechanical": "high_impact",
-    "explainer":  "clean",
+    "ugc_lifestyle": "karaoke",
+    "ugc_ad":        "high_impact",
+    "animal_story":  "karaoke",
+    "cinematic":     "cinematic",
+    "science":       "karaoke",
+    "mechanical":    "high_impact",
+    "explainer":     "clean",
 }
 
 
