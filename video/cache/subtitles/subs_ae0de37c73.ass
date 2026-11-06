@@ -1,0 +1,30 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Karaoke,Arial,96,&H00FFFFFF,&H0000FFFF,&H00000000,&HB0000000,-1,0,0,0,100,100,0,0,1,6.5,3.5,2,40,40,480,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.05,0:00:01.72,Karaoke,,0,0,0,,{\kf39}This {\kf39}tiny {\kf39}cream {\kf39}tabby
+Dialogue: 0,0:00:01.62,0:00:03.29,Karaoke,,0,0,0,,{\kf39}kitten {\kf39}shivered {\kf39}alone {\kf39}in
+Dialogue: 0,0:00:03.19,0:00:04.86,Karaoke,,0,0,0,,{\kf39}the {\kf39}biting {\kf39}cold, {\kf39}its
+Dialogue: 0,0:00:04.76,0:00:06.44,Karaoke,,0,0,0,,{\kf39}fragile {\kf39}life {\kf39}slipping {\kf39}away
+Dialogue: 0,0:00:06.34,0:00:08.01,Karaoke,,0,0,0,,{\kf39}with {\kf39}every {\kf39}icy {\kf39}breath.
+Dialogue: 0,0:00:07.91,0:00:09.28,Karaoke,,0,0,0,,{\kf31}A {\kf31}kind {\kf31}baker {\kf31}scooped
+Dialogue: 0,0:00:09.18,0:00:10.54,Karaoke,,0,0,0,,{\kf31}it {\kf31}up, {\kf31}bringing {\kf31}it
+Dialogue: 0,0:00:10.44,0:00:11.81,Karaoke,,0,0,0,,{\kf31}into {\kf31}his {\kf31}warm {\kf31}bakery.
+Dialogue: 0,0:00:11.71,0:00:13.45,Karaoke,,0,0,0,,{\kf40}He {\kf41}offered {\kf40}gentle {\kf41}cuddles,
+Dialogue: 0,0:00:13.35,0:00:15.09,Karaoke,,0,0,0,,{\kf41}a {\kf40}cozy {\kf41}blanket, {\kf41}and
+Dialogue: 0,0:00:14.99,0:00:16.72,Karaoke,,0,0,0,,{\kf40}a {\kf41}bowl {\kf41}of {\kf40}delicious
+Dialogue: 0,0:00:16.62,0:00:18.36,Karaoke,,0,0,0,,{\kf41}milk, {\kf41}slowly {\kf40}earning {\kf41}its
+Dialogue: 0,0:00:18.26,0:00:20.02,Karaoke,,0,0,0,,{\kf41}trust. {\kf41}Today, {\kf41}that {\kf41}once-tiny
+Dialogue: 0,0:00:19.92,0:00:21.68,Karaoke,,0,0,0,,{\kf41}kitten {\kf41}is {\kf41}a {\kf41}happy,
+Dialogue: 0,0:00:21.58,0:00:23.34,Karaoke,,0,0,0,,{\kf41}playful {\kf41}cat, {\kf41}thriving {\kf41}in
+Dialogue: 0,0:00:23.24,0:00:25.00,Karaoke,,0,0,0,,{\kf41}its {\kf41}forever {\kf41}home, {\kf41}a
+Dialogue: 0,0:00:24.90,0:00:26.66,Karaoke,,0,0,0,,{\kf41}cherished {\kf41}part {\kf41}of {\kf41}the
+Dialogue: 0,0:00:26.56,0:00:27.49,Karaoke,,0,0,0,,{\kf41}bakery {\kf41}family.

@@ -1,0 +1,32 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: HighImpact,Impact,106,&H0000F5FF,&H00000000,&H00000000,&HB0000000,-1,0,0,0,105,100,1,0,1,7.5,4.0,2,30,30,480,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.05,0:00:01.81,HighImpact,,0,0,0,,{\kf41}This {\kf41}is {\kf41}a {\kf41}turbocharger:
+Dialogue: 0,0:00:01.71,0:00:03.47,HighImpact,,0,0,0,,{\kf41}a {\kf41}mechanical {\kf41}wizard {\kf41}converting
+Dialogue: 0,0:00:03.37,0:00:05.13,HighImpact,,0,0,0,,{\kf41}waste {\kf41}energy {\kf41}into {\kf41}raw
+Dialogue: 0,0:00:05.03,0:00:06.72,HighImpact,,0,0,0,,{\kf41}power. {\kf39}Exhaust {\kf39}gases {\kf39}spin
+Dialogue: 0,0:00:06.62,0:00:08.28,HighImpact,,0,0,0,,{\kf39}a {\kf39}turbine, {\kf39}which {\kf39}then
+Dialogue: 0,0:00:08.18,0:00:09.78,HighImpact,,0,0,0,,{\kf39}drives {\kf39}a {\kf39}compressor. {\kf32}As
+Dialogue: 0,0:00:09.68,0:00:11.08,HighImpact,,0,0,0,,{\kf32}the {\kf32}turbine {\kf32}spins, {\kf32}it's
+Dialogue: 0,0:00:10.98,0:00:12.37,HighImpact,,0,0,0,,{\kf32}directly {\kf32}connected {\kf32}to {\kf32}a
+Dialogue: 0,0:00:12.27,0:00:13.67,HighImpact,,0,0,0,,{\kf32}compressor {\kf32}wheel {\kf32}on {\kf32}the
+Dialogue: 0,0:00:13.57,0:00:15.09,HighImpact,,0,0,0,,{\kf32}same {\kf32}shaft. {\kf38}This {\kf38}compressor
+Dialogue: 0,0:00:14.99,0:00:16.64,HighImpact,,0,0,0,,{\kf38}sucks {\kf38}in {\kf38}ambient {\kf38}air,
+Dialogue: 0,0:00:16.54,0:00:18.19,HighImpact,,0,0,0,,{\kf38}pressurizing {\kf38}it {\kf38}before {\kf38}forcing
+Dialogue: 0,0:00:18.09,0:00:19.74,HighImpact,,0,0,0,,{\kf38}it {\kf38}into {\kf38}the {\kf38}engine's
+Dialogue: 0,0:00:19.64,0:00:21.28,HighImpact,,0,0,0,,{\kf38}intake {\kf38}manifold. {\kf38}More {\kf38}air
+Dialogue: 0,0:00:21.18,0:00:22.82,HighImpact,,0,0,0,,{\kf38}means {\kf38}more {\kf38}oxygen, {\kf38}allowing
+Dialogue: 0,0:00:22.72,0:00:24.36,HighImpact,,0,0,0,,{\kf38}the {\kf38}engine {\kf38}to {\kf38}burn
+Dialogue: 0,0:00:24.26,0:00:25.90,HighImpact,,0,0,0,,{\kf38}more {\kf38}fuel {\kf38}and {\kf38}generate
+Dialogue: 0,0:00:25.80,0:00:27.58,HighImpact,,0,0,0,,{\kf38}significantly {\kf38}more {\kf38}power. {\kf52}It's
+Dialogue: 0,0:00:27.48,0:00:29.67,HighImpact,,0,0,0,,{\kf52}a {\kf52}closed-loop {\kf52}system, {\kf52}boosting
+Dialogue: 0,0:00:29.57,0:00:31.24,HighImpact,,0,0,0,,{\kf52}efficiency {\kf52}and {\kf52}performance!

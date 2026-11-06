@@ -1,0 +1,28 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Karaoke,Arial,96,&H00FFFFFF,&H0000FFFF,&H00000000,&HB0000000,-1,0,0,0,100,100,0,0,1,6.5,3.5,2,40,40,480,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.05,0:00:01.67,Karaoke,,0,0,0,,{\kf38}Lost {\kf38}and {\kf38}alone, {\kf38}this
+Dialogue: 0,0:00:01.57,0:00:03.19,Karaoke,,0,0,0,,{\kf38}tiny {\kf38}fluffy {\kf38}grey {\kf38}tabby
+Dialogue: 0,0:00:03.09,0:00:04.71,Karaoke,,0,0,0,,{\kf38}kitten {\kf38}shivered {\kf38}in {\kf38}the
+Dialogue: 0,0:00:04.61,0:00:06.24,Karaoke,,0,0,0,,{\kf38}harsh {\kf38}snow, {\kf38}his {\kf38}small
+Dialogue: 0,0:00:06.14,0:00:07.76,Karaoke,,0,0,0,,{\kf38}body {\kf38}trembling {\kf38}from {\kf38}the
+Dialogue: 0,0:00:07.66,0:00:09.28,Karaoke,,0,0,0,,{\kf38}bitter {\kf38}cold. {\kf37}Then {\kf37}a
+Dialogue: 0,0:00:09.18,0:00:10.79,Karaoke,,0,0,0,,{\kf37}kind {\kf37}soul {\kf37}discovered {\kf37}him,
+Dialogue: 0,0:00:10.69,0:00:12.30,Karaoke,,0,0,0,,{\kf37}gently {\kf37}scooping {\kf37}him {\kf37}into
+Dialogue: 0,0:00:12.20,0:00:13.83,Karaoke,,0,0,0,,{\kf37}a {\kf37}warm {\kf37}blanket. {\kf40}She
+Dialogue: 0,0:00:13.73,0:00:15.44,Karaoke,,0,0,0,,{\kf40}offered {\kf40}soft {\kf40}pats {\kf40}and
+Dialogue: 0,0:00:15.34,0:00:17.05,Karaoke,,0,0,0,,{\kf40}delicious {\kf40}food, {\kf40}slowly {\kf40}earning
+Dialogue: 0,0:00:16.95,0:00:18.88,Karaoke,,0,0,0,,{\kf40}his {\kf40}trust. {\kf50}Now, {\kf51}he's
+Dialogue: 0,0:00:18.78,0:00:20.91,Karaoke,,0,0,0,,{\kf50}the {\kf51}beloved {\kf50}bookstore {\kf51}guardian,
+Dialogue: 0,0:00:20.81,0:00:22.95,Karaoke,,0,0,0,,{\kf50}greeting {\kf51}customers {\kf50}with {\kf51}purrs.
+Dialogue: 0,0:00:22.85,0:00:24.79,Karaoke,,0,0,0,,{\kf45}This {\kf45}once-frozen {\kf45}kitten {\kf45}found
+Dialogue: 0,0:00:24.69,0:00:26.62,Karaoke,,0,0,0,,{\kf45}his {\kf45}warm, {\kf45}forever {\kf45}home.

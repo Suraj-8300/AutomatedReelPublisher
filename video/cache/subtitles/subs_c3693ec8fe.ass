@@ -1,0 +1,29 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Karaoke,Arial,96,&H00FFFFFF,&H0000FFFF,&H00000000,&HB0000000,-1,0,0,0,100,100,0,0,1,6.5,3.5,2,40,40,480,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.05,0:00:02.07,Karaoke,,0,0,0,,{\kf48}High {\kf48}above {\kf48}the {\kf48}red
+Dialogue: 0,0:00:01.97,0:00:04.00,Karaoke,,0,0,0,,{\kf48}planet, {\kf48}orbital {\kf48}data {\kf48}revealed
+Dialogue: 0,0:00:03.90,0:00:05.93,Karaoke,,0,0,0,,{\kf48}mysterious {\kf48}dark {\kf48}streaks {\kf48}appearing
+Dialogue: 0,0:00:05.83,0:00:07.86,Karaoke,,0,0,0,,{\kf48}seasonally {\kf48}on {\kf48}Martian {\kf48}slopes,
+Dialogue: 0,0:00:07.76,0:00:09.79,Karaoke,,0,0,0,,{\kf48}hinting {\kf48}at {\kf48}a {\kf48}remarkable,
+Dialogue: 0,0:00:09.69,0:00:11.68,Karaoke,,0,0,0,,{\kf48}dynamic {\kf48}process. {\kf46}Spectroscopic {\kf46}analysis
+Dialogue: 0,0:00:11.58,0:00:13.53,Karaoke,,0,0,0,,{\kf46}confirmed {\kf46}it: {\kf46}hydrated {\kf46}salts
+Dialogue: 0,0:00:13.43,0:00:15.39,Karaoke,,0,0,0,,{\kf46}were {\kf46}lowering {\kf46}water's {\kf46}freezing
+Dialogue: 0,0:00:15.29,0:00:17.25,Karaoke,,0,0,0,,{\kf46}point, {\kf46}allowing {\kf46}briny {\kf46}liquid
+Dialogue: 0,0:00:17.15,0:00:19.11,Karaoke,,0,0,0,,{\kf46}to {\kf46}flow {\kf46}across {\kf46}the
+Dialogue: 0,0:00:19.01,0:00:20.96,Karaoke,,0,0,0,,{\kf46}surface, {\kf46}even {\kf46}in {\kf46}Mars's
+Dialogue: 0,0:00:20.86,0:00:22.90,Karaoke,,0,0,0,,{\kf46}harsh {\kf46}conditions. {\kf50}This {\kf50}groundbreaking
+Dialogue: 0,0:00:22.80,0:00:24.90,Karaoke,,0,0,0,,{\kf50}discovery {\kf50}transforms {\kf50}our {\kf50}understanding
+Dialogue: 0,0:00:24.80,0:00:26.91,Karaoke,,0,0,0,,{\kf50}of {\kf50}Mars, {\kf50}fueling {\kf50}dreams
+Dialogue: 0,0:00:26.81,0:00:28.92,Karaoke,,0,0,0,,{\kf50}of {\kf50}future {\kf50}human {\kf50}settlements
+Dialogue: 0,0:00:28.82,0:00:30.92,Karaoke,,0,0,0,,{\kf50}and {\kf50}the {\kf50}tantalizing {\kf50}hunt
+Dialogue: 0,0:00:30.82,0:00:32.43,Karaoke,,0,0,0,,{\kf50}for {\kf50}extraterrestrial {\kf50}life.

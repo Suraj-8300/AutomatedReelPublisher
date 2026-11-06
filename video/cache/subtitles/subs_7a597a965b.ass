@@ -1,0 +1,26 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: HighImpact,Impact,106,&H0000F5FF,&H00000000,&H00000000,&HB0000000,-1,0,0,0,105,100,1,0,1,7.5,4.0,2,30,30,480,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.10,0:00:01.85,HighImpact,,0,0,0,,{\kf41}Unleash {\kf41}the {\kf41}power: {\kf41}How
+Dialogue: 0,0:00:01.75,0:00:03.51,HighImpact,,0,0,0,,{\kf41}jet {\kf41}engines {\kf41}turn {\kf41}air
+Dialogue: 0,0:00:03.41,0:00:05.12,HighImpact,,0,0,0,,{\kf41}into {\kf41}colossal {\kf41}thrust. {\kf41}Air
+Dialogue: 0,0:00:05.02,0:00:06.77,HighImpact,,0,0,0,,{\kf41}rockets {\kf41}through {\kf41}massive {\kf41}fan
+Dialogue: 0,0:00:06.67,0:00:08.42,HighImpact,,0,0,0,,{\kf41}blades, {\kf41}getting {\kf41}squeezed {\kf41}by
+Dialogue: 0,0:00:08.32,0:00:10.08,HighImpact,,0,0,0,,{\kf41}rotating {\kf41}compressors {\kf41}into {\kf41}a
+Dialogue: 0,0:00:09.98,0:00:11.81,HighImpact,,0,0,0,,{\kf41}super-dense {\kf41}state. {\kf45}Then, {\kf45}fuel
+Dialogue: 0,0:00:11.71,0:00:13.63,HighImpact,,0,0,0,,{\kf45}is {\kf45}injected {\kf45}and {\kf45}ignited,
+Dialogue: 0,0:00:13.53,0:00:15.45,HighImpact,,0,0,0,,{\kf45}creating {\kf45}a {\kf45}fiery {\kf45}expansion
+Dialogue: 0,0:00:15.35,0:00:17.23,HighImpact,,0,0,0,,{\kf45}that {\kf45}drives {\kf45}turbines. {\kf40}This
+Dialogue: 0,0:00:17.13,0:00:18.86,HighImpact,,0,0,0,,{\kf40}incredible {\kf40}force {\kf40}then {\kf40}blasts
+Dialogue: 0,0:00:18.76,0:00:20.50,HighImpact,,0,0,0,,{\kf40}out {\kf40}the {\kf40}back, {\kf40}generating
+Dialogue: 0,0:00:20.40,0:00:22.13,HighImpact,,0,0,0,,{\kf40}the {\kf40}immense {\kf40}forward {\kf40}thrust
+Dialogue: 0,0:00:22.03,0:00:23.36,HighImpact,,0,0,0,,{\kf40}that {\kf40}propels {\kf40}aircraft.

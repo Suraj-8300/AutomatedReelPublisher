@@ -1,0 +1,20 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cinematic,Georgia,94,&H00F0F4FC,&H00000000,&H00000000,&H90000000,-1,0,0,0,100,100,1,0,1,6.0,3.0,2,40,40,480,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.10,0:00:02.12,Cinematic,,0,0,0,,{\kf48}Here's {\kf48}something {\kf48}extraordinary {\kf48}about
+Dialogue: 0,0:00:02.02,0:00:04.04,Cinematic,,0,0,0,,{\kf48}A {\kf48}neutron {\kf48}star {\kf48}collision.
+Dialogue: 0,0:00:03.89,0:00:05.60,Cinematic,,0,0,0,,{\kf40}Scientists {\kf40}and {\kf40}engineers {\kf40}have
+Dialogue: 0,0:00:05.50,0:00:07.22,Cinematic,,0,0,0,,{\kf40}uncovered {\kf40}remarkable {\kf40}insights {\kf40}that
+Dialogue: 0,0:00:07.12,0:00:08.83,Cinematic,,0,0,0,,{\kf40}change {\kf40}how {\kf40}we {\kf40}understand
+Dialogue: 0,0:00:08.73,0:00:10.42,Cinematic,,0,0,0,,{\kf40}our {\kf40}world. {\kf39}The {\kf39}deeper
+Dialogue: 0,0:00:10.32,0:00:11.99,Cinematic,,0,0,0,,{\kf39}you {\kf39}look, {\kf39}the {\kf39}more
+Dialogue: 0,0:00:11.89,0:00:13.17,Cinematic,,0,0,0,,{\kf39}astonishing {\kf39}it {\kf39}becomes.
