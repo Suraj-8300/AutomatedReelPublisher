@@ -140,6 +140,12 @@ def publish_direct(
         print(f"\n⚠️  WARNING: '{video_path.name}' is already located in published/ directory!")
         print("   This video was previously published. Proceeding with requested upload...\n")
 
+    if not caption or not title:
+        from video.video_analyzer import VideoAnalyzer
+        meta = VideoAnalyzer.get_video_metadata(video_path)
+        title = title or meta.get("title") or video_path.stem.replace("_", " ").title()
+        caption = caption or meta.get("instagram_caption") or title
+
     caption = caption or title
     print("\n" + "=" * 65)
     print("🚀 DIRECT REEL PUBLISHER (NO QUEUE / NO PACING)")
@@ -245,6 +251,12 @@ def publish_direct(
                 shutil.move(str(companion), str(comp_dest))
                 print(f"   📄 Companion metadata moved: {companion.name} -> published/{comp_dest.name}")
 
+        # Move thumbnail if exists
+        thumb_file = video_path.parent / f"{video_path.stem}_thumb.jpg"
+        if thumb_file.exists() and thumb_file.parent.resolve() != PUBLISHED_DIR.resolve():
+            shutil.move(str(thumb_file), str(PUBLISHED_DIR / thumb_file.name))
+            print(f"   🖼️  Thumbnail moved: {thumb_file.name} -> published/{thumb_file.name}")
+
         # Record publication links in history
         history_file = PROJECT_ROOT / "data" / "published_history.json"
         history_file.parent.mkdir(parents=True, exist_ok=True)
@@ -285,13 +297,26 @@ def main():
     # Command: status
     subparsers.add_parser("status", help="Verify Instagram & YouTube credentials and connectivity")
 
+    # Command: upload
+    up_parser = subparsers.add_parser("upload", help="Upload a video to output/ and run AI video understanding")
+    up_parser.add_argument("video_path", type=str, help="Path to local MP4 video file")
+    up_parser.add_argument("--instruction", type=str, default=None, help="Custom prompt instruction for captions")
+    up_parser.add_argument("--publish", action="store_true", help="Publish immediately after analysis")
+    up_parser.add_argument("--platform", choices=["instagram", "youtube", "all"], default="all")
+    up_parser.add_argument("--dry-run", action="store_true", help="Simulate upload without actual posting")
+
+    # Command: analyze
+    an_parser = subparsers.add_parser("analyze", help="Read video with Gemini and print generated title, caption & hashtags")
+    an_parser.add_argument("video_path", type=str, help="Path to local MP4 video file")
+    an_parser.add_argument("--instruction", type=str, default=None, help="Custom prompt instruction for captions")
+
     # Command: publish
     pub_parser = subparsers.add_parser("publish", help="Directly publish an MP4 file immediately")
     pub_parser.add_argument("video_path", type=str, help="Path to local MP4 video file")
     pub_parser.add_argument("--platform", choices=["instagram", "youtube", "all"], default="all",
                             help="Target platform (default: all)")
-    pub_parser.add_argument("--title", type=str, default="Viral AI Reel", help="Video title")
-    pub_parser.add_argument("--caption", type=str, default="", help="Video caption/description")
+    pub_parser.add_argument("--title", type=str, default=None, help="Video title (auto-detected if omitted)")
+    pub_parser.add_argument("--caption", type=str, default=None, help="Video caption (auto-detected if omitted)")
     pub_parser.add_argument("--dry-run", action="store_true", help="Simulate upload without actual posting")
 
     # Command: generate
@@ -363,6 +388,53 @@ def main():
 
     if args.command == "status":
         check_auth_status()
+
+    elif args.command == "upload":
+        from video.video_analyzer import VideoAnalyzer
+        vpath = Path(args.video_path).resolve()
+        if not vpath.exists():
+            print(f"❌ File not found: {vpath}")
+            sys.exit(1)
+        from video.config import OUTPUT_DIR
+        dest = OUTPUT_DIR / vpath.name
+        if vpath.parent.resolve() != OUTPUT_DIR.resolve():
+            shutil.copy2(str(vpath), str(dest))
+            print(f"📦 Uploaded to: {dest}")
+        else:
+            dest = vpath
+        meta = VideoAnalyzer.analyze_video(dest, custom_instruction=args.instruction)
+        print("\n" + "=" * 65)
+        print("🎬 AI VIDEO UNDERSTANDING & PACKAGING")
+        print("=" * 65)
+        print(f"📌 Title:    {meta.get('title')}")
+        print(f"🎯 Hook:     {meta.get('hook')}")
+        print(f"📝 Summary:  {meta.get('summary')}")
+        print(f"📸 Caption:\n{meta.get('instagram_caption')}")
+        print(f"🏷️  Hashtags: {' '.join(meta.get('hashtags', []))}")
+        print("=" * 65 + "\n")
+        if args.publish:
+            platforms = ["instagram", "youtube"] if args.platform == "all" else [args.platform]
+            publish_direct(
+                video_path=dest,
+                platforms=platforms,
+                title=meta.get("title", dest.stem),
+                caption=meta.get("instagram_caption", dest.stem),
+                dry_run=args.dry_run
+            )
+
+    elif args.command == "analyze":
+        from video.video_analyzer import VideoAnalyzer
+        vpath = Path(args.video_path).resolve()
+        meta = VideoAnalyzer.analyze_video(vpath, custom_instruction=args.instruction)
+        print("\n" + "=" * 65)
+        print(f"🎬 VIDEO ANALYSIS FOR: {vpath.name}")
+        print("=" * 65)
+        print(f"📌 Title:    {meta.get('title')}")
+        print(f"🎯 Hook:     {meta.get('hook')}")
+        print(f"📝 Summary:  {meta.get('summary')}")
+        print(f"📸 Caption:\n{meta.get('instagram_caption')}")
+        print(f"🏷️  Hashtags: {' '.join(meta.get('hashtags', []))}")
+        print("=" * 65 + "\n")
 
     elif args.command in ("generate", "auto", "ugc"):
         if args.command == "ugc":
@@ -442,7 +514,7 @@ def main():
             video_path=Path(args.video_path),
             platforms=platforms,
             title=args.title,
-            caption=args.caption or args.title,
+            caption=args.caption,
             dry_run=args.dry_run
         )
 

@@ -12,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from video.config import OUTPUT_DIR, PUBLISHED_DIR
+from video.video_analyzer import VideoAnalyzer
 from autoreel import publish_direct
 
 
@@ -62,11 +63,12 @@ def run_publish_all():
     print("=" * 65 + "\n")
 
     for i, v in enumerate(ordered_videos, 1):
-        title = clean_title_from_filename(v.name)
-        caption = get_caption_for_video(title, v.name)
+        meta = VideoAnalyzer.get_video_metadata(v)
+        title = meta.get("title") or clean_title_from_filename(v.name)
+        caption = meta.get("instagram_caption") or get_caption_for_video(title, v.name)
         print(f"\n▶️ [{i}/{len(ordered_videos)}] Publishing: {v.name}")
         print(f"   📌 Title:   {title}")
-        print(f"   📝 Caption: {caption.splitlines()[0]}")
+        print(f"   📝 Caption: {caption.splitlines()[0] if caption else title}")
 
         try:
             publish_direct(

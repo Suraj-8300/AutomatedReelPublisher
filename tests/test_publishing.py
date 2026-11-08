@@ -150,6 +150,18 @@ class TestDirectPublishing(unittest.TestCase):
             for p in [dummy_video, dummy_companion, PUBLISHED_DIR / "test_lifecycle_reel_123.mp4", PUBLISHED_DIR / "test_lifecycle_reel_123.json"]:
                 if p.exists():
                     p.unlink()
+            # Clean test entries from published_history.json
+            history_file = PROJECT_ROOT / "data" / "published_history.json"
+            if history_file.exists():
+                try:
+                    import json
+                    with open(history_file, "r") as f:
+                        h = json.load(f)
+                    h = [item for item in h if not item.get("filename", "").startswith("test_")]
+                    with open(history_file, "w") as f:
+                        json.dump(h, f, indent=2)
+                except Exception:
+                    pass
 
 
 if __name__ == "__main__":

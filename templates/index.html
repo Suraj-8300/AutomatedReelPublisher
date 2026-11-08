@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoReelStudio — Modern AI Video & Publishing Studio</title>
+    <title>AutoReelStudio — Video Upload, AI Reading & Social Publishing</title>
     
-    <!-- Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN with configuration -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,10 +30,12 @@
                             700: '#1d4ed8',
                         },
                         dark: {
-                            900: '#0b0f17',
-                            800: '#111827',
-                            750: '#151e30',
-                            700: '#1f2937',
+                            950: '#070a10',
+                            900: '#0c101a',
+                            850: '#101624',
+                            800: '#151c2e',
+                            750: '#1a233a',
+                            700: '#232f4c',
                             600: '#374151'
                         }
                     }
@@ -45,14 +47,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- React 18 & ReactDOM & Babel Standalone -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <style>
         body {
-            background-color: #0b0f17;
+            background-color: #070a10;
             color: #f3f4f6;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
@@ -62,29 +59,27 @@
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #111827;
+            background: #0c101a;
         }
         ::-webkit-scrollbar-thumb {
-            background: #374151;
-            border-radius: 3px;
+            background: #232f4c;
+            border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563;
-        }
-        .glass-panel {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #3b82f6;
         }
         .glass-card {
-            background: rgba(21, 30, 48, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(16, 22, 36, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .glass-card-hover {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glass-card:hover {
+        .glass-card-hover:hover {
             border-color: rgba(59, 130, 246, 0.4);
             transform: translateY(-2px);
+            box-shadow: 0 12px 30px -10px rgba(59, 130, 246, 0.2);
         }
         .glow-button {
             background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
@@ -92,15 +87,31 @@
             transition: all 0.2s ease;
         }
         .glow-button:hover {
-            box-shadow: 0 6px 24px 0px rgba(59, 130, 246, 0.7);
+            box-shadow: 0 6px 26px 0px rgba(59, 130, 246, 0.75);
             filter: brightness(1.1);
+        }
+        .ig-gradient-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            transition: all 0.2s ease;
+        }
+        .ig-gradient-btn:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 4px 20px rgba(220, 39, 67, 0.4);
+        }
+        .yt-gradient-btn {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            transition: all 0.2s ease;
+        }
+        .yt-gradient-btn:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4);
         }
     </style>
 </head>
-<body class="bg-dark-900 text-gray-100 min-h-screen overflow-x-hidden antialiased">
-    <div id="root"></div>
+<body class="bg-dark-950 text-gray-100 min-h-screen overflow-x-hidden antialiased flex flex-col">
+    <div id="app" class="flex-1 flex flex-col"></div>
 
-    <!-- App JSX Script -->
-    <script type="text/babel" src="/static/js/App.jsx"></script>
+    <!-- Main Application Script (Vanilla ES6 with Reactivity & Zero Babel Delay) -->
+    <script src="/static/js/app.js"></script>
 </body>
 </html>
