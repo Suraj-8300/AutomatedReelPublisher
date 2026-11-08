@@ -52,9 +52,23 @@ def check_auth_status():
     print("\n📸 [INSTAGRAM REELS (Meta Graph API)]")
     if INSTAGRAM_ACCOUNT_ID and META_ACCESS_TOKEN:
         masked_token = META_ACCESS_TOKEN[:6] + "..." + META_ACCESS_TOKEN[-4:]
-        print(f"  ✅ Account ID:    {INSTAGRAM_ACCOUNT_ID}")
-        print(f"  ✅ Access Token:  {masked_token} (Loaded from .env / instagram.env)")
-        print(f"  ⚡ Status:        CONFIGURED & READY")
+        print(f"  Account ID:    {INSTAGRAM_ACCOUNT_ID}")
+        print(f"  Access Token:  {masked_token} (Loaded from .env / instagram.env)")
+        try:
+            pub = MetaGraphPublisher()
+            acc = pub.get_account_info()
+            if acc.get("authenticated"):
+                print(f"  ⚡ Live Status:  ✅ CONNECTED & AUTHENTICATED (@{acc.get('username')})")
+            else:
+                err_msg = acc.get("error", "Verification failed")
+                print(f"  ⚠️ Live Status:  ❌ BLOCKED / AUTH FAILED")
+                print(f"     Details:      {err_msg}")
+                if "login to www.facebook.com" in err_msg.lower() or "checkpoint" in err_msg.lower():
+                    print("     👉 SOLUTION:   Meta Security Checkpoint triggered.")
+                    print("                    1. Open https://www.facebook.com in your browser and approve login.")
+                    print("                    2. Or generate a fresh token from Meta Graph API Explorer.")
+        except Exception as e:
+            print(f"  ❌ Error checking Meta status: {e}")
     else:
         print(f"  ❌ Missing credentials in .env or instagram/instagram.env")
         if not INSTAGRAM_ACCOUNT_ID:
@@ -160,7 +174,10 @@ def publish_direct(
     ig_success = False
     yt_success = False
     ig_media_id = None
+    ig_permalink = None
+    ig_error = None
     yt_url = None
+    yt_error = None
 
     # 1. Instagram Direct Upload
     if "instagram" in platforms or "all" in platforms:
@@ -168,6 +185,7 @@ def publish_direct(
         try:
             ig_pub = MetaGraphPublisher()
             if not ig_pub.is_configured() and not dry_run:
+                ig_error = "Instagram credentials missing in .env"
                 print("  ❌ Instagram credentials missing in .env")
             else:
                 res = ig_pub.publish_pipeline(
@@ -183,6 +201,7 @@ def publish_direct(
                         print(f"  🔗 Instagram URL: {ig_permalink}")
                     ig_success = True
         except Exception as e:
+            ig_error = str(e)
             print(f"  ❌ Instagram Publishing Failed: {e}")
 
     # 2. YouTube Shorts Direct Upload
@@ -206,8 +225,10 @@ def publish_direct(
                     print(f"  🎉 Published YouTube Short: {yt_url}")
                     yt_success = True
                 else:
+                    yt_error = str(res.get("error"))
                     print(f"  ❌ YouTube upload failed: {res.get('error')}")
         except Exception as e:
+            yt_error = str(e)
             print(f"  ❌ YouTube Publishing Failed: {e}")
 
     # 3. Post-Publishing: Move from output/ to published/ to avoid multiple publish
@@ -221,6 +242,14 @@ def publish_direct(
         overall_success = ig_success
     elif target_yt:
         overall_success = yt_success
+
+    if not overall_success and not dry_run:
+        errs = []
+        if target_ig and not ig_success:
+            errs.append(f"Instagram: {ig_error or 'failed'}")
+        if target_yt and not yt_success:
+            errs.append(f"YouTube: {yt_error or 'failed'}")
+        raise RuntimeError(f"Publishing failed: {'; '.join(errs)}")
 
     final_path = video_path
 
@@ -278,6 +307,7 @@ def publish_direct(
             "youtube_url": yt_url,
             "instagram_id": ig_media_id,
             "instagram_url": ig_url,
+            "instagram_error": ig_error if not ig_success else None,
         }
         history.insert(0, entry)
         import json

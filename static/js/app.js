@@ -207,7 +207,11 @@ async function publishVideo(filename, platform = 'all') {
         });
         const data = await res.json();
         if (data.success) {
-            showToast(`🎉 Published successfully to ${targetLabel}! Moved to Published Archive.`, 'success');
+            if (data.warning) {
+                showToast(`⚠️ ${data.warning}`, 'warning');
+            } else {
+                showToast(`🎉 Published successfully to ${targetLabel}! Moved to Published Archive.`, 'success');
+            }
             // If the currently selected video was published, reset selected
             if (state.selectedVideo && state.selectedVideo.filename === filename) {
                 state.selectedVideo = null;
@@ -272,8 +276,9 @@ async function deleteReadyVideo(filename) {
 
 function renderHeader() {
     const igConfigured = state.status?.instagram?.configured;
+    const igAuth = state.status?.instagram?.authenticated;
     const igUsername = state.status?.instagram?.username || '@sun_27417';
-    const igQuota = `${state.status?.instagram?.quota_usage ?? 15}/${state.status?.instagram?.quota_total ?? 100}`;
+    const igQuota = `${state.status?.instagram?.quota_usage ?? 0}/${state.status?.instagram?.quota_total ?? 100}`;
 
     const ytAuth = state.status?.youtube?.authenticated;
     const ytChannel = state.status?.youtube?.channel_title || 'EGO X';
@@ -301,12 +306,27 @@ function renderHeader() {
         <!-- Real-time Connected Account Badges -->
         <div class="flex items-center space-x-3 text-xs">
             <!-- Instagram Status -->
-            <div class="flex items-center space-x-2 px-3 py-1.5 rounded-xl glass-card border border-white/5">
-                <span class="w-2.5 h-2.5 rounded-full ${igConfigured ? 'bg-pink-500 animate-pulse' : 'bg-gray-500'}"></span>
-                <span class="text-gray-300 font-medium">Instagram:</span>
-                <span class="text-white font-semibold font-mono">${igUsername}</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-pink-500/10 text-pink-300 font-mono">Quota: ${igQuota}</span>
-            </div>
+            ${igAuth ? `
+                <div class="flex items-center space-x-2 px-3 py-1.5 rounded-xl glass-card border border-white/5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse"></span>
+                    <span class="text-gray-300 font-medium">Instagram:</span>
+                    <span class="text-white font-semibold font-mono">${igUsername}</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-pink-500/10 text-pink-300 font-mono">Quota: ${igQuota}</span>
+                </div>
+            ` : (igConfigured ? `
+                <div class="flex items-center space-x-2 px-3 py-1.5 rounded-xl glass-card border border-amber-500/30 bg-amber-500/10 shadow-lg shadow-amber-500/5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span class="text-amber-300 font-medium">Instagram:</span>
+                    <span class="text-amber-200 font-bold font-mono">Checkpoint Blocked</span>
+                    <button onclick="setTab('insights')" class="text-[10px] px-2 py-0.5 rounded bg-amber-500 text-black font-extrabold hover:bg-amber-400 transition-all">Fix</button>
+                </div>
+            ` : `
+                <div class="flex items-center space-x-2 px-3 py-1.5 rounded-xl glass-card border border-white/5 opacity-60">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gray-500"></span>
+                    <span class="text-gray-400 font-medium">Instagram:</span>
+                    <span class="text-gray-500 font-mono">Disconnected</span>
+                </div>
+            `)}
 
             <!-- YouTube Status -->
             <div class="flex items-center space-x-2 px-3 py-1.5 rounded-xl glass-card border border-white/5">
@@ -965,9 +985,9 @@ function renderInsightsTab() {
                         </div>
                     </div>
                     <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        ig.configured ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/20 text-red-300'
+                        ig.authenticated ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : (ig.configured ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-red-500/20 text-red-300')
                     }">
-                        ${ig.configured ? 'Connected' : 'Missing Config'}
+                        ${ig.authenticated ? 'Connected & Verified' : (ig.configured ? 'Action Required (Blocked)' : 'Missing Config')}
                     </span>
                 </div>
 
@@ -982,13 +1002,31 @@ function renderInsightsTab() {
                     </div>
                     <div class="flex items-center justify-between py-1.5 border-b border-white/5">
                         <span class="text-gray-400">Daily Upload Quota:</span>
-                        <span class="font-mono text-pink-300 font-semibold">${ig.quota_usage || 15} / ${ig.quota_total || 100} reels</span>
+                        <span class="font-mono text-pink-300 font-semibold">${ig.quota_usage || 0} / ${ig.quota_total || 100} reels</span>
                     </div>
                     <div class="flex items-center justify-between py-1.5">
                         <span class="text-gray-400">Ingestion Method:</span>
                         <span class="font-mono text-emerald-300">Direct Binary Resumable (No Tunnels)</span>
                     </div>
                 </div>
+
+                ${!ig.authenticated ? `
+                    <div class="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2.5">
+                        <div class="flex items-center space-x-2 font-bold text-amber-300">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+                            <span>Meta Security Checkpoint Active</span>
+                        </div>
+                        <p class="leading-relaxed text-gray-300">
+                            ${escapeHtml(ig.error || 'You cannot access the app till you log in to www.facebook.com and follow instructions.')}
+                        </p>
+                        <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 font-mono text-[11px] text-amber-300 space-y-1">
+                            <div><b>How to resolve:</b></div>
+                            <div>1. Open <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="underline text-blue-400 font-bold">facebook.com</a> in your browser and log in with your Meta account.</div>
+                            <div>2. Approve any pending security prompts or "Did you just log in?" alerts.</div>
+                            <div>3. Once approved (or after generating a fresh User Token in Meta Graph API Explorer), update <code>META_ACCESS_TOKEN</code> in <code>.env</code>.</div>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
 
             <!-- YouTube Card -->

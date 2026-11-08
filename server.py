@@ -200,14 +200,24 @@ class ReelStudioHandler(SimpleHTTPRequestHandler):
     def handle_api_status(self):
         """Audits live Instagram and YouTube credentials and folder counts."""
         # 1. Instagram status
-        ig_info = {"configured": False, "username": "", "id": "", "quota_usage": 0, "quota_total": 100}
+        ig_info = {
+            "configured": False,
+            "authenticated": False,
+            "username": "",
+            "id": "",
+            "error": None,
+            "quota_usage": 0,
+            "quota_total": 100
+        }
         try:
             pub = MetaGraphPublisher()
             if pub.is_configured():
                 ig_info["configured"] = True
                 acc = pub.get_account_info()
+                ig_info["authenticated"] = acc.get("authenticated", False)
                 ig_info["username"] = acc.get("username", "@sun_27417")
                 ig_info["id"] = acc.get("id", pub.account_id)
+                ig_info["error"] = acc.get("error")
                 lim = pub.get_publishing_limit()
                 ig_info["quota_usage"] = lim.get("quota_usage", 0)
                 ig_info["quota_total"] = lim.get("quota_total", 100)
@@ -473,12 +483,29 @@ class ReelStudioHandler(SimpleHTTPRequestHandler):
                 caption=caption,
                 dry_run=dry_run
             )
-            self.send_json({
+            warning_msg = None
+            history_file = PROJECT_ROOT / "data" / "published_history.json"
+            if history_file.exists():
+                try:
+                    with open(history_file, "r", encoding="utf-8") as f:
+                        h = json.load(f)
+                    for item in h:
+                        if item.get("filename") == dest_path.name:
+                            if item.get("instagram_error"):
+                                warning_msg = f"Published to YouTube, but Instagram failed: {item['instagram_error']}"
+                            break
+                except Exception:
+                    pass
+
+            resp_data = {
                 "success": True,
-                "message": f"Successfully published {filename}",
+                "message": f"Successfully processed {filename}",
                 "dest_path": str(dest_path.name),
                 "is_dry_run": dry_run
-            })
+            }
+            if warning_msg:
+                resp_data["warning"] = warning_msg
+            self.send_json(resp_data)
         except Exception as e:
             self.send_json({"error": str(e)}, status=500)
 
