@@ -24,7 +24,11 @@ class MetaGraphPublisher:
     def __init__(self, account_id: Optional[str] = None, access_token: Optional[str] = None):
         self.account_id = account_id or INSTAGRAM_ACCOUNT_ID
         self.access_token = access_token or META_ACCESS_TOKEN
-        self.base_url = META_API_BASE_URL
+        if self.access_token and (self.access_token.startswith("IG") or self.access_token.startswith("ig")):
+            from .config import META_GRAPH_API_VERSION
+            self.base_url = f"https://graph.instagram.com/{META_GRAPH_API_VERSION}"
+        else:
+            self.base_url = META_API_BASE_URL
         self.timeout = META_API_TIMEOUT
         self.poll_interval = CONTAINER_POLL_INTERVAL
         self.poll_timeout = CONTAINER_POLL_TIMEOUT
