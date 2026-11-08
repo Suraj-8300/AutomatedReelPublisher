@@ -32,7 +32,7 @@ load_dotenv(INSTAGRAM_DIR / "instagram.env")
 # Meta Graph API Settings
 META_GRAPH_API_VERSION = os.getenv("META_GRAPH_API_VERSION", "v21.0")
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "")
-META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN", "")
+META_ACCESS_TOKEN = os.getenv("INSTAGRAM_ACCESS_TOKEN") or os.getenv("META_ACCESS_TOKEN", "")
 META_API_BASE_URL = f"https://graph.facebook.com/{META_GRAPH_API_VERSION}"
 META_API_TIMEOUT = int(os.getenv("META_API_TIMEOUT", "60"))
 CONTAINER_POLL_INTERVAL = int(os.getenv("CONTAINER_POLL_INTERVAL", "5"))
